@@ -2,7 +2,7 @@ use actix_web::web;
 use actix_web::HttpResponse;
 use futures::StreamExt as _;
 use futures::TryStreamExt as _;
-use isucholar::routes::course_routes::{add_course, search_courses};
+use isucholar::routes::course_routes::{add_course, get_course_detail, search_courses};
 use isucholar::routes::user_routes::{
     get_grades, get_me, get_registered_courses, register_courses,
 };
@@ -589,31 +589,6 @@ struct GetCourseDetailResponse {
     keywords: String,
     status: CourseStatus,
     teacher: String,
-}
-
-// GET /api/courses/{course_id} 科目詳細の取得
-async fn get_course_detail(
-    pool: web::Data<sqlx::MySqlPool>,
-    course_id: web::Path<(String,)>,
-) -> actix_web::Result<HttpResponse> {
-    let course_id = &course_id.0;
-
-    let res: Option<GetCourseDetailResponse> = sqlx::query_as(concat!(
-        "SELECT `courses`.*, `users`.`name` AS `teacher`",
-        " FROM `courses`",
-        " JOIN `users` ON `courses`.`teacher_id` = `users`.`id`",
-        " WHERE `courses`.`id` = ?",
-    ))
-    .bind(course_id)
-    .fetch_optional(pool.as_ref())
-    .await
-    .map_err(SqlxError)?;
-
-    if let Some(res) = res {
-        Ok(HttpResponse::Ok().json(res))
-    } else {
-        Err(actix_web::error::ErrorNotFound("No such course."))
-    }
 }
 
 #[derive(Debug, serde::Deserialize)]
