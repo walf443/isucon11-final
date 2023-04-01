@@ -1,3 +1,10 @@
+#[derive(Debug, sqlx::FromRow)]
+pub struct Announcement {
+    pub id: String,
+    pub course_id: String,
+    pub title: String,
+    pub message: String,
+}
 
 #[derive(Debug, sqlx::FromRow, serde::Serialize)]
 pub struct AnnouncementWithoutDetail {
@@ -7,4 +14,3 @@ pub struct AnnouncementWithoutDetail {
     title: String,
     unread: bool,
 }
-

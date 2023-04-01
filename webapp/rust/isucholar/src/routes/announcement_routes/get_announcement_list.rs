@@ -2,8 +2,8 @@ use crate::db;
 use crate::responses::error::SqlxError;
 use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
-use sqlx::Arguments;
 use isucholar_core::models::announcement::AnnouncementWithoutDetail;
+use sqlx::Arguments;
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct GetAnnouncementsQuery {
