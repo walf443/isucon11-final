@@ -2,7 +2,9 @@ use actix_web::web;
 use actix_web::HttpResponse;
 use futures::StreamExt as _;
 use futures::TryStreamExt as _;
-use isucholar::routes::course_routes::{add_course, get_course_detail, search_courses};
+use isucholar::routes::course_routes::{
+    add_course, get_course_detail, search_courses, set_course_status,
+};
 use isucholar::routes::user_routes::{
     get_grades, get_me, get_registered_courses, register_courses,
 };
@@ -479,34 +481,12 @@ async fn logout(session: actix_session::Session) -> actix_web::Result<HttpRespon
 // ---------- Users API ----------
 
 #[derive(Debug, serde::Serialize)]
-struct GetMeResponse {
-    code: String,
-    name: String,
-    is_admin: bool,
-}
-
-#[derive(Debug, serde::Serialize)]
 struct GetRegisteredCourseResponseContent {
     id: String,
     name: String,
     teacher: String,
     period: u8,
     day_of_week: DayOfWeek,
-}
-
-#[derive(Debug, serde::Deserialize)]
-struct RegisterCourseRequestContent {
-    id: String,
-}
-
-#[derive(Debug, Default, serde::Serialize)]
-struct RegisterCoursesErrorResponse {
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    course_not_found: Vec<String>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    not_registrable_status: Vec<String>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    schedule_conflict: Vec<String>,
 }
 
 #[derive(Debug, sqlx::FromRow)]
@@ -517,13 +497,6 @@ struct Class {
     title: String,
     description: String,
     submission_closed: bool,
-}
-
-#[derive(Debug, serde::Serialize)]
-struct GetGradeResponse {
-    summary: Summary,
-    #[serde(rename = "courses")]
-    course_results: Vec<CourseResult>,
 }
 
 #[derive(Debug, Default, serde::Serialize)]
@@ -558,76 +531,6 @@ struct ClassScore {
 }
 
 // ---------- Courses API ----------
-
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
-struct SearchCoursesQuery {
-    #[serde(rename = "type")]
-    type_: Option<String>,
-    credit: Option<i64>,
-    teacher: Option<String>,
-    period: Option<i64>,
-    day_of_week: Option<DayOfWeek>,
-    keywords: Option<String>,
-    status: Option<String>,
-    page: Option<String>,
-}
-
-#[derive(Debug, serde::Serialize, sqlx::FromRow)]
-struct GetCourseDetailResponse {
-    id: String,
-    code: String,
-    #[serde(rename = "type")]
-    #[sqlx(rename = "type")]
-    type_: String,
-    name: String,
-    description: String,
-    credit: u8,
-    period: u8,
-    day_of_week: DayOfWeek,
-    #[serde(skip)]
-    teacher_id: String,
-    keywords: String,
-    status: CourseStatus,
-    teacher: String,
-}
-
-#[derive(Debug, serde::Deserialize)]
-struct SetCourseStatusRequest {
-    status: CourseStatus,
-}
-
-// PUT /api/courses/{course_id}/status 科目のステータスを変更
-async fn set_course_status(
-    pool: web::Data<sqlx::MySqlPool>,
-    course_id: web::Path<(String,)>,
-    req: web::Json<SetCourseStatusRequest>,
-) -> actix_web::Result<HttpResponse> {
-    let course_id = &course_id.0;
-
-    let mut tx = pool.begin().await.map_err(SqlxError)?;
-
-    let count: i64 = isucholar::db::fetch_one_scalar(
-        sqlx::query_scalar("SELECT COUNT(*) FROM `courses` WHERE `id` = ? FOR UPDATE")
-            .bind(course_id),
-        &mut tx,
-    )
-    .await
-    .map_err(SqlxError)?;
-    if count == 0 {
-        return Err(actix_web::error::ErrorNotFound("No such course."));
-    }
-
-    sqlx::query("UPDATE `courses` SET `status` = ? WHERE `id` = ?")
-        .bind(&req.status)
-        .bind(course_id)
-        .execute(&mut tx)
-        .await
-        .map_err(SqlxError)?;
-
-    tx.commit().await.map_err(SqlxError)?;
-
-    Ok(HttpResponse::Ok().finish())
-}
 
 #[derive(Debug, sqlx::FromRow)]
 struct ClassWithSubmitted {
