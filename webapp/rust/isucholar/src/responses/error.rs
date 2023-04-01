@@ -7,7 +7,9 @@ pub enum ResponseError {
     #[error("repos error")]
     ReposError(#[from] ReposError),
     #[error("actix error")]
-    ActixError(#[from] actix_web::Error)
+    ActixError(#[from] actix_web::Error),
+    #[error("sqlx error")]
+    SqlxError(#[from] sqlx::Error),
 }
 
 impl actix_web::ResponseError for ResponseError {

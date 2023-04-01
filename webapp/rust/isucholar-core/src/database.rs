@@ -1,3 +1,3 @@
-use sqlx::{MySqlPool};
+use sqlx::MySqlPool;
 
 pub type DBPool = MySqlPool;

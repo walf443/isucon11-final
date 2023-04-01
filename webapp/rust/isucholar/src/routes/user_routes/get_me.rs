@@ -1,4 +1,4 @@
-use crate::responses::error::{ResponseResult};
+use crate::responses::error::ResponseResult;
 use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
 use isucholar_core::repos::user_repository::{UserRepository, UserRepositoryImpl};
