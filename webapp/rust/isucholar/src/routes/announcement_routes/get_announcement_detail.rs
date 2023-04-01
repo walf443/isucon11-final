@@ -1,8 +1,8 @@
-use actix_web::{HttpResponse, web};
-use isucholar_core::models::announcement_detail::AnnouncementDetail;
 use crate::db;
 use crate::responses::error::SqlxError;
 use crate::routes::util::get_user_info;
+use actix_web::{web, HttpResponse};
+use isucholar_core::models::announcement_detail::AnnouncementDetail;
 
 // GET /api/announcements/{announcement_id} お知らせ詳細取得
 pub async fn get_announcement_detail(
@@ -38,12 +38,12 @@ pub async fn get_announcement_detail(
         sqlx::query_scalar(
             "SELECT COUNT(*) FROM `registrations` WHERE `course_id` = ? AND `user_id` = ?",
         )
-            .bind(&announcement.course_id)
-            .bind(&user_id),
+        .bind(&announcement.course_id)
+        .bind(&user_id),
         &mut tx,
     )
-        .await
-        .map_err(SqlxError)?;
+    .await
+    .map_err(SqlxError)?;
     if registration_count == 0 {
         return Err(actix_web::error::ErrorNotFound("No such announcement."));
     }

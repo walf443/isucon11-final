@@ -1,4 +1,5 @@
 pub mod announcement;
+pub mod announcement_detail;
 pub mod assignment_path;
 pub mod class;
 pub mod class_score;
@@ -12,4 +13,3 @@ pub mod submission;
 pub mod summary;
 pub mod user;
 pub mod user_type;
-pub mod announcement_detail;

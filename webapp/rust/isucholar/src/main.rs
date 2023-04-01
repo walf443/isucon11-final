@@ -2,6 +2,7 @@ use actix_web::web;
 use actix_web::HttpResponse;
 use futures::StreamExt as _;
 use isucholar::routes::announcement_routes::add_announcement::add_announcement;
+use isucholar::routes::announcement_routes::get_announcement_detail::get_announcement_detail;
 use isucholar::routes::announcement_routes::get_announcement_list::get_announcement_list;
 use isucholar::routes::course_routes::add_class::add_class;
 use isucholar::routes::course_routes::add_course::add_course;
@@ -12,13 +13,14 @@ use isucholar::routes::course_routes::register_scores::register_scores;
 use isucholar::routes::course_routes::search_courses::search_courses;
 use isucholar::routes::course_routes::set_course_status::set_course_status;
 use isucholar::routes::course_routes::submit_assignment::submit_assignment;
+use isucholar::routes::initialize;
+use isucholar::routes::initialize::initialize;
 use isucholar::routes::user_routes::get_grades::get_grades;
 use isucholar::routes::user_routes::get_me::get_me;
 use isucholar::routes::user_routes::get_registered_courses::get_registered_courses;
 use isucholar::routes::user_routes::register_courses::register_courses;
 use sqlx::Arguments as _;
 use sqlx::Executor as _;
-use isucholar::routes::announcement_routes::get_announcement_detail::get_announcement_detail;
 
 const SQL_DIRECTORY: &str = "../sql/";
 const ASSIGNMENTS_DIRECTORY: &str = "../assignments/";
@@ -179,51 +181,6 @@ impl actix_web::ResponseError for SqlxError {
             .content_type(mime::TEXT_PLAIN)
             .body(format!("SQLx error: {:?}", self.0))
     }
-}
-
-#[derive(Debug, serde::Serialize)]
-struct InitializeResponse {
-    language: &'static str,
-}
-
-// POST /initialize 初期化エンドポイント
-async fn initialize(pool: web::Data<sqlx::MySqlPool>) -> actix_web::Result<HttpResponse> {
-    let files = ["1_schema.sql", "2_init.sql", "3_sample.sql"];
-    for file in files {
-        let data = tokio::fs::read_to_string(format!("{}{}", SQL_DIRECTORY, file)).await?;
-        let mut stream = pool.execute_many(data.as_str());
-        while let Some(result) = stream.next().await {
-            result.map_err(SqlxError)?;
-        }
-    }
-
-    if !tokio::process::Command::new("rm")
-        .stdin(std::process::Stdio::null())
-        .stdout(std::process::Stdio::null())
-        .stderr(std::process::Stdio::null())
-        .arg("-rf")
-        .arg(ASSIGNMENTS_DIRECTORY)
-        .status()
-        .await?
-        .success()
-    {
-        return Err(actix_web::error::ErrorInternalServerError(""));
-    }
-    if !tokio::process::Command::new("cp")
-        .stdin(std::process::Stdio::null())
-        .stdout(std::process::Stdio::null())
-        .stderr(std::process::Stdio::null())
-        .arg("-r")
-        .arg(INIT_DATA_DIRECTORY)
-        .arg(ASSIGNMENTS_DIRECTORY)
-        .status()
-        .await?
-        .success()
-    {
-        return Err(actix_web::error::ErrorInternalServerError(""));
-    }
-
-    Ok(HttpResponse::Ok().json(InitializeResponse { language: "rust" }))
 }
 
 fn get_user_info(session: actix_session::Session) -> actix_web::Result<(String, String, bool)> {
@@ -485,4 +442,3 @@ async fn logout(session: actix_session::Session) -> actix_web::Result<HttpRespon
     session.purge();
     Ok(HttpResponse::Ok().finish())
 }
-
