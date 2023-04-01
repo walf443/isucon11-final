@@ -6,7 +6,7 @@ use isucholar::routes::course_routes::add_course::add_course;
 use isucholar::routes::course_routes::get_classes::get_classes;
 use isucholar::routes::course_routes::get_course_detail::get_course_detail;
 use isucholar::routes::course_routes::search_courses::search_courses;
-use isucholar::routes::course_routes::set_course_status;
+use isucholar::routes::course_routes::set_course_status::set_course_status;
 use isucholar::routes::user_routes::{
     get_grades, get_me, get_registered_courses, register_courses,
 };
