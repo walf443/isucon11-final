@@ -13,6 +13,9 @@ use isucholar_core::repos::class_repository::{ClassRepository, ClassRepositoryIm
 use isucholar_core::repos::registration_course_repository::{
     RegistrationCourseRepository, RegistrationCourseRepositoryImpl,
 };
+use isucholar_core::repos::submission_repository::{
+    SubmissionRepository, SubmissionRepositoryImpl,
+};
 use num_traits::ToPrimitive;
 
 // GET /api/users/me/grades 成績取得
@@ -32,6 +35,7 @@ pub async fn get_grades(
     let mut my_gpa = 0f64;
     let mut my_credits = 0;
     let class_repo = ClassRepositoryImpl {};
+    let submission_repo = SubmissionRepositoryImpl {};
     for course in registered_courses {
         let classes = class_repo.find_all_by_course_id(&pool, &course.id).await?;
 
@@ -39,11 +43,7 @@ pub async fn get_grades(
         let mut class_scores = Vec::with_capacity(classes.len());
         let mut my_total_score = 0;
         for class in classes {
-            let submissions_count: i64 =
-                sqlx::query_scalar("SELECT COUNT(*) FROM `submissions` WHERE `class_id` = ?")
-                    .bind(&class.id)
-                    .fetch_one(pool.as_ref())
-                    .await?;
+            let submissions_count = submission_repo.count_by_class_id(&pool, &class.id).await?;
 
             let my_score: Option<Option<u8>> = sqlx::query_scalar(concat!(
                 "SELECT `submissions`.`score` FROM `submissions`",
