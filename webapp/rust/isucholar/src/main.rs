@@ -11,10 +11,11 @@ use isucholar::routes::course_routes::search_courses::search_courses;
 use isucholar::routes::course_routes::set_course_status::set_course_status;
 use isucholar::routes::course_routes::submit_assignment::submit_assignment;
 use isucholar::routes::user_routes::{
-    get_grades, get_me, get_registered_courses, register_courses,
+    get_grades, get_registered_courses, register_courses,
 };
 use sqlx::Arguments as _;
 use sqlx::Executor as _;
+use isucholar::routes::user_routes::get_me::get_me;
 
 const SQL_DIRECTORY: &str = "../sql/";
 const ASSIGNMENTS_DIRECTORY: &str = "../assignments/";
