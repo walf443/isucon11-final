@@ -10,15 +10,15 @@ use crate::routes::course_routes::set_course_status::set_course_status;
 use crate::routes::course_routes::submit_assignment::submit_assignment;
 use actix_web::{web, Scope};
 
-pub mod add_class;
-pub mod add_course;
-pub mod download_submitted_assignments;
-pub mod get_classes;
-pub mod get_course_detail;
-pub mod register_scores;
-pub mod search_courses;
-pub mod set_course_status;
-pub mod submit_assignment;
+mod add_class;
+mod add_course;
+mod download_submitted_assignments;
+mod get_classes;
+mod get_course_detail;
+mod register_scores;
+mod search_courses;
+mod set_course_status;
+mod submit_assignment;
 
 pub fn get_course_routes() -> Scope {
     web::scope("/courses")

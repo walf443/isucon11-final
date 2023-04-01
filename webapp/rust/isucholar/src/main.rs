@@ -1,7 +1,5 @@
 use actix_web::web;
-use isucholar::routes::announcement_routes::add_announcement::add_announcement;
-use isucholar::routes::announcement_routes::get_announcement_detail::get_announcement_detail;
-use isucholar::routes::announcement_routes::get_announcement_list::get_announcement_list;
+use isucholar::routes::announcement_routes::get_announcement_routes;
 use isucholar::routes::course_routes::get_course_routes;
 use isucholar::routes::initialize::initialize;
 use isucholar::routes::login::login;
@@ -62,16 +60,7 @@ async fn main() -> std::io::Result<()> {
     let server = actix_web::HttpServer::new(move || {
         let users_api = get_user_routes();
         let courses_api = get_course_routes();
-
-        let announcements_api = web::scope("/announcements")
-            .route("", web::get().to(get_announcement_list))
-            .service(
-                web::resource("")
-                    .guard(actix_web::guard::Post())
-                    .wrap(isucholar::middleware::IsAdmin)
-                    .to(add_announcement),
-            )
-            .route("/{announcement_id}", web::get().to(get_announcement_detail));
+        let announcements_api = get_announcement_routes();
 
         actix_web::App::new()
             .app_data(web::Data::new(pool.clone()))
