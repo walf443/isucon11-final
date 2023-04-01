@@ -1,5 +1,6 @@
 pub mod add_course;
 pub mod get_classes;
+pub mod get_course_detail;
 pub mod search_courses;
 
 use crate::requests::search_courses_query::SearchCoursesQuery;
@@ -14,31 +15,6 @@ use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::models::course_type::CourseType;
 use isucholar_core::models::day_of_week::DayOfWeek;
 use sqlx::Arguments;
-
-// GET /api/courses/{course_id} 科目詳細の取得
-pub async fn get_course_detail(
-    pool: web::Data<sqlx::MySqlPool>,
-    course_id: web::Path<(String,)>,
-) -> actix_web::Result<HttpResponse> {
-    let course_id = &course_id.0;
-
-    let res: Option<GetCourseDetailResponse> = sqlx::query_as(concat!(
-        "SELECT `courses`.*, `users`.`name` AS `teacher`",
-        " FROM `courses`",
-        " JOIN `users` ON `courses`.`teacher_id` = `users`.`id`",
-        " WHERE `courses`.`id` = ?",
-    ))
-    .bind(course_id)
-    .fetch_optional(pool.as_ref())
-    .await
-    .map_err(SqlxError)?;
-
-    if let Some(res) = res {
-        Ok(HttpResponse::Ok().json(res))
-    } else {
-        Err(actix_web::error::ErrorNotFound("No such course."))
-    }
-}
 
 #[derive(Debug, serde::Deserialize)]
 pub struct SetCourseStatusRequest {

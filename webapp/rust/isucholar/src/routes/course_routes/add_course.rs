@@ -1,10 +1,10 @@
-use actix_web::{HttpResponse, web};
-use isucholar_core::models::course::Course;
-use isucholar_core::models::course_type::CourseType;
-use isucholar_core::models::day_of_week::DayOfWeek;
 use crate::responses::error::SqlxError;
 use crate::routes::util::get_user_info;
 use crate::util;
+use actix_web::{web, HttpResponse};
+use isucholar_core::models::course::Course;
+use isucholar_core::models::course_type::CourseType;
+use isucholar_core::models::day_of_week::DayOfWeek;
 
 const MYSQL_ERR_NUM_DUPLICATE_ENTRY: u16 = 1062;
 
@@ -77,4 +77,3 @@ pub async fn add_course(
 
     Ok(HttpResponse::Created().json(AddCourseResponse { id: course_id }))
 }
-
