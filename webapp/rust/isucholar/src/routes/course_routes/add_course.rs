@@ -5,8 +5,7 @@ use actix_web::{web, HttpResponse};
 use isucholar_core::models::course::Course;
 use isucholar_core::models::course_type::CourseType;
 use isucholar_core::models::day_of_week::DayOfWeek;
-
-const MYSQL_ERR_NUM_DUPLICATE_ENTRY: u16 = 1062;
+use isucholar_core::MYSQL_ERR_NUM_DUPLICATE_ENTRY;
 
 #[derive(Debug, serde::Deserialize)]
 pub struct AddCourseRequest {
