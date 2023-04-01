@@ -2,15 +2,7 @@ use actix_web::web;
 use isucholar::routes::announcement_routes::add_announcement::add_announcement;
 use isucholar::routes::announcement_routes::get_announcement_detail::get_announcement_detail;
 use isucholar::routes::announcement_routes::get_announcement_list::get_announcement_list;
-use isucholar::routes::course_routes::add_class::add_class;
-use isucholar::routes::course_routes::add_course::add_course;
-use isucholar::routes::course_routes::download_submitted_assignments::download_submitted_assignments;
-use isucholar::routes::course_routes::get_classes::get_classes;
-use isucholar::routes::course_routes::get_course_detail::get_course_detail;
-use isucholar::routes::course_routes::register_scores::register_scores;
-use isucholar::routes::course_routes::search_courses::search_courses;
-use isucholar::routes::course_routes::set_course_status::set_course_status;
-use isucholar::routes::course_routes::submit_assignment::submit_assignment;
+use isucholar::routes::course_routes::get_course_routes;
 use isucholar::routes::initialize::initialize;
 use isucholar::routes::login::login;
 use isucholar::routes::logout::logout;
@@ -69,45 +61,7 @@ async fn main() -> std::io::Result<()> {
 
     let server = actix_web::HttpServer::new(move || {
         let users_api = get_user_routes();
-
-        let courses_api = web::scope("/courses")
-            .route("", web::get().to(search_courses))
-            .service(
-                web::resource("")
-                    .guard(actix_web::guard::Post())
-                    .wrap(isucholar::middleware::IsAdmin)
-                    .to(add_course),
-            )
-            .route("/{course_id}", web::get().to(get_course_detail))
-            .service(
-                web::resource("/{course_id}/status")
-                    .guard(actix_web::guard::Put())
-                    .wrap(isucholar::middleware::IsAdmin)
-                    .to(set_course_status),
-            )
-            .route("/{course_id}/classes", web::get().to(get_classes))
-            .service(
-                web::resource("/{course_id}/classes")
-                    .guard(actix_web::guard::Post())
-                    .wrap(isucholar::middleware::IsAdmin)
-                    .to(add_class),
-            )
-            .route(
-                "/{course_id}/classes/{class_id}/assignments",
-                web::post().to(submit_assignment),
-            )
-            .service(
-                web::resource("/{course_id}/classes/{class_id}/assignments/scores")
-                    .guard(actix_web::guard::Put())
-                    .wrap(isucholar::middleware::IsAdmin)
-                    .to(register_scores),
-            )
-            .service(
-                web::resource("/{course_id}/classes/{class_id}/assignments/export")
-                    .guard(actix_web::guard::Get())
-                    .wrap(isucholar::middleware::IsAdmin)
-                    .to(download_submitted_assignments),
-            );
+        let courses_api = get_course_routes();
 
         let announcements_api = web::scope("/announcements")
             .route("", web::get().to(get_announcement_list))
