@@ -2,7 +2,10 @@ use actix_web::web;
 use actix_web::HttpResponse;
 use futures::StreamExt as _;
 use futures::TryStreamExt as _;
-use isucholar::routes::course_routes::{add_course, get_classes, get_course_detail, search_courses, set_course_status};
+use isucholar::routes::course_routes::get_classes::get_classes;
+use isucholar::routes::course_routes::{
+    add_course, get_course_detail, search_courses, set_course_status,
+};
 use isucholar::routes::user_routes::{
     get_grades, get_me, get_registered_courses, register_courses,
 };
