@@ -1,3 +1,4 @@
+pub mod announcement;
 pub mod assignment_path;
 pub mod class;
 pub mod class_score;
