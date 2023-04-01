@@ -1,6 +1,6 @@
-use actix_web::{HttpResponse, web};
 use crate::responses::error::SqlxError;
 use crate::routes::util::get_user_info;
+use actix_web::{web, HttpResponse};
 
 #[derive(Debug, serde::Serialize)]
 pub struct GetMeResponse {

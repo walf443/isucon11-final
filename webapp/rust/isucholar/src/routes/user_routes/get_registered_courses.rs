@@ -1,11 +1,11 @@
-use actix_web::{HttpResponse, web};
-use isucholar_core::models::course::Course;
-use isucholar_core::models::course_status::CourseStatus;
-use isucholar_core::models::user::User;
 use crate::db;
 use crate::responses::error::SqlxError;
 use crate::responses::get_registered_course_response::GetRegisteredCourseResponseContent;
 use crate::routes::util::get_user_info;
+use actix_web::{web, HttpResponse};
+use isucholar_core::models::course::Course;
+use isucholar_core::models::course_status::CourseStatus;
+use isucholar_core::models::user::User;
 
 // GET /api/users/me/courses 履修中の科目一覧取得
 pub async fn get_registered_courses(
@@ -17,16 +17,16 @@ pub async fn get_registered_courses(
     let mut tx = pool.begin().await.map_err(SqlxError)?;
 
     let courses: Vec<Course> = sqlx::query_as(concat!(
-    "SELECT `courses`.*",
-    " FROM `courses`",
-    " JOIN `registrations` ON `courses`.`id` = `registrations`.`course_id`",
-    " WHERE `courses`.`status` != ? AND `registrations`.`user_id` = ?",
+        "SELECT `courses`.*",
+        " FROM `courses`",
+        " JOIN `registrations` ON `courses`.`id` = `registrations`.`course_id`",
+        " WHERE `courses`.`status` != ? AND `registrations`.`user_id` = ?",
     ))
-        .bind(CourseStatus::Closed)
-        .bind(&user_id)
-        .fetch_all(&mut tx)
-        .await
-        .map_err(SqlxError)?;
+    .bind(CourseStatus::Closed)
+    .bind(&user_id)
+    .fetch_all(&mut tx)
+    .await
+    .map_err(SqlxError)?;
 
     // 履修科目が0件の時は空配列を返却
     let mut res = Vec::with_capacity(courses.len());
@@ -35,8 +35,8 @@ pub async fn get_registered_courses(
             sqlx::query_as("SELECT * FROM `users` WHERE `id` = ?").bind(&course.teacher_id),
             &mut tx,
         )
-            .await
-            .map_err(SqlxError)?;
+        .await
+        .map_err(SqlxError)?;
 
         res.push(GetRegisteredCourseResponseContent {
             id: course.id,
