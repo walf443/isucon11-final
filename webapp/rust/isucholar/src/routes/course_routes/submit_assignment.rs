@@ -3,16 +3,11 @@ use crate::responses::error::SqlxError;
 use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
 use futures::{StreamExt, TryStreamExt};
+use isucholar_core::models::assignment_path::AssignmentPath;
 use isucholar_core::models::course_status::CourseStatus;
 use tokio::io::AsyncWriteExt;
 
 const ASSIGNMENTS_DIRECTORY: &str = "../assignments/";
-
-#[derive(Debug, serde::Deserialize)]
-pub struct AssignmentPath {
-    course_id: String,
-    class_id: String,
-}
 
 // POST /api/courses/{course_id}/classes/{class_id}/assignments 課題の提出
 pub async fn submit_assignment(

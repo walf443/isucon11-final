@@ -4,6 +4,7 @@ use futures::StreamExt as _;
 use isucholar::routes::course_routes::add_course::add_course;
 use isucholar::routes::course_routes::get_classes::get_classes;
 use isucholar::routes::course_routes::get_course_detail::get_course_detail;
+use isucholar::routes::course_routes::register_scores::register_scores;
 use isucholar::routes::course_routes::search_courses::search_courses;
 use isucholar::routes::course_routes::set_course_status::set_course_status;
 use isucholar::routes::course_routes::submit_assignment::submit_assignment;
@@ -619,54 +620,6 @@ async fn add_class(
 struct AssignmentPath {
     course_id: String,
     class_id: String,
-}
-
-#[derive(Debug, serde::Deserialize)]
-struct Score {
-    user_code: String,
-    score: i64,
-}
-
-// PUT /api/courses/{course_id}/classes/{class_id}/assignments/scores 採点結果登録
-async fn register_scores(
-    pool: web::Data<sqlx::MySqlPool>,
-    path: web::Path<AssignmentPath>,
-    req: web::Json<Vec<Score>>,
-) -> actix_web::Result<HttpResponse> {
-    let class_id = &path.class_id;
-
-    let mut tx = pool.begin().await.map_err(SqlxError)?;
-
-    let submission_closed: Option<bool> = isucholar::db::fetch_optional_scalar(
-        sqlx::query_scalar("SELECT `submission_closed` FROM `classes` WHERE `id` = ? FOR SHARE")
-            .bind(class_id),
-        &mut tx,
-    )
-    .await
-    .map_err(SqlxError)?;
-    if let Some(submission_closed) = submission_closed {
-        if !submission_closed {
-            return Err(actix_web::error::ErrorBadRequest(
-                "This assignment is not closed yet.",
-            ));
-        }
-    } else {
-        return Err(actix_web::error::ErrorNotFound("No such class."));
-    }
-
-    for score in req.into_inner() {
-        sqlx::query("UPDATE `submissions` JOIN `users` ON `users`.`id` = `submissions`.`user_id` SET `score` = ? WHERE `users`.`code` = ? AND `class_id` = ?")
-            .bind(&score.score)
-            .bind(&score.user_code)
-            .bind(class_id)
-            .execute(&mut tx)
-            .await
-            .map_err(SqlxError)?;
-    }
-
-    tx.commit().await.map_err(SqlxError)?;
-
-    Ok(HttpResponse::NoContent().finish())
 }
 
 #[derive(Debug, sqlx::FromRow)]
