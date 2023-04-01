@@ -1,4 +1,5 @@
 use actix_web::{HttpResponse, web};
+use crate::responses::get_me_response::GetMeResponse;
 
 #[derive(Debug)]
 struct SqlxError(sqlx::Error);
@@ -36,13 +37,6 @@ fn get_user_info(session: actix_session::Session) -> actix_web::Result<(String, 
         ));
     }
     Ok((user_id.unwrap(), user_name.unwrap(), is_admin.unwrap()))
-}
-
-#[derive(Debug, serde::Serialize)]
-pub struct GetMeResponse {
-    code: String,
-    name: String,
-    is_admin: bool,
 }
 
 // GET /api/users/me 自身の情報を取得
