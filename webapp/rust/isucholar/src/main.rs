@@ -13,7 +13,7 @@ use isucholar::routes::course_routes::submit_assignment::submit_assignment;
 use isucholar::routes::user_routes::get_grades::get_grades;
 use isucholar::routes::user_routes::get_me::get_me;
 use isucholar::routes::user_routes::get_registered_courses::get_registered_courses;
-use isucholar::routes::user_routes::register_courses;
+use isucholar::routes::user_routes::register_courses::register_courses;
 use sqlx::Arguments as _;
 use sqlx::Executor as _;
 
