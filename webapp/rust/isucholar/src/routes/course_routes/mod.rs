@@ -1,4 +1,5 @@
 pub mod add_course;
+pub mod download_submitted_assignments;
 pub mod get_classes;
 pub mod get_course_detail;
 pub mod register_scores;
