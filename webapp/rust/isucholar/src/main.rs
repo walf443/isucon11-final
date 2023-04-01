@@ -1396,7 +1396,7 @@ async fn submit_assignment(
     let mut file = None;
     while let Some(field) = payload.next().await {
         let field = field.map_err(|_| actix_web::error::ErrorBadRequest("Invalid file."))?;
-        if let Some(content_disposition) = field.content_disposition() {
+        if let content_disposition = field.content_disposition() {
             if let Some(name) = content_disposition.get_name() {
                 if name == "file" {
                     file = Some(field);
@@ -1415,7 +1415,7 @@ async fn submit_assignment(
     )
     .bind(&user_id)
     .bind(class_id)
-    .bind(file.content_disposition().unwrap().get_filename())
+    .bind(file.content_disposition().get_filename())
     .execute(&mut tx)
     .await
     .map_err(SqlxError)?;
