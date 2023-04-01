@@ -12,3 +12,4 @@ pub mod submission;
 pub mod summary;
 pub mod user;
 pub mod user_type;
+pub mod announcement_detail;
