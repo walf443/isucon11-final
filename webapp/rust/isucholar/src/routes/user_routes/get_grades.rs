@@ -4,13 +4,12 @@ use crate::routes::util::get_user_info;
 use crate::util;
 use actix_web::{web, HttpResponse};
 use futures::StreamExt;
-use isucholar_core::models::class::Class;
 use isucholar_core::models::class_score::ClassScore;
-use isucholar_core::models::course::Course;
 use isucholar_core::models::course_result::CourseResult;
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::models::summary::Summary;
 use isucholar_core::models::user_type::UserType;
+use isucholar_core::repos::class_repository::{ClassRepository, ClassRepositoryImpl};
 use isucholar_core::repos::registration_course_repository::{
     RegistrationCourseRepository, RegistrationCourseRepositoryImpl,
 };
@@ -32,17 +31,9 @@ pub async fn get_grades(
     let mut course_results = Vec::with_capacity(registered_courses.len());
     let mut my_gpa = 0f64;
     let mut my_credits = 0;
+    let class_repo = ClassRepositoryImpl {};
     for course in registered_courses {
-        // 講義一覧の取得
-        let classes: Vec<Class> = sqlx::query_as(concat!(
-            "SELECT *",
-            " FROM `classes`",
-            " WHERE `course_id` = ?",
-            " ORDER BY `part` DESC",
-        ))
-        .bind(&course.id)
-        .fetch_all(pool.as_ref())
-        .await?;
+        let classes = class_repo.find_all_by_course_id(&pool, &course.id).await?;
 
         // 講義毎の成績計算処理
         let mut class_scores = Vec::with_capacity(classes.len());
