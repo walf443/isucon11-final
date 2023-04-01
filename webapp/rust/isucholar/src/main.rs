@@ -2,11 +2,11 @@ use actix_web::web;
 use actix_web::HttpResponse;
 use futures::StreamExt as _;
 use futures::TryStreamExt as _;
+use isucholar::routes::user_routes::get_me;
 use num_traits::ToPrimitive as _;
 use sqlx::Arguments as _;
 use sqlx::Executor as _;
 use tokio::io::AsyncWriteExt as _;
-use isucholar::routes::user_routes::get_me;
 
 const SQL_DIRECTORY: &str = "../sql/";
 const ASSIGNMENTS_DIRECTORY: &str = "../assignments/";

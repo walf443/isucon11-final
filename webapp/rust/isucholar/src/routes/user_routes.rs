@@ -1,21 +1,6 @@
-use actix_web::{HttpResponse, web};
+use crate::responses::error::SqlxError;
 use crate::responses::get_me_response::GetMeResponse;
-
-#[derive(Debug)]
-struct SqlxError(sqlx::Error);
-impl std::fmt::Display for SqlxError {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        self.0.fmt(f)
-    }
-}
-impl actix_web::ResponseError for SqlxError {
-    fn error_response(&self) -> HttpResponse {
-        log::error!("{}", self);
-        HttpResponse::InternalServerError()
-            .content_type(mime::TEXT_PLAIN)
-            .body(format!("SQLx error: {:?}", self.0))
-    }
-}
+use actix_web::{web, HttpResponse};
 
 fn get_user_info(session: actix_session::Session) -> actix_web::Result<(String, String, bool)> {
     let user_id = session.get("userID")?;

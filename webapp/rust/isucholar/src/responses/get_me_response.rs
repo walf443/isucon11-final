@@ -4,4 +4,3 @@ pub struct GetMeResponse {
     pub name: String,
     pub is_admin: bool,
 }
-
