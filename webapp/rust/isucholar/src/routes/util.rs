@@ -19,4 +19,3 @@ pub fn get_user_info(session: actix_session::Session) -> actix_web::Result<(Stri
     }
     Ok((user_id.unwrap(), user_name.unwrap(), is_admin.unwrap()))
 }
-

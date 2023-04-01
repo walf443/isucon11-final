@@ -1177,6 +1177,10 @@ dependencies = [
 [[package]]
 name = "isucholar-core"
 version = "0.1.0"
+dependencies = [
+ "serde",
+ "sqlx",
+]
 
 [[package]]
 name = "itertools"
