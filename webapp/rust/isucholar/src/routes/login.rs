@@ -1,7 +1,7 @@
-use actix_web::{HttpResponse, web};
+use crate::responses::error::SqlxError;
+use actix_web::{web, HttpResponse};
 use isucholar_core::models::user::User;
 use isucholar_core::models::user_type::UserType;
-use crate::responses::error::SqlxError;
 
 #[derive(Debug, serde::Deserialize)]
 pub struct LoginRequest {
@@ -31,7 +31,7 @@ pub async fn login(
         &req.password,
         &String::from_utf8(user.hashed_password).unwrap(),
     )
-        .map_err(actix_web::error::ErrorInternalServerError)?
+    .map_err(actix_web::error::ErrorInternalServerError)?
     {
         return Err(actix_web::error::ErrorUnauthorized(
             "Code or Password is wrong.",

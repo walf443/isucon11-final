@@ -15,13 +15,14 @@ use isucholar::routes::course_routes::set_course_status::set_course_status;
 use isucholar::routes::course_routes::submit_assignment::submit_assignment;
 use isucholar::routes::initialize;
 use isucholar::routes::initialize::initialize;
+use isucholar::routes::login::login;
 use isucholar::routes::user_routes::get_grades::get_grades;
 use isucholar::routes::user_routes::get_me::get_me;
 use isucholar::routes::user_routes::get_registered_courses::get_registered_courses;
 use isucholar::routes::user_routes::register_courses::register_courses;
 use sqlx::Arguments as _;
 use sqlx::Executor as _;
-use isucholar::routes::login::login;
+use isucholar::routes::logout::logout;
 
 const SQL_DIRECTORY: &str = "../sql/";
 const ASSIGNMENTS_DIRECTORY: &str = "../assignments/";
@@ -385,12 +386,4 @@ struct Course {
     teacher_id: String,
     keywords: String,
     status: CourseStatus,
-}
-
-// ---------- Public API ----------
-
-// POST /logout ログアウト
-async fn logout(session: actix_session::Session) -> actix_web::Result<HttpResponse> {
-    session.purge();
-    Ok(HttpResponse::Ok().finish())
 }
