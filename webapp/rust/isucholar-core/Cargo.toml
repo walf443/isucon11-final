@@ -6,3 +6,6 @@ edition = "2021"
 [dependencies]
 sqlx.workspace = true
 serde.workspace = true
+async-trait.workspace = true
+thiserror.workspace = true
+anyhow.workspace = true

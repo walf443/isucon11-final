@@ -6,3 +6,6 @@ members = ["isucholar-core", "isucholar"]
 [workspace.dependencies]
 sqlx = { version = "0.5", default-features = false, features = ["macros", "runtime-actix-rustls", "mysql", "chrono", "decimal"] }
 serde = { version = "1", features = ["derive"] }
+async-trait = { version = "0.1" }
+anyhow = { version = "1" }
+thiserror = { version = "1" }
