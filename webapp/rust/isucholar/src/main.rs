@@ -1,5 +1,4 @@
 use actix_web::web;
-use sqlx::Executor;
 use isucholar::routes::announcement_routes::add_announcement::add_announcement;
 use isucholar::routes::announcement_routes::get_announcement_detail::get_announcement_detail;
 use isucholar::routes::announcement_routes::get_announcement_list::get_announcement_list;
@@ -15,10 +14,8 @@ use isucholar::routes::course_routes::submit_assignment::submit_assignment;
 use isucholar::routes::initialize::initialize;
 use isucholar::routes::login::login;
 use isucholar::routes::logout::logout;
-use isucholar::routes::user_routes::get_grades::get_grades;
-use isucholar::routes::user_routes::get_me::get_me;
-use isucholar::routes::user_routes::get_registered_courses::get_registered_courses;
-use isucholar::routes::user_routes::register_courses::register_courses;
+use isucholar::routes::user_routes::get_user_routes;
+use sqlx::Executor;
 
 const SESSION_NAME: &str = "isucholar_rust";
 
@@ -71,11 +68,7 @@ async fn main() -> std::io::Result<()> {
     session_key.resize(32, 0);
 
     let server = actix_web::HttpServer::new(move || {
-        let users_api = web::scope("/users")
-            .route("/me", web::get().to(get_me))
-            .route("/me/courses", web::get().to(get_registered_courses))
-            .route("/me/courses", web::put().to(register_courses))
-            .route("/me/grades", web::get().to(get_grades));
+        let users_api = get_user_routes();
 
         let courses_api = web::scope("/courses")
             .route("", web::get().to(search_courses))
