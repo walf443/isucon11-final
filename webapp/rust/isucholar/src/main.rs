@@ -4,13 +4,14 @@ use futures::StreamExt as _;
 use futures::TryStreamExt as _;
 use isucholar::routes::course_routes::get_classes::get_classes;
 use isucholar::routes::course_routes::search_courses::search_courses;
-use isucholar::routes::course_routes::{add_course, get_course_detail, set_course_status};
+use isucholar::routes::course_routes::{get_course_detail, set_course_status};
 use isucholar::routes::user_routes::{
     get_grades, get_me, get_registered_courses, register_courses,
 };
 use sqlx::Arguments as _;
 use sqlx::Executor as _;
 use tokio::io::AsyncWriteExt as _;
+use isucholar::routes::course_routes::add_course::add_course;
 
 const SQL_DIRECTORY: &str = "../sql/";
 const ASSIGNMENTS_DIRECTORY: &str = "../assignments/";
