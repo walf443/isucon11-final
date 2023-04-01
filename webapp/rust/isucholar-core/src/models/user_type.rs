@@ -29,6 +29,6 @@ impl<'q> sqlx::Encode<'q, sqlx::MySql> for UserType {
             Self::Teacher => "teacher",
             Self::Student => "student",
         }
-            .encode_by_ref(buf)
+        .encode_by_ref(buf)
     }
 }

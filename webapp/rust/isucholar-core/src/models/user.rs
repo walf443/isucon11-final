@@ -9,4 +9,3 @@ pub struct User {
     #[sqlx(rename = "type")]
     pub type_: UserType,
 }
-
