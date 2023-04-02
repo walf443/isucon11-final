@@ -5,7 +5,9 @@ use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::repos::course_repository::{CourseRepository, CourseRepositoryImpl};
-use isucholar_core::repos::registration_course_repository::{RegistrationCourseRepository, RegistrationCourseRepositoryImpl};
+use isucholar_core::repos::registration_course_repository::{
+    RegistrationCourseRepository, RegistrationCourseRepositoryImpl,
+};
 use isucholar_core::repos::registration_repository::{
     RegistrationRepository, RegistrationRepositoryImpl,
 };
@@ -54,7 +56,9 @@ pub async fn register_courses(
         newly_added.push(course);
     }
 
-    let already_registered = registration_course_repo.find_open_courses_by_user_id_in_tx(&mut tx, &user_id).await?;
+    let already_registered = registration_course_repo
+        .find_open_courses_by_user_id_in_tx(&mut tx, &user_id)
+        .await?;
 
     for course1 in &newly_added {
         for course2 in already_registered.iter().chain(newly_added.iter()) {
@@ -76,10 +80,8 @@ pub async fn register_courses(
     }
 
     for course in newly_added {
-        sqlx::query("INSERT INTO `registrations` (`course_id`, `user_id`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `course_id` = VALUES(`course_id`), `user_id` = VALUES(`user_id`)")
-            .bind(course.id)
-            .bind(&user_id)
-            .execute(&mut tx)
+        registration_repo
+            .create_or_update_in_tx(&mut tx, &user_id, &course.id)
             .await?;
     }
 

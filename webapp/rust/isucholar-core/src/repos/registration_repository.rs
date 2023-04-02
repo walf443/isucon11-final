@@ -5,6 +5,12 @@ use async_trait::async_trait;
 
 #[async_trait]
 pub trait RegistrationRepository {
+    async fn create_or_update_in_tx<'c>(
+        &self,
+        tx: &mut TxConn<'c>,
+        user_id: &str,
+        course_id: &str,
+    ) -> Result<()>;
     async fn exist_by_user_id_and_course_id_in_tx<'c>(
         &self,
         tx: &mut TxConn<'c>,
@@ -16,6 +22,21 @@ pub struct RegistrationRepositoryImpl {}
 
 #[async_trait]
 impl RegistrationRepository for RegistrationRepositoryImpl {
+    async fn create_or_update_in_tx<'c>(
+        &self,
+        tx: &mut TxConn<'c>,
+        user_id: &str,
+        course_id: &str,
+    ) -> Result<()> {
+        sqlx::query("INSERT INTO `registrations` (`course_id`, `user_id`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `course_id` = VALUES(`course_id`), `user_id` = VALUES(`user_id`)")
+            .bind(course_id)
+            .bind(user_id)
+            .execute(tx)
+            .await?;
+
+        Ok(())
+    }
+
     async fn exist_by_user_id_and_course_id_in_tx<'c>(
         &self,
         tx: &mut TxConn<'c>,
