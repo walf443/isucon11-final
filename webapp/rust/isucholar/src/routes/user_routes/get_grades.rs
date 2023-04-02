@@ -44,7 +44,9 @@ pub async fn get_grades(
         let mut my_total_score = 0;
         for class in classes {
             let submissions_count = submission_repo.count_by_class_id(&pool, &class.id).await?;
-            let my_score = submission_repo.find_score_by_class_id_and_user_id(&pool, &class.id, &user_id).await?;
+            let my_score = submission_repo
+                .find_score_by_class_id_and_user_id(&pool, &class.id, &user_id)
+                .await?;
 
             if let Some(Some(my_score)) = my_score {
                 let my_score = my_score as i64;
@@ -67,24 +69,9 @@ pub async fn get_grades(
             }
         }
 
-        // この科目を履修している学生のtotal_score一覧を取得
-        let mut rows = sqlx::query_scalar(concat!(
-        "SELECT IFNULL(SUM(`submissions`.`score`), 0) AS `total_score`",
-        " FROM `users`",
-        " JOIN `registrations` ON `users`.`id` = `registrations`.`user_id`",
-        " JOIN `courses` ON `registrations`.`course_id` = `courses`.`id`",
-        " LEFT JOIN `classes` ON `courses`.`id` = `classes`.`course_id`",
-        " LEFT JOIN `submissions` ON `users`.`id` = `submissions`.`user_id` AND `submissions`.`class_id` = `classes`.`id`",
-        " WHERE `courses`.`id` = ?",
-        " GROUP BY `users`.`id`",
-        ))
-            .bind(&course.id)
-            .fetch(pool.as_ref());
-        let mut totals = Vec::new();
-        while let Some(row) = rows.next().await {
-            let total_score: sqlx::types::Decimal = row?;
-            totals.push(total_score.to_i64().unwrap());
-        }
+        let totals = registration_course_repo
+            .find_total_score_by_course_id_group_by_user_id(&pool, &course.id)
+            .await?;
 
         course_results.push(CourseResult {
             name: course.name,
