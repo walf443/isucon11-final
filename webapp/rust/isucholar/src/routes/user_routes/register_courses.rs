@@ -3,9 +3,9 @@ use crate::responses::error::ResponseResult;
 use crate::responses::register_courses_error_response::RegisterCoursesErrorResponse;
 use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
-use isucholar_core::models::course::Course;
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::repos::course_repository::{CourseRepository, CourseRepositoryImpl};
+use isucholar_core::repos::registration_course_repository::{RegistrationCourseRepository, RegistrationCourseRepositoryImpl};
 use isucholar_core::repos::registration_repository::{
     RegistrationRepository, RegistrationRepositoryImpl,
 };
@@ -27,6 +27,7 @@ pub async fn register_courses(
     let mut newly_added = Vec::new();
     let course_repo = CourseRepositoryImpl {};
     let registration_repo = RegistrationRepositoryImpl {};
+    let registration_course_repo = RegistrationCourseRepositoryImpl {};
     for course_req in req {
         let course = course_repo
             .find_for_share_lock_by_id_in_tx(&mut tx, &course_req.id)
@@ -53,16 +54,7 @@ pub async fn register_courses(
         newly_added.push(course);
     }
 
-    let already_registered: Vec<Course> = sqlx::query_as(concat!(
-        "SELECT `courses`.*",
-        " FROM `courses`",
-        " JOIN `registrations` ON `courses`.`id` = `registrations`.`course_id`",
-        " WHERE `courses`.`status` != ? AND `registrations`.`user_id` = ?",
-    ))
-    .bind(CourseStatus::Closed)
-    .bind(&user_id)
-    .fetch_all(&mut tx)
-    .await?;
+    let already_registered = registration_course_repo.find_open_courses_by_user_id_in_tx(&mut tx, &user_id).await?;
 
     for course1 in &newly_added {
         for course2 in already_registered.iter().chain(newly_added.iter()) {
