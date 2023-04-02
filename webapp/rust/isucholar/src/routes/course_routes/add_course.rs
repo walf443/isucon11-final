@@ -1,4 +1,4 @@
-use crate::responses::error::SqlxError;
+use crate::responses::error::{ResponseError, ResponseResult};
 use crate::routes::util::get_user_info;
 use crate::util;
 use actix_web::{web, HttpResponse};
@@ -6,6 +6,7 @@ use isucholar_core::models::course::Course;
 use isucholar_core::models::course_type::CourseType;
 use isucholar_core::models::day_of_week::DayOfWeek;
 use isucholar_core::MYSQL_ERR_NUM_DUPLICATE_ENTRY;
+use isucholar_core::repos::course_repository::{CourseRepository, CourseRepositoryImpl};
 
 #[derive(Debug, serde::Deserialize)]
 pub struct AddCourseRequest {
@@ -30,7 +31,7 @@ pub async fn add_course(
     pool: web::Data<sqlx::MySqlPool>,
     session: actix_session::Session,
     req: web::Json<AddCourseRequest>,
-) -> actix_web::Result<HttpResponse> {
+) -> ResponseResult<HttpResponse> {
     let (user_id, _, _) = get_user_info(session)?;
 
     let course_id = util::new_ulid().await;
@@ -47,14 +48,13 @@ pub async fn add_course(
         .bind(&req.keywords)
         .execute(pool.as_ref())
         .await;
+
+    let course_repo = CourseRepositoryImpl {};
     if let Err(sqlx::Error::Database(ref db_error)) = result {
         if let Some(mysql_error) = db_error.try_downcast_ref::<sqlx::mysql::MySqlDatabaseError>() {
             if mysql_error.number() == MYSQL_ERR_NUM_DUPLICATE_ENTRY {
-                let course: Course = sqlx::query_as("SELECT * FROM `courses` WHERE `code` = ?")
-                    .bind(&req.code)
-                    .fetch_one(pool.as_ref())
-                    .await
-                    .map_err(SqlxError)?;
+                let course = course_repo.find_by_code(&pool, &req.code).await?;
+
                 if req.type_ != course.type_
                     || req.name != course.name
                     || req.description != course.description
@@ -63,16 +63,16 @@ pub async fn add_course(
                     || req.day_of_week != course.day_of_week
                     || req.keywords != course.keywords
                 {
-                    return Err(actix_web::error::ErrorConflict(
+                    return Err(ResponseError::ActixError(actix_web::error::ErrorConflict(
                         "A course with the same code already exists.",
-                    ));
+                    )));
                 } else {
                     return Ok(HttpResponse::Created().json(AddCourseResponse { id: course.id }));
                 }
             }
         }
     }
-    result.map_err(SqlxError)?;
+    result?;
 
     Ok(HttpResponse::Created().json(AddCourseResponse { id: course_id }))
 }
