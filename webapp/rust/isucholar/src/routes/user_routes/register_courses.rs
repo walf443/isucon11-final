@@ -1,34 +1,33 @@
 use crate::db;
 use crate::requests::register_course_request::RegisterCourseRequestContent;
-use crate::responses::error::SqlxError;
+use crate::responses::error::ResponseResult;
 use crate::responses::register_courses_error_response::RegisterCoursesErrorResponse;
 use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::course::Course;
 use isucholar_core::models::course_status::CourseStatus;
+use isucholar_core::repos::course_repository::{CourseRepository, CourseRepositoryImpl};
 
 // PUT /api/users/me/courses 履修登録
 pub async fn register_courses(
     pool: web::Data<sqlx::MySqlPool>,
     session: actix_session::Session,
     req: web::Json<Vec<RegisterCourseRequestContent>>,
-) -> actix_web::Result<HttpResponse> {
+) -> ResponseResult<HttpResponse> {
     let (user_id, _, _) = get_user_info(session)?;
 
     let mut req = req.into_inner();
     req.sort_by(|x, y| x.id.cmp(&y.id));
 
-    let mut tx = pool.begin().await.map_err(SqlxError)?;
+    let mut tx = pool.begin().await?;
 
     let mut errors = RegisterCoursesErrorResponse::default();
     let mut newly_added = Vec::new();
+    let course_repo = CourseRepositoryImpl {};
     for course_req in req {
-        let course: Option<Course> = db::fetch_optional_as(
-            sqlx::query_as("SELECT * FROM `courses` WHERE `id` = ? FOR SHARE").bind(&course_req.id),
-            &mut tx,
-        )
-        .await
-        .map_err(SqlxError)?;
+        let course = course_repo
+            .find_for_share_lock_by_id_in_tx(&mut tx, &course_req.id)
+            .await?;
         if course.is_none() {
             errors.course_not_found.push(course_req.id);
             continue;
@@ -49,8 +48,7 @@ pub async fn register_courses(
             .bind(&user_id),
             &mut tx,
         )
-        .await
-        .map_err(SqlxError)?;
+        .await?;
         if count > 0 {
             continue;
         }
@@ -67,8 +65,7 @@ pub async fn register_courses(
     .bind(CourseStatus::Closed)
     .bind(&user_id)
     .fetch_all(&mut tx)
-    .await
-    .map_err(SqlxError)?;
+    .await?;
 
     for course1 in &newly_added {
         for course2 in already_registered.iter().chain(newly_added.iter()) {
@@ -94,11 +91,10 @@ pub async fn register_courses(
             .bind(course.id)
             .bind(&user_id)
             .execute(&mut tx)
-            .await
-            .map_err(SqlxError)?;
+            .await?;
     }
 
-    tx.commit().await.map_err(SqlxError)?;
+    tx.commit().await?;
 
     Ok(HttpResponse::Ok().finish())
 }
