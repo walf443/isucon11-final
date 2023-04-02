@@ -1,8 +1,9 @@
-use crate::db;
-use crate::responses::error::SqlxError;
+use crate::responses::error::ResponseError::{AnnouncementConflict, CourseNotFound};
+use crate::responses::error::ResponseResult;
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::announcement::Announcement;
 use isucholar_core::models::user::User;
+use isucholar_core::repos::course_repository::{CourseRepository, CourseRepositoryImpl};
 use isucholar_core::MYSQL_ERR_NUM_DUPLICATE_ENTRY;
 
 #[derive(Debug, serde::Deserialize)]
@@ -17,17 +18,15 @@ pub struct AddAnnouncementRequest {
 pub async fn add_announcement(
     pool: web::Data<sqlx::MySqlPool>,
     req: web::Json<AddAnnouncementRequest>,
-) -> actix_web::Result<HttpResponse> {
-    let mut tx = pool.begin().await.map_err(SqlxError)?;
+) -> ResponseResult<HttpResponse> {
+    let mut tx = pool.begin().await?;
 
-    let count: i64 = db::fetch_one_scalar(
-        sqlx::query_scalar("SELECT COUNT(*) FROM `courses` WHERE `id` = ?").bind(&req.course_id),
-        &mut tx,
-    )
-    .await
-    .map_err(SqlxError)?;
-    if count == 0 {
-        return Err(actix_web::error::ErrorNotFound("No such course."));
+    let course_repo = CourseRepositoryImpl {};
+    let is_exist = course_repo
+        .exist_by_id_in_tx(&mut tx, &req.course_id)
+        .await?;
+    if !is_exist {
+        return Err(CourseNotFound);
     }
 
     let result = sqlx::query(
@@ -50,22 +49,19 @@ pub async fn add_announcement(
                         sqlx::query_as("SELECT * FROM `announcements` WHERE `id` = ?")
                             .bind(&req.id)
                             .fetch_one(pool.as_ref())
-                            .await
-                            .map_err(SqlxError)?;
+                            .await?;
                     if announcement.course_id != req.course_id
                         || announcement.title != req.title
                         || announcement.message != req.message
                     {
-                        return Err(actix_web::error::ErrorConflict(
-                            "An announcement with the same id already exists.",
-                        ));
+                        return Err(AnnouncementConflict);
                     } else {
                         return Ok(HttpResponse::Created().finish());
                     }
                 }
             }
         }
-        return Err(SqlxError(e).into());
+        return Err(e.into());
     }
 
     let targets: Vec<User> = sqlx::query_as(concat!(
@@ -75,8 +71,7 @@ pub async fn add_announcement(
     ))
     .bind(&req.course_id)
     .fetch_all(&mut tx)
-    .await
-    .map_err(SqlxError)?;
+    .await?;
 
     for user in targets {
         sqlx::query(
@@ -85,11 +80,10 @@ pub async fn add_announcement(
         .bind(&req.id)
         .bind(user.id)
         .execute(&mut tx)
-        .await
-        .map_err(SqlxError)?;
+        .await?;
     }
 
-    tx.commit().await.map_err(SqlxError)?;
+    tx.commit().await?;
 
     Ok(HttpResponse::Created().finish())
 }

@@ -22,6 +22,8 @@ pub enum ResponseError {
     InvalidPage,
     #[error("Invalid file.")]
     InvalidFile,
+    #[error("An announcement with the same id already exists.")]
+    AnnouncementConflict,
     #[error("No such class.")]
     ClassNotFound,
     #[error("No such course.")]
@@ -54,9 +56,11 @@ impl actix_web::ResponseError for ResponseError {
             | ResponseError::SubmissionClosed => HttpResponse::BadRequest()
                 .content_type(mime::TEXT_PLAIN)
                 .body(self.to_string()),
-            ResponseError::CourseConflict => HttpResponse::Conflict()
-                .content_type(mime::TEXT_PLAIN)
-                .body(self.to_string()),
+            ResponseError::CourseConflict | ResponseError::AnnouncementConflict => {
+                HttpResponse::Conflict()
+                    .content_type(mime::TEXT_PLAIN)
+                    .body(self.to_string())
+            }
             _ => {
                 log::error!("{}", self);
                 HttpResponse::InternalServerError()
