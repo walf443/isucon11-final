@@ -1,10 +1,10 @@
 use crate::database::DBPool;
+use crate::models::course_status::CourseStatus;
+use crate::models::user_type::UserType;
 use crate::repos::error::Result;
 use async_trait::async_trait;
 use futures::StreamExt;
 use num_traits::ToPrimitive;
-use crate::models::course_status::CourseStatus;
-use crate::models::user_type::UserType;
 
 #[async_trait]
 pub trait UserRepository {

@@ -1,4 +1,4 @@
-#[derive(Debug, PartialEq, Eq, serde::Deserialize)]
+#[derive(Debug, PartialEq, Eq, serde::Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub enum CourseType {
     LiberalArts,
