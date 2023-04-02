@@ -1,5 +1,5 @@
 use crate::db::{DBPool, TxConn};
-use crate::models::submission::CreateSubmission;
+use crate::models::submission::{CreateSubmission, Submission};
 use crate::repos::error::Result;
 use async_trait::async_trait;
 
@@ -24,6 +24,11 @@ pub trait SubmissionRepository {
         class_id: &str,
         user_id: &str,
     ) -> Result<Option<Option<u8>>>;
+    async fn find_all_by_class_id_in_tx<'c>(
+        &self,
+        tx: &mut TxConn,
+        class_id: &str,
+    ) -> Result<Vec<Submission>>;
 }
 
 pub struct SubmissionRepositoryImpl {}
@@ -85,5 +90,23 @@ impl SubmissionRepository for SubmissionRepositoryImpl {
         .await?;
 
         Ok(score)
+    }
+
+    async fn find_all_by_class_id_in_tx<'c>(
+        &self,
+        tx: &mut TxConn,
+        class_id: &str,
+    ) -> Result<Vec<Submission>> {
+        let submissions: Vec<Submission> = sqlx::query_as(concat!(
+        "SELECT `submissions`.`user_id`, `submissions`.`file_name`, `users`.`code` AS `user_code`",
+        " FROM `submissions`",
+        " JOIN `users` ON `users`.`id` = `submissions`.`user_id`",
+        " WHERE `class_id` = ?",
+        ))
+        .bind(class_id)
+        .fetch_all(tx)
+        .await?;
+
+        Ok(submissions)
     }
 }

@@ -4,6 +4,9 @@ use actix_web::web;
 use isucholar_core::models::assignment_path::AssignmentPath;
 use isucholar_core::models::submission::Submission;
 use isucholar_core::repos::class_repository::{ClassRepository, ClassRepositoryImpl};
+use isucholar_core::repos::submission_repository::{
+    SubmissionRepository, SubmissionRepositoryImpl,
+};
 use isucholar_core::ASSIGNMENTS_DIRECTORY;
 
 // GET /api/courses/{course_id}/classes/{class_id}/assignments/export 提出済みの課題ファイルをzip形式で一括ダウンロード
@@ -22,15 +25,10 @@ pub async fn download_submitted_assignments(
     if !is_exist {
         return Err(ClassNotFound);
     }
-    let submissions: Vec<Submission> = sqlx::query_as(concat!(
-        "SELECT `submissions`.`user_id`, `submissions`.`file_name`, `users`.`code` AS `user_code`",
-        " FROM `submissions`",
-        " JOIN `users` ON `users`.`id` = `submissions`.`user_id`",
-        " WHERE `class_id` = ?",
-    ))
-    .bind(class_id)
-    .fetch_all(&mut tx)
-    .await?;
+    let submission_repo = SubmissionRepositoryImpl {};
+    let submissions = submission_repo
+        .find_all_by_class_id_in_tx(&mut tx, &class_id)
+        .await?;
 
     let zip_file_path = format!("{}{}.zip", ASSIGNMENTS_DIRECTORY, class_id);
     create_submissions_zip(&zip_file_path, class_id, &submissions).await?;
