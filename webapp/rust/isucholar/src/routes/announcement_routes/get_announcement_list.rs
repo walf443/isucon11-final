@@ -3,7 +3,9 @@ use crate::responses::error::ResponseResult;
 use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::announcement::AnnouncementWithoutDetail;
-use isucholar_core::repos::unread_announcement_repository::{UnreadAnnouncementRepository, UnreadAnnouncementRepositoryImpl};
+use isucholar_core::repos::unread_announcement_repository::{
+    UnreadAnnouncementRepository, UnreadAnnouncementRepositoryImpl,
+};
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct GetAnnouncementsQuery {
@@ -26,7 +28,7 @@ pub async fn get_announcement_list(
 ) -> ResponseResult<HttpResponse> {
     let (user_id, _, _) = get_user_info(session)?;
 
-    let unread_announcement_repos = UnreadAnnouncementRepositoryImpl{};
+    let unread_announcement_repos = UnreadAnnouncementRepositoryImpl {};
 
     let mut tx = pool.begin().await?;
 

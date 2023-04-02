@@ -1,10 +1,10 @@
 use crate::responses::error::ResponseError::{AnnouncementConflict, CourseNotFound};
 use crate::responses::error::ResponseResult;
 use actix_web::{web, HttpResponse};
-use isucholar_core::models::announcement::Announcement;
 use isucholar_core::models::user::User;
 use isucholar_core::repos::course_repository::{CourseRepository, CourseRepositoryImpl};
 use isucholar_core::MYSQL_ERR_NUM_DUPLICATE_ENTRY;
+use isucholar_core::repos::announcement_repository::{AnnouncementRepository, AnnouncementRepositoryImpl};
 
 #[derive(Debug, serde::Deserialize)]
 pub struct AddAnnouncementRequest {
@@ -45,11 +45,8 @@ pub async fn add_announcement(
                 db_error.try_downcast_ref::<sqlx::mysql::MySqlDatabaseError>()
             {
                 if mysql_error.number() == MYSQL_ERR_NUM_DUPLICATE_ENTRY {
-                    let announcement: Announcement =
-                        sqlx::query_as("SELECT * FROM `announcements` WHERE `id` = ?")
-                            .bind(&req.id)
-                            .fetch_one(pool.as_ref())
-                            .await?;
+                    let announcement_repos = AnnouncementRepositoryImpl{};
+                    let announcement = announcement_repos.find_by_id(&pool, &req.id).await?;
                     if announcement.course_id != req.course_id
                         || announcement.title != req.title
                         || announcement.message != req.message
