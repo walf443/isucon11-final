@@ -4,8 +4,8 @@ use crate::responses::error::ResponseError::{
 use crate::responses::error::ResponseResult;
 use crate::util;
 use actix_web::{web, HttpResponse};
-use isucholar_core::models::class::Class;
 use isucholar_core::models::course_status::CourseStatus;
+use isucholar_core::repos::class_repository::{ClassRepository, ClassRepositoryImpl};
 use isucholar_core::repos::course_repository::{CourseRepository, CourseRepositoryImpl};
 use isucholar_core::MYSQL_ERR_NUM_DUPLICATE_ENTRY;
 
@@ -43,6 +43,7 @@ pub async fn add_class(
         return Err(CourseIsNotInProgress);
     }
 
+    let class_repo = ClassRepositoryImpl {};
     let class_id = util::new_ulid().await;
     let result = sqlx::query("INSERT INTO `classes` (`id`, `course_id`, `part`, `title`, `description`) VALUES (?, ?, ?, ?, ?)")
         .bind(&class_id)
@@ -59,13 +60,9 @@ pub async fn add_class(
                 db_error.try_downcast_ref::<sqlx::mysql::MySqlDatabaseError>()
             {
                 if mysql_error.number() == MYSQL_ERR_NUM_DUPLICATE_ENTRY {
-                    let class: Class = sqlx::query_as(
-                        "SELECT * FROM `classes` WHERE `course_id` = ? AND `part` = ?",
-                    )
-                    .bind(course_id)
-                    .bind(&req.part)
-                    .fetch_one(pool.as_ref())
-                    .await?;
+                    let class = class_repo
+                        .find_by_course_id_and_part(&pool, course_id, &req.part)
+                        .await?;
                     if req.title != class.title || req.description != class.description {
                         return Err(CourseConflict);
                     } else {
