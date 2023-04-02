@@ -44,15 +44,8 @@ pub async fn get_grades(
         let mut my_total_score = 0;
         for class in classes {
             let submissions_count = submission_repo.count_by_class_id(&pool, &class.id).await?;
+            let my_score = submission_repo.find_score_by_class_id_and_user_id(&pool, &class.id, &user_id).await?;
 
-            let my_score: Option<Option<u8>> = sqlx::query_scalar(concat!(
-                "SELECT `submissions`.`score` FROM `submissions`",
-                " WHERE `user_id` = ? AND `class_id` = ?"
-            ))
-            .bind(&user_id)
-            .bind(&class.id)
-            .fetch_optional(pool.as_ref())
-            .await?;
             if let Some(Some(my_score)) = my_score {
                 let my_score = my_score as i64;
                 my_total_score += my_score;
