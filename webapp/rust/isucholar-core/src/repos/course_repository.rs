@@ -63,7 +63,7 @@ impl CourseRepository for CourseRepositoryImpl {
                         || req.day_of_week != course.day_of_week
                         || req.keywords != course.keywords
                     {
-                        return Err(ReposError::CourseDepulicate());
+                        return Err(ReposError::CourseDepulicate);
                     } else {
                         return Ok(course.id);
                     }

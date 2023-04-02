@@ -4,10 +4,11 @@ use crate::responses::error::ResponseError::{
 use crate::responses::error::ResponseResult;
 use crate::util;
 use actix_web::{web, HttpResponse};
+use isucholar_core::models::class::CreateClass;
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::repos::class_repository::{ClassRepository, ClassRepositoryImpl};
 use isucholar_core::repos::course_repository::{CourseRepository, CourseRepositoryImpl};
-use isucholar_core::MYSQL_ERR_NUM_DUPLICATE_ENTRY;
+use isucholar_core::repos::error::ReposError;
 
 #[derive(Debug, serde::Deserialize)]
 pub struct AddClassRequest {
@@ -45,21 +46,22 @@ pub async fn add_class(
 
     let class_repo = ClassRepositoryImpl {};
     let class_id = util::new_ulid().await;
-    let result = sqlx::query("INSERT INTO `classes` (`id`, `course_id`, `part`, `title`, `description`) VALUES (?, ?, ?, ?, ?)")
-        .bind(&class_id)
-        .bind(course_id)
-        .bind(&req.part)
-        .bind(&req.title)
-        .bind(&req.description)
-        .execute(&mut tx)
-        .await;
-    if let Err(e) = result {
-        let _ = tx.rollback().await;
-        if let sqlx::error::Error::Database(ref db_error) = e {
-            if let Some(mysql_error) =
-                db_error.try_downcast_ref::<sqlx::mysql::MySqlDatabaseError>()
-            {
-                if mysql_error.number() == MYSQL_ERR_NUM_DUPLICATE_ENTRY {
+    let form = CreateClass {
+        id: class_id.clone(),
+        course_id: course_id.clone(),
+        part: req.part.clone(),
+        title: req.title.clone(),
+        description: req.description.clone(),
+    };
+    let result = class_repo.create_in_tx(&mut tx, &form).await;
+    match result {
+        Ok(_) => {
+            tx.commit().await?;
+        }
+        Err(e) => {
+            let _ = tx.rollback().await;
+            match e {
+                ReposError::CourseDepulicate => {
                     let class = class_repo
                         .find_by_course_id_and_part(&pool, course_id, &req.part)
                         .await?;
@@ -71,12 +73,10 @@ pub async fn add_class(
                         );
                     }
                 }
+                _ => {}
             }
         }
-        return Err(e.into());
     }
-
-    tx.commit().await?;
 
     Ok(HttpResponse::Created().json(AddClassResponse { class_id }))
 }
