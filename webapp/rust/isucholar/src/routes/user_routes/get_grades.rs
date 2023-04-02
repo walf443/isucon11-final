@@ -3,12 +3,10 @@ use crate::responses::get_grade_response::GetGradeResponse;
 use crate::routes::util::get_user_info;
 use crate::util;
 use actix_web::{web, HttpResponse};
-use futures::StreamExt;
 use isucholar_core::models::class_score::ClassScore;
 use isucholar_core::models::course_result::CourseResult;
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::models::summary::Summary;
-use isucholar_core::models::user_type::UserType;
 use isucholar_core::repos::class_repository::{ClassRepository, ClassRepositoryImpl};
 use isucholar_core::repos::registration_course_repository::{
     RegistrationCourseRepository, RegistrationCourseRepositoryImpl,
@@ -16,7 +14,7 @@ use isucholar_core::repos::registration_course_repository::{
 use isucholar_core::repos::submission_repository::{
     SubmissionRepository, SubmissionRepositoryImpl,
 };
-use num_traits::ToPrimitive;
+use isucholar_core::repos::user_repository::{UserRepository, UserRepositoryImpl};
 
 // GET /api/users/me/grades 成績取得
 pub async fn get_grades(
@@ -36,6 +34,8 @@ pub async fn get_grades(
     let mut my_credits = 0;
     let class_repo = ClassRepositoryImpl {};
     let submission_repo = SubmissionRepositoryImpl {};
+    let user_repo = UserRepositoryImpl {};
+
     for course in registered_courses {
         let classes = class_repo.find_all_by_course_id(&pool, &course.id).await?;
 
@@ -94,37 +94,7 @@ pub async fn get_grades(
         my_gpa = my_gpa / 100.0 / my_credits as f64;
     }
 
-    // GPAの統計値
-    // 一つでも修了した科目がある学生のGPA一覧
-    let gpas = {
-        let mut rows = sqlx::query_scalar(concat!(
-        "SELECT IFNULL(SUM(`submissions`.`score` * `courses`.`credit`), 0) / 100 / `credits`.`credits` AS `gpa`",
-        " FROM `users`",
-        " JOIN (",
-        "     SELECT `users`.`id` AS `user_id`, SUM(`courses`.`credit`) AS `credits`",
-        "     FROM `users`",
-        "     JOIN `registrations` ON `users`.`id` = `registrations`.`user_id`",
-        "     JOIN `courses` ON `registrations`.`course_id` = `courses`.`id` AND `courses`.`status` = ?",
-        "     GROUP BY `users`.`id`",
-        " ) AS `credits` ON `credits`.`user_id` = `users`.`id`",
-        " JOIN `registrations` ON `users`.`id` = `registrations`.`user_id`",
-        " JOIN `courses` ON `registrations`.`course_id` = `courses`.`id` AND `courses`.`status` = ?",
-        " LEFT JOIN `classes` ON `courses`.`id` = `classes`.`course_id`",
-        " LEFT JOIN `submissions` ON `users`.`id` = `submissions`.`user_id` AND `submissions`.`class_id` = `classes`.`id`",
-        " WHERE `users`.`type` = ?",
-        " GROUP BY `users`.`id`",
-        ))
-            .bind(CourseStatus::Closed)
-            .bind(CourseStatus::Closed)
-            .bind(UserType::Student)
-            .fetch(pool.as_ref());
-        let mut gpas = Vec::new();
-        while let Some(row) = rows.next().await {
-            let gpa: sqlx::types::Decimal = row?;
-            gpas.push(gpa.to_f64().unwrap());
-        }
-        gpas
-    };
+    let gpas = user_repo.find_gpas_group_by_user_id(&pool).await?;
 
     Ok(HttpResponse::Ok().json(GetGradeResponse {
         course_results,
