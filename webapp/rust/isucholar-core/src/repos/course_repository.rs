@@ -7,7 +7,8 @@ use async_trait::async_trait;
 #[async_trait]
 pub trait CourseRepository {
     async fn create(&self, pool: &DBPool, course: &CreateCourse) -> Result<String>;
-    async fn exist_by_id_in_tx<'c>(&self, pool: &mut TxConn<'c>, id: &str) -> Result<bool>;
+    async fn exist_by_id_in_tx<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<bool>;
+    async fn for_update_by_id_in_tx<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<bool>;
     async fn find_by_code(&self, pool: &DBPool, code: &str) -> Result<Course>;
     async fn find_with_teacher_by_id(
         &self,
@@ -63,10 +64,20 @@ impl CourseRepository for CourseRepositoryImpl {
         Ok(req.id.clone())
     }
 
-    async fn exist_by_id_in_tx<'c>(&self, pool: &mut TxConn<'c>, id: &str) -> Result<bool> {
+    async fn exist_by_id_in_tx<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<bool> {
         let count: i64 = db::fetch_one_scalar(
             sqlx::query_scalar("SELECT COUNT(*) FROM `courses` WHERE `id` = ?").bind(id),
-            pool,
+            tx,
+        )
+        .await?;
+
+        Ok(count == 1)
+    }
+
+    async fn for_update_by_id_in_tx<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<bool> {
+        let count: i64 = db::fetch_one_scalar(
+            sqlx::query_scalar("SELECT COUNT(*) FROM `courses` WHERE `id` = ? FOR UPDATE").bind(id),
+            tx,
         )
         .await?;
 

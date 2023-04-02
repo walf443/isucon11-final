@@ -1,7 +1,8 @@
-use crate::db;
-use crate::responses::error::SqlxError;
+use crate::responses::error::ResponseError::CourseNotFound;
+use crate::responses::error::ResponseResult;
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::course_status::CourseStatus;
+use isucholar_core::repos::course_repository::{CourseRepository, CourseRepositoryImpl};
 
 #[derive(Debug, serde::Deserialize)]
 pub struct SetCourseStatusRequest {
@@ -13,30 +14,25 @@ pub async fn set_course_status(
     pool: web::Data<sqlx::MySqlPool>,
     course_id: web::Path<(String,)>,
     req: web::Json<SetCourseStatusRequest>,
-) -> actix_web::Result<HttpResponse> {
+) -> ResponseResult<HttpResponse> {
     let course_id = &course_id.0;
 
-    let mut tx = pool.begin().await.map_err(SqlxError)?;
-
-    let count: i64 = db::fetch_one_scalar(
-        sqlx::query_scalar("SELECT COUNT(*) FROM `courses` WHERE `id` = ? FOR UPDATE")
-            .bind(course_id),
-        &mut tx,
-    )
-    .await
-    .map_err(SqlxError)?;
-    if count == 0 {
-        return Err(actix_web::error::ErrorNotFound("No such course."));
+    let mut tx = pool.begin().await?;
+    let course_repo = CourseRepositoryImpl {};
+    let is_exist = course_repo
+        .for_update_by_id_in_tx(&mut tx, course_id)
+        .await?;
+    if !is_exist {
+        return Err(CourseNotFound);
     }
 
     sqlx::query("UPDATE `courses` SET `status` = ? WHERE `id` = ?")
         .bind(&req.status)
         .bind(course_id)
         .execute(&mut tx)
-        .await
-        .map_err(SqlxError)?;
+        .await?;
 
-    tx.commit().await.map_err(SqlxError)?;
+    tx.commit().await?;
 
     Ok(HttpResponse::Ok().finish())
 }
