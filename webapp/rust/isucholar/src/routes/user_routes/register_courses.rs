@@ -1,4 +1,3 @@
-use crate::db;
 use crate::requests::register_course_request::RegisterCourseRequestContent;
 use crate::responses::error::ResponseResult;
 use crate::responses::register_courses_error_response::RegisterCoursesErrorResponse;
@@ -7,6 +6,9 @@ use actix_web::{web, HttpResponse};
 use isucholar_core::models::course::Course;
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::repos::course_repository::{CourseRepository, CourseRepositoryImpl};
+use isucholar_core::repos::registration_repository::{
+    RegistrationRepository, RegistrationRepositoryImpl,
+};
 
 // PUT /api/users/me/courses 履修登録
 pub async fn register_courses(
@@ -24,6 +26,7 @@ pub async fn register_courses(
     let mut errors = RegisterCoursesErrorResponse::default();
     let mut newly_added = Vec::new();
     let course_repo = CourseRepositoryImpl {};
+    let registration_repo = RegistrationRepositoryImpl {};
     for course_req in req {
         let course = course_repo
             .find_for_share_lock_by_id_in_tx(&mut tx, &course_req.id)
@@ -40,16 +43,10 @@ pub async fn register_courses(
         }
 
         // すでに履修登録済みの科目は無視する
-        let count: i64 = db::fetch_one_scalar(
-            sqlx::query_scalar(
-                "SELECT COUNT(*) FROM `registrations` WHERE `course_id` = ? AND `user_id` = ?",
-            )
-            .bind(&course.id)
-            .bind(&user_id),
-            &mut tx,
-        )
-        .await?;
-        if count > 0 {
+        let is_exist = registration_repo
+            .exist_by_user_id_and_course_id_in_tx(&mut tx, &user_id, &course.id)
+            .await?;
+        if is_exist {
             continue;
         }
 
