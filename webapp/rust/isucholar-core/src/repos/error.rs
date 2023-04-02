@@ -7,7 +7,7 @@ pub enum ReposError {
     #[error("A announcement with the same code already exists.")]
     AnnoucementDuplicate,
     #[error("A course with the same code already exists.")]
-    CourseDepulicate,
+    CourseDuplicate,
     #[error("A class  with the same code already exists.")]
     ClassDepulicate,
 }

@@ -61,7 +61,7 @@ pub async fn add_class(
         Err(e) => {
             let _ = tx.rollback().await;
             match e {
-                ReposError::CourseDepulicate => {
+                ReposError::CourseDuplicate => {
                     let class = class_repo
                         .find_by_course_id_and_part(&pool, course_id, &req.part)
                         .await?;
