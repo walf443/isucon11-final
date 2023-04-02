@@ -12,12 +12,22 @@ pub enum ResponseError {
     SqlxError(#[from] sqlx::Error),
     #[error("No such course.")]
     CourseNotFound,
+    #[error("This course is not in progress")]
+    CourseIsNotInProgress,
+    #[error("A class with the same part already exists.")]
+    CourseConflict,
 }
 
 impl actix_web::ResponseError for ResponseError {
     fn error_response(&self) -> HttpResponse {
         match self {
             ResponseError::CourseNotFound => HttpResponse::NotFound()
+                .content_type(mime::TEXT_PLAIN)
+                .body(self.to_string()),
+            ResponseError::CourseIsNotInProgress => HttpResponse::BadRequest()
+                .content_type(mime::TEXT_PLAIN)
+                .body(self.to_string()),
+            ResponseError::CourseConflict => HttpResponse::Conflict()
                 .content_type(mime::TEXT_PLAIN)
                 .body(self.to_string()),
             _ => {

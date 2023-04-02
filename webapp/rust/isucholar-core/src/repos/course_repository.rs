@@ -8,6 +8,11 @@ use async_trait::async_trait;
 #[async_trait]
 pub trait CourseRepository {
     async fn create(&self, pool: &DBPool, course: &CreateCourse) -> Result<String>;
+    async fn find_for_share_lock_by_id_in_tx<'c>(
+        &self,
+        tx: &mut TxConn<'c>,
+        id: &str,
+    ) -> Result<Option<Course>>;
     async fn exist_by_id_in_tx<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<bool>;
     async fn for_update_by_id_in_tx<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<bool>;
     async fn update_status_by_id_in_tx<'c>(
@@ -69,6 +74,20 @@ impl CourseRepository for CourseRepositoryImpl {
         result?;
 
         Ok(req.id.clone())
+    }
+
+    async fn find_for_share_lock_by_id_in_tx<'c>(
+        &self,
+        tx: &mut TxConn<'c>,
+        id: &str,
+    ) -> Result<Option<Course>> {
+        let course: Option<Course> = db::fetch_optional_as(
+            sqlx::query_as("SELECT * FROM `courses` WHERE `id` = ? FOR SHARE").bind(id),
+            tx,
+        )
+        .await?;
+
+        Ok(course)
     }
 
     async fn exist_by_id_in_tx<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<bool> {

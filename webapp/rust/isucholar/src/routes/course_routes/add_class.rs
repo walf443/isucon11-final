@@ -1,9 +1,12 @@
-use crate::responses::error::SqlxError;
-use crate::{db, util};
+use crate::responses::error::ResponseError::{
+    CourseConflict, CourseIsNotInProgress, CourseNotFound,
+};
+use crate::responses::error::ResponseResult;
+use crate::util;
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::class::Class;
-use isucholar_core::models::course::Course;
 use isucholar_core::models::course_status::CourseStatus;
+use isucholar_core::repos::course_repository::{CourseRepository, CourseRepositoryImpl};
 use isucholar_core::MYSQL_ERR_NUM_DUPLICATE_ENTRY;
 
 #[derive(Debug, serde::Deserialize)]
@@ -23,25 +26,21 @@ pub async fn add_class(
     pool: web::Data<sqlx::MySqlPool>,
     course_id: web::Path<(String,)>,
     req: web::Json<AddClassRequest>,
-) -> actix_web::Result<HttpResponse> {
+) -> ResponseResult<HttpResponse> {
     let course_id = &course_id.0;
 
-    let mut tx = pool.begin().await.map_err(SqlxError)?;
+    let mut tx = pool.begin().await?;
 
-    let course: Option<Course> = db::fetch_optional_as(
-        sqlx::query_as("SELECT * FROM `courses` WHERE `id` = ? FOR SHARE").bind(course_id),
-        &mut tx,
-    )
-    .await
-    .map_err(SqlxError)?;
+    let course_repo = CourseRepositoryImpl {};
+    let course = course_repo
+        .find_for_share_lock_by_id_in_tx(&mut tx, course_id)
+        .await?;
     if course.is_none() {
-        return Err(actix_web::error::ErrorNotFound("No such course."));
+        return Err(CourseNotFound);
     }
     let course = course.unwrap();
     if course.status != CourseStatus::InProgress {
-        return Err(actix_web::error::ErrorBadRequest(
-            "This course is not in-progress.",
-        ));
+        return Err(CourseIsNotInProgress);
     }
 
     let class_id = util::new_ulid().await;
@@ -66,12 +65,9 @@ pub async fn add_class(
                     .bind(course_id)
                     .bind(&req.part)
                     .fetch_one(pool.as_ref())
-                    .await
-                    .map_err(SqlxError)?;
+                    .await?;
                     if req.title != class.title || req.description != class.description {
-                        return Err(actix_web::error::ErrorConflict(
-                            "A class with the same part already exists.",
-                        ));
+                        return Err(CourseConflict);
                     } else {
                         return Ok(
                             HttpResponse::Created().json(AddClassResponse { class_id: class.id })
@@ -80,10 +76,10 @@ pub async fn add_class(
                 }
             }
         }
-        return Err(SqlxError(e).into());
+        return Err(e.into());
     }
 
-    tx.commit().await.map_err(SqlxError)?;
+    tx.commit().await?;
 
     Ok(HttpResponse::Created().json(AddClassResponse { class_id }))
 }
