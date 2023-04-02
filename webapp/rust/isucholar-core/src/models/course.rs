@@ -18,6 +18,25 @@ pub struct Course {
     pub status: CourseStatus,
 }
 
+#[derive(Debug, sqlx::FromRow, serde::Serialize)]
+pub struct CourseWithTeacher {
+    pub id: String,
+    pub code: String,
+    #[serde(rename = "type")]
+    #[sqlx(rename = "type")]
+    pub type_: String,
+    pub name: String,
+    pub description: String,
+    pub credit: u8,
+    pub period: u8,
+    pub day_of_week: DayOfWeek,
+    #[serde(skip)]
+    pub teacher_id: String,
+    pub keywords: String,
+    pub status: CourseStatus,
+    pub teacher: String,
+}
+
 #[derive(Debug, serde::Deserialize)]
 pub struct CreateCourse {
     pub id: String,

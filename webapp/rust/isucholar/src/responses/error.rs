@@ -10,14 +10,23 @@ pub enum ResponseError {
     ActixError(#[from] actix_web::Error),
     #[error("sqlx error")]
     SqlxError(#[from] sqlx::Error),
+    #[error("No such course.")]
+    CourseNotFound,
 }
 
 impl actix_web::ResponseError for ResponseError {
     fn error_response(&self) -> HttpResponse {
-        log::error!("{}", self);
-        HttpResponse::InternalServerError()
-            .content_type(mime::TEXT_PLAIN)
-            .body(self.to_string())
+        match self {
+            ResponseError::CourseNotFound => HttpResponse::NotFound()
+                .content_type(mime::TEXT_PLAIN)
+                .body(self.to_string()),
+            _ => {
+                log::error!("{}", self);
+                HttpResponse::InternalServerError()
+                    .content_type(mime::TEXT_PLAIN)
+                    .body(self.to_string())
+            }
+        }
     }
 }
 

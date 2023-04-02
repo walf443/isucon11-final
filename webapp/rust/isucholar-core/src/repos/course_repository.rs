@@ -1,5 +1,5 @@
 use crate::database::DBPool;
-use crate::models::course::{Course, CreateCourse};
+use crate::models::course::{Course, CourseWithTeacher, CreateCourse};
 use crate::repos::error::{ReposError, Result};
 use crate::MYSQL_ERR_NUM_DUPLICATE_ENTRY;
 use async_trait::async_trait;
@@ -8,6 +8,11 @@ use async_trait::async_trait;
 pub trait CourseRepository {
     async fn create(&self, pool: &DBPool, course: &CreateCourse) -> Result<String>;
     async fn find_by_code(&self, pool: &DBPool, code: &str) -> Result<Course>;
+    async fn find_with_teacher_by_id(
+        &self,
+        pool: &DBPool,
+        id: &str,
+    ) -> Result<Option<CourseWithTeacher>>;
 }
 
 pub struct CourseRepositoryImpl {}
@@ -64,5 +69,23 @@ impl CourseRepository for CourseRepositoryImpl {
             .await?;
 
         Ok(course)
+    }
+
+    async fn find_with_teacher_by_id(
+        &self,
+        pool: &DBPool,
+        id: &str,
+    ) -> Result<Option<CourseWithTeacher>> {
+        let res: Option<CourseWithTeacher> = sqlx::query_as(concat!(
+            "SELECT `courses`.*, `users`.`name` AS `teacher`",
+            " FROM `courses`",
+            " JOIN `users` ON `courses`.`teacher_id` = `users`.`id`",
+            " WHERE `courses`.`id` = ?",
+        ))
+        .bind(id)
+        .fetch_optional(pool)
+        .await?;
+
+        Ok(res)
     }
 }
