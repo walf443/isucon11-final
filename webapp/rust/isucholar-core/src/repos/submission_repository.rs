@@ -1,4 +1,4 @@
-use crate::database::DBPool;
+use crate::db::DBPool;
 use crate::repos::error::Result;
 use async_trait::async_trait;
 

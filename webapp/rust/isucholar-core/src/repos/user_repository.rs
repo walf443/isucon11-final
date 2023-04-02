@@ -1,4 +1,4 @@
-use crate::database::DBPool;
+use crate::db::DBPool;
 use crate::models::course_status::CourseStatus;
 use crate::models::user_type::UserType;
 use crate::repos::error::Result;

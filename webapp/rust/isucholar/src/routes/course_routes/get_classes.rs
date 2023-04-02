@@ -1,8 +1,9 @@
-use crate::db;
-use crate::responses::error::SqlxError;
+use crate::responses::error::ResponseError::CourseNotFound;
+use crate::responses::error::ResponseResult;
 use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::class::ClassWithSubmitted;
+use isucholar_core::repos::course_repository::{CourseRepository, CourseRepositoryImpl};
 
 #[derive(Debug, serde::Serialize)]
 struct GetClassResponse {
@@ -19,21 +20,17 @@ pub async fn get_classes(
     pool: web::Data<sqlx::MySqlPool>,
     session: actix_session::Session,
     course_id: web::Path<(String,)>,
-) -> actix_web::Result<HttpResponse> {
+) -> ResponseResult<HttpResponse> {
     let (user_id, _, _) = get_user_info(session)?;
 
     let course_id = &course_id.0;
 
-    let mut tx = pool.begin().await.map_err(SqlxError)?;
+    let mut tx = pool.begin().await?;
+    let course_repo = CourseRepositoryImpl {};
+    let is_exist = course_repo.exist_by_id_in_tx(&mut tx, course_id).await?;
 
-    let count: i64 = db::fetch_one_scalar(
-        sqlx::query_scalar("SELECT COUNT(*) FROM `courses` WHERE `id` = ?").bind(course_id),
-        &mut tx,
-    )
-    .await
-    .map_err(SqlxError)?;
-    if count == 0 {
-        return Err(actix_web::error::ErrorNotFound("No such course."));
+    if !is_exist {
+        return Err(CourseNotFound);
     }
 
     let classes: Vec<ClassWithSubmitted> = sqlx::query_as(concat!(
@@ -46,10 +43,9 @@ pub async fn get_classes(
         .bind(&user_id)
         .bind(course_id)
         .fetch_all(&mut tx)
-        .await
-        .map_err(SqlxError)?;
+        .await?;
 
-    tx.commit().await.map_err(SqlxError)?;
+    tx.commit().await?;
 
     // 結果が0件の時は空配列を返却
     let res = classes
