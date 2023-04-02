@@ -6,7 +6,7 @@ use async_trait::async_trait;
 use sqlx::Arguments;
 
 #[async_trait]
-pub trait UnreadAnnouncemnetRepository {
+pub trait UnreadAnnouncementRepository {
     async fn count_unread_by_user_id_in_tx<'c>(
         &self,
         tx: &mut TxConn<'c>,
@@ -22,10 +22,10 @@ pub trait UnreadAnnouncemnetRepository {
     ) -> Result<Vec<AnnouncementWithoutDetail>>;
 }
 
-pub struct UnreadAnnouncemntRepositoryImpl {}
+pub struct UnreadAnnouncementRepositoryImpl {}
 
 #[async_trait]
-impl UnreadAnnouncemnetRepository for UnreadAnnouncemntRepositoryImpl {
+impl UnreadAnnouncementRepository for UnreadAnnouncementRepositoryImpl {
     async fn count_unread_by_user_id_in_tx<'c>(
         &self,
         tx: &mut TxConn<'c>,
