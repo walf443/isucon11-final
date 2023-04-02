@@ -33,9 +33,9 @@ pub async fn download_submitted_assignments(
     let zip_file_path = format!("{}{}.zip", ASSIGNMENTS_DIRECTORY, class_id);
     create_submissions_zip(&zip_file_path, class_id, &submissions).await?;
 
-    sqlx::query("UPDATE `classes` SET `submission_closed` = true WHERE `id` = ?")
-        .bind(class_id)
-        .execute(&mut tx)
+    let class_repo = ClassRepositoryImpl {};
+    class_repo
+        .update_submission_closed_by_id_in_tx(&mut tx, &class_id)
         .await?;
 
     tx.commit().await?;

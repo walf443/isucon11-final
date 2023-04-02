@@ -9,6 +9,11 @@ use async_trait::async_trait;
 pub trait ClassRepository {
     async fn for_update_by_id_in_tx<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<bool>;
     async fn create_in_tx<'c>(&self, tx: &mut TxConn<'c>, class: &CreateClass) -> Result<()>;
+    async fn update_submission_closed_by_id_in_tx<'c>(
+        &self,
+        tx: &mut TxConn<'c>,
+        id: &str,
+    ) -> Result<()>;
     async fn find_submission_closed_by_id_in_tx<'c>(
         &self,
         tx: &mut TxConn<'c>,
@@ -66,6 +71,19 @@ impl ClassRepository for ClassRepositoryImpl {
 
             return Err(e.into());
         }
+
+        Ok(())
+    }
+
+    async fn update_submission_closed_by_id_in_tx<'c>(
+        &self,
+        tx: &mut TxConn<'c>,
+        id: &str,
+    ) -> Result<()> {
+        sqlx::query("UPDATE `classes` SET `submission_closed` = true WHERE `id` = ?")
+            .bind(id)
+            .execute(tx)
+            .await?;
 
         Ok(())
     }
