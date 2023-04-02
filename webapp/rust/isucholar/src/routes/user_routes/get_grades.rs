@@ -70,7 +70,7 @@ pub async fn get_grades(
         }
 
         let totals = registration_course_repo
-            .find_total_score_by_course_id_group_by_user_id(&pool, &course.id)
+            .find_total_scores_by_course_id_group_by_user_id(&pool, &course.id)
             .await?;
 
         course_results.push(CourseResult {
