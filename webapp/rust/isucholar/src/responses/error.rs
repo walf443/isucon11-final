@@ -22,6 +22,8 @@ pub enum ResponseError {
     ClassNotFound,
     #[error("No such course.")]
     CourseNotFound,
+    #[error("This assignment is not closed yet.")]
+    ClassIsNotSubmissionClosed,
     #[error("This course is not in progress")]
     CourseIsNotInProgress,
     #[error("A class with the same part already exists.")]
@@ -41,6 +43,7 @@ impl actix_web::ResponseError for ResponseError {
                     .body(self.to_string())
             }
             ResponseError::CourseIsNotInProgress
+            | ResponseError::ClassIsNotSubmissionClosed
             | ResponseError::InvalidFile
             | ResponseError::RegistrationAlready
             | ResponseError::SubmissionClosed => HttpResponse::BadRequest()
