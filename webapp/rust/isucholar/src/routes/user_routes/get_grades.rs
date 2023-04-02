@@ -45,7 +45,7 @@ pub async fn get_grades(
         for class in classes {
             let submissions_count = submission_repo.count_by_class_id(&pool, &class.id).await?;
             let my_score = submission_repo
-                .find_scores_by_class_id_and_user_id(&pool, &class.id, &user_id)
+                .find_score_by_class_id_and_user_id(&pool, &class.id, &user_id)
                 .await?;
 
             if let Some(Some(my_score)) = my_score {
