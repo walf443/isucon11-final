@@ -1,5 +1,7 @@
+use actix_multipart::MultipartError;
 use actix_web::HttpResponse;
 use isucholar_core::repos::error::ReposError;
+use std::io;
 
 use thiserror::Error;
 #[derive(Error, Debug)]
@@ -10,21 +12,38 @@ pub enum ResponseError {
     ActixError(#[from] actix_web::Error),
     #[error("sqlx error")]
     SqlxError(#[from] sqlx::Error),
+    #[error("io error")]
+    IoError(#[from] io::Error),
+    #[error("multipart error")]
+    MultipartError(#[from] MultipartError),
+    #[error("Invalid file.")]
+    InvalidFile,
+    #[error("No such class.")]
+    ClassNotFound,
     #[error("No such course.")]
     CourseNotFound,
     #[error("This course is not in progress")]
     CourseIsNotInProgress,
     #[error("A class with the same part already exists.")]
     CourseConflict,
+    #[error("You have not taken this course.")]
+    RegistrationAlready,
+    #[error("Submission has been closed for this class.")]
+    SubmissionClosed,
 }
 
 impl actix_web::ResponseError for ResponseError {
     fn error_response(&self) -> HttpResponse {
         match self {
-            ResponseError::CourseNotFound => HttpResponse::NotFound()
-                .content_type(mime::TEXT_PLAIN)
-                .body(self.to_string()),
-            ResponseError::CourseIsNotInProgress => HttpResponse::BadRequest()
+            ResponseError::CourseNotFound | ResponseError::ClassNotFound => {
+                HttpResponse::NotFound()
+                    .content_type(mime::TEXT_PLAIN)
+                    .body(self.to_string())
+            }
+            ResponseError::CourseIsNotInProgress
+            | ResponseError::InvalidFile
+            | ResponseError::RegistrationAlready
+            | ResponseError::SubmissionClosed => HttpResponse::BadRequest()
                 .content_type(mime::TEXT_PLAIN)
                 .body(self.to_string()),
             ResponseError::CourseConflict => HttpResponse::Conflict()

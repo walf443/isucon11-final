@@ -1,10 +1,15 @@
 use crate::db;
-use crate::responses::error::SqlxError;
+use crate::responses::error::ResponseError::{
+    ClassNotFound, CourseIsNotInProgress, CourseNotFound, InvalidFile, RegistrationAlready,
+    SubmissionClosed,
+};
+use crate::responses::error::ResponseResult;
 use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
 use futures::{StreamExt, TryStreamExt};
 use isucholar_core::models::assignment_path::AssignmentPath;
 use isucholar_core::models::course_status::CourseStatus;
+use isucholar_core::repos::course_repository::{CourseRepository, CourseRepositoryImpl};
 use isucholar_core::ASSIGNMENTS_DIRECTORY;
 use tokio::io::AsyncWriteExt;
 
@@ -14,28 +19,23 @@ pub async fn submit_assignment(
     session: actix_session::Session,
     path: web::Path<AssignmentPath>,
     mut payload: actix_multipart::Multipart,
-) -> actix_web::Result<HttpResponse> {
+) -> ResponseResult<HttpResponse> {
     let (user_id, _, _) = get_user_info(session)?;
 
     let course_id = &path.course_id;
     let class_id = &path.class_id;
 
-    let mut tx = pool.begin().await.map_err(SqlxError)?;
-    let status: Option<CourseStatus> = db::fetch_optional_scalar(
-        sqlx::query_scalar("SELECT `status` FROM `courses` WHERE `id` = ? FOR SHARE")
-            .bind(course_id),
-        &mut tx,
-    )
-    .await
-    .map_err(SqlxError)?;
+    let mut tx = pool.begin().await?;
+    let course_repo = CourseRepositoryImpl {};
+    let status = course_repo
+        .find_status_for_share_lock_by_id_in_tx(&mut tx, course_id)
+        .await?;
     if let Some(status) = status {
         if status != CourseStatus::InProgress {
-            return Err(actix_web::error::ErrorBadRequest(
-                "This course is not in progress.",
-            ));
+            return Err(CourseIsNotInProgress);
         }
     } else {
-        return Err(actix_web::error::ErrorNotFound("No such course."));
+        return Err(CourseNotFound);
     }
 
     let registration_count: i64 = db::fetch_one_scalar(
@@ -46,12 +46,9 @@ pub async fn submit_assignment(
         .bind(course_id),
         &mut tx,
     )
-    .await
-    .map_err(SqlxError)?;
+    .await?;
     if registration_count == 0 {
-        return Err(actix_web::error::ErrorBadRequest(
-            "You have not taken this course.",
-        ));
+        return Err(RegistrationAlready);
     }
 
     let submission_closed: Option<bool> = db::fetch_optional_scalar(
@@ -59,21 +56,18 @@ pub async fn submit_assignment(
             .bind(class_id),
         &mut tx,
     )
-    .await
-    .map_err(SqlxError)?;
+    .await?;
     if let Some(submission_closed) = submission_closed {
         if submission_closed {
-            return Err(actix_web::error::ErrorBadRequest(
-                "Submission has been closed for this class.",
-            ));
+            return Err(SubmissionClosed);
         }
     } else {
-        return Err(actix_web::error::ErrorNotFound("No such class."));
+        return Err(ClassNotFound);
     }
 
     let mut file = None;
     while let Some(field) = payload.next().await {
-        let field = field.map_err(|_| actix_web::error::ErrorBadRequest("Invalid file."))?;
+        let field = field.map_err(|_| InvalidFile)?;
         let content_disposition = field.content_disposition();
         if let Some(name) = content_disposition.get_name() {
             if name == "file" {
@@ -83,7 +77,7 @@ pub async fn submit_assignment(
         }
     }
     if file.is_none() {
-        return Err(actix_web::error::ErrorBadRequest("Invalid file."));
+        return Err(InvalidFile);
     }
     let file = file.unwrap();
 
@@ -94,8 +88,7 @@ pub async fn submit_assignment(
         .bind(class_id)
         .bind(file.content_disposition().get_filename())
         .execute(&mut tx)
-        .await
-        .map_err(SqlxError)?;
+        .await?;
 
     let mut data = file
         .map_ok(|b| web::BytesMut::from(&b[..]))
@@ -111,7 +104,7 @@ pub async fn submit_assignment(
         .await?;
     file.write_all_buf(&mut data).await?;
 
-    tx.commit().await.map_err(SqlxError)?;
+    tx.commit().await?;
 
     Ok(HttpResponse::NoContent().finish())
 }
