@@ -1,5 +1,7 @@
-use crate::db::DBPool;
+use crate::db;
+use crate::db::{DBPool, TxConn};
 use crate::models::course_status::CourseStatus;
+use crate::models::user::User;
 use crate::models::user_type::UserType;
 use crate::repos::error::Result;
 use async_trait::async_trait;
@@ -8,6 +10,7 @@ use num_traits::ToPrimitive;
 
 #[async_trait]
 pub trait UserRepository {
+    async fn find_in_tx<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<User>;
     async fn find_code_by_id(&self, pool: &DBPool, id: &str) -> Result<String>;
     async fn find_gpas_group_by_user_id(&self, pool: &DBPool) -> Result<Vec<f64>>;
 }
@@ -16,6 +19,16 @@ pub struct UserRepositoryImpl {}
 
 #[async_trait]
 impl UserRepository for UserRepositoryImpl {
+    async fn find_in_tx<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<User> {
+        let user: User = db::fetch_one_as(
+            sqlx::query_as("SELECT * FROM `users` WHERE `id` = ?").bind(id),
+            tx,
+        )
+        .await?;
+
+        Ok(user)
+    }
+
     async fn find_code_by_id(&self, pool: &DBPool, id: &str) -> Result<String> {
         let user_code = sqlx::query_scalar("SELECT `code` FROM `users` WHERE `id` = ?")
             .bind(&id)

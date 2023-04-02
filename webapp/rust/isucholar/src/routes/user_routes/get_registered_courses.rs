@@ -1,20 +1,19 @@
-use crate::db;
-use crate::responses::error::SqlxError;
+use crate::responses::error::ResponseResult;
 use crate::responses::get_registered_course_response::GetRegisteredCourseResponseContent;
 use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::course::Course;
 use isucholar_core::models::course_status::CourseStatus;
-use isucholar_core::models::user::User;
+use isucholar_core::repos::user_repository::{UserRepository, UserRepositoryImpl};
 
 // GET /api/users/me/courses 履修中の科目一覧取得
 pub async fn get_registered_courses(
     pool: web::Data<sqlx::MySqlPool>,
     session: actix_session::Session,
-) -> actix_web::Result<HttpResponse> {
+) -> ResponseResult<HttpResponse> {
     let (user_id, _, _) = get_user_info(session)?;
 
-    let mut tx = pool.begin().await.map_err(SqlxError)?;
+    let mut tx = pool.begin().await?;
 
     let courses: Vec<Course> = sqlx::query_as(concat!(
         "SELECT `courses`.*",
@@ -25,18 +24,13 @@ pub async fn get_registered_courses(
     .bind(CourseStatus::Closed)
     .bind(&user_id)
     .fetch_all(&mut tx)
-    .await
-    .map_err(SqlxError)?;
+    .await?;
 
     // 履修科目が0件の時は空配列を返却
     let mut res = Vec::with_capacity(courses.len());
+    let user_repo = UserRepositoryImpl {};
     for course in courses {
-        let teacher: User = db::fetch_one_as(
-            sqlx::query_as("SELECT * FROM `users` WHERE `id` = ?").bind(&course.teacher_id),
-            &mut tx,
-        )
-        .await
-        .map_err(SqlxError)?;
+        let teacher = user_repo.find_in_tx(&mut tx, &course.teacher_id).await?;
 
         res.push(GetRegisteredCourseResponseContent {
             id: course.id,
@@ -47,7 +41,7 @@ pub async fn get_registered_courses(
         });
     }
 
-    tx.commit().await.map_err(SqlxError)?;
+    tx.commit().await?;
 
     Ok(HttpResponse::Ok().json(res))
 }
