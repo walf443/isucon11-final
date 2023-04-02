@@ -16,6 +16,10 @@ pub enum ResponseError {
     IoError(#[from] io::Error),
     #[error("multipart error")]
     MultipartError(#[from] MultipartError),
+    #[error("url encode error")]
+    UrlEncodeError(#[from] serde_urlencoded::ser::Error),
+    #[error("Invalid page.")]
+    InvalidPage,
     #[error("Invalid file.")]
     InvalidFile,
     #[error("No such class.")]
@@ -45,6 +49,7 @@ impl actix_web::ResponseError for ResponseError {
             ResponseError::CourseIsNotInProgress
             | ResponseError::ClassIsNotSubmissionClosed
             | ResponseError::InvalidFile
+            | ResponseError::InvalidPage
             | ResponseError::RegistrationAlready
             | ResponseError::SubmissionClosed => HttpResponse::BadRequest()
                 .content_type(mime::TEXT_PLAIN)

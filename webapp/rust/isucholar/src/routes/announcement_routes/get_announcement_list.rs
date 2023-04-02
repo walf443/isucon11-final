@@ -1,8 +1,11 @@
-use crate::db;
-use crate::responses::error::SqlxError;
+use crate::responses::error::ResponseError::InvalidPage;
+use crate::responses::error::ResponseResult;
 use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::announcement::AnnouncementWithoutDetail;
+use isucholar_core::repos::unread_announcement_repository::{
+    UnreadAnnouncemnetRepository, UnreadAnnouncemntRepositoryImpl,
+};
 use sqlx::Arguments;
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
@@ -23,10 +26,10 @@ pub async fn get_announcement_list(
     session: actix_session::Session,
     params: web::Query<GetAnnouncementsQuery>,
     request: actix_web::HttpRequest,
-) -> actix_web::Result<HttpResponse> {
+) -> ResponseResult<HttpResponse> {
     let (user_id, _, _) = get_user_info(session)?;
 
-    let mut tx = pool.begin().await.map_err(SqlxError)?;
+    let mut tx = pool.begin().await?;
 
     let mut query = concat!(
     "SELECT `announcements`.`id`, `courses`.`id` AS `course_id`, `courses`.`name` AS `course_name`, `announcements`.`title`, NOT `unread_announcements`.`is_deleted` AS `unread`",
@@ -55,7 +58,7 @@ pub async fn get_announcement_list(
     let page = if let Some(ref page_str) = params.page {
         match page_str.parse() {
             Ok(page) if page > 0 => page,
-            _ => return Err(actix_web::error::ErrorBadRequest("Invalid page.")),
+            _ => return Err(InvalidPage),
         }
     } else {
         1
@@ -66,22 +69,15 @@ pub async fn get_announcement_list(
     args.add(limit + 1);
     args.add(offset);
 
-    let mut announcements: Vec<AnnouncementWithoutDetail> = sqlx::query_as_with(&query, args)
-        .fetch_all(&mut tx)
-        .await
-        .map_err(SqlxError)?;
+    let mut announcements: Vec<AnnouncementWithoutDetail> =
+        sqlx::query_as_with(&query, args).fetch_all(&mut tx).await?;
 
-    let unread_count: i64 = db::fetch_one_scalar(
-        sqlx::query_scalar(
-            "SELECT COUNT(*) FROM `unread_announcements` WHERE `user_id` = ? AND NOT `is_deleted`",
-        )
-        .bind(&user_id),
-        &mut tx,
-    )
-    .await
-    .map_err(SqlxError)?;
+    let unread_announcement_repos = UnreadAnnouncemntRepositoryImpl {};
+    let unread_count = unread_announcement_repos
+        .count_unread_by_user_id_in_tx(&mut tx, &user_id)
+        .await?;
 
-    tx.commit().await.map_err(SqlxError)?;
+    tx.commit().await?;
 
     let uri = request.uri();
     let mut params = params.into_inner();
