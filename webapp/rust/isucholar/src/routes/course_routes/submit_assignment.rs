@@ -10,6 +10,9 @@ use futures::{StreamExt, TryStreamExt};
 use isucholar_core::models::assignment_path::AssignmentPath;
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::repos::course_repository::{CourseRepository, CourseRepositoryImpl};
+use isucholar_core::repos::registration_repository::{
+    RegistrationRepository, RegistrationRepositoryImpl,
+};
 use isucholar_core::ASSIGNMENTS_DIRECTORY;
 use tokio::io::AsyncWriteExt;
 
@@ -38,16 +41,12 @@ pub async fn submit_assignment(
         return Err(CourseNotFound);
     }
 
-    let registration_count: i64 = db::fetch_one_scalar(
-        sqlx::query_scalar(
-            "SELECT COUNT(*) FROM `registrations` WHERE `user_id` = ? AND `course_id` = ?",
-        )
-        .bind(&user_id)
-        .bind(course_id),
-        &mut tx,
-    )
-    .await?;
-    if registration_count == 0 {
+    let registration_repo = RegistrationRepositoryImpl {};
+
+    let is_registered = registration_repo
+        .exist_by_user_id_and_course_id_in_tx(&mut tx, &user_id, &course_id)
+        .await?;
+    if is_registered {
         return Err(RegistrationAlready);
     }
 
