@@ -8,10 +8,14 @@ use actix_web::{web, HttpResponse};
 use futures::{StreamExt, TryStreamExt};
 use isucholar_core::models::assignment_path::AssignmentPath;
 use isucholar_core::models::course_status::CourseStatus;
+use isucholar_core::models::submission::CreateSubmission;
 use isucholar_core::repos::class_repository::{ClassRepository, ClassRepositoryImpl};
 use isucholar_core::repos::course_repository::{CourseRepository, CourseRepositoryImpl};
 use isucholar_core::repos::registration_repository::{
     RegistrationRepository, RegistrationRepositoryImpl,
+};
+use isucholar_core::repos::submission_repository::{
+    SubmissionRepository, SubmissionRepositoryImpl,
 };
 use isucholar_core::ASSIGNMENTS_DIRECTORY;
 use tokio::io::AsyncWriteExt;
@@ -79,13 +83,20 @@ pub async fn submit_assignment(
     }
     let file = file.unwrap();
 
-    sqlx::query(
-        "INSERT INTO `submissions` (`user_id`, `class_id`, `file_name`) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE `file_name` = VALUES(`file_name`)",
-    )
-        .bind(&user_id)
-        .bind(class_id)
-        .bind(file.content_disposition().get_filename())
-        .execute(&mut tx)
+    let submission_repo = SubmissionRepositoryImpl {};
+    submission_repo
+        .create_in_tx(
+            &mut tx,
+            &CreateSubmission {
+                user_id: user_id.clone(),
+                class_id: class_id.clone(),
+                file_name: file
+                    .content_disposition()
+                    .get_filename()
+                    .unwrap()
+                    .to_string(),
+            },
+        )
         .await?;
 
     let mut data = file

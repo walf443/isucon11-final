@@ -1,9 +1,15 @@
-use crate::db::DBPool;
+use crate::db::{DBPool, TxConn};
+use crate::models::submission::CreateSubmission;
 use crate::repos::error::Result;
 use async_trait::async_trait;
 
 #[async_trait]
 pub trait SubmissionRepository {
+    async fn create_in_tx<'c>(
+        &self,
+        tx: &mut TxConn<'c>,
+        submission: &CreateSubmission,
+    ) -> Result<()>;
     async fn count_by_class_id(&self, pool: &DBPool, class_id: &str) -> Result<i64>;
     async fn find_score_by_class_id_and_user_id(
         &self,
@@ -17,6 +23,19 @@ pub struct SubmissionRepositoryImpl {}
 
 #[async_trait]
 impl SubmissionRepository for SubmissionRepositoryImpl {
+    async fn create_in_tx<'c>(&self, tx: &mut TxConn, submission: &CreateSubmission) -> Result<()> {
+        sqlx::query(
+            "INSERT INTO `submissions` (`user_id`, `class_id`, `file_name`) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE `file_name` = VALUES(`file_name`)",
+        )
+            .bind(&submission.user_id)
+            .bind(&submission.class_id)
+            .bind(&submission.file_name)
+            .execute(tx)
+            .await?;
+
+        Ok(())
+    }
+
     async fn count_by_class_id(&self, pool: &DBPool, class_id: &str) -> Result<i64> {
         let submissions_count: i64 =
             sqlx::query_scalar("SELECT COUNT(*) FROM `submissions` WHERE `class_id` = ?")
