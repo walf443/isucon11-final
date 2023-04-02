@@ -6,7 +6,6 @@ use isucholar_core::models::announcement::AnnouncementWithoutDetail;
 use isucholar_core::repos::unread_announcement_repository::{
     UnreadAnnouncemnetRepository, UnreadAnnouncemntRepositoryImpl,
 };
-use sqlx::Arguments;
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct GetAnnouncementsQuery {
@@ -29,31 +28,14 @@ pub async fn get_announcement_list(
 ) -> ResponseResult<HttpResponse> {
     let (user_id, _, _) = get_user_info(session)?;
 
+    let unread_announcement_repos = UnreadAnnouncemntRepositoryImpl {};
+
     let mut tx = pool.begin().await?;
 
-    let mut query = concat!(
-    "SELECT `announcements`.`id`, `courses`.`id` AS `course_id`, `courses`.`name` AS `course_name`, `announcements`.`title`, NOT `unread_announcements`.`is_deleted` AS `unread`",
-    " FROM `announcements`",
-    " JOIN `courses` ON `announcements`.`course_id` = `courses`.`id`",
-    " JOIN `registrations` ON `courses`.`id` = `registrations`.`course_id`",
-    " JOIN `unread_announcements` ON `announcements`.`id` = `unread_announcements`.`announcement_id`",
-    " WHERE 1=1",
-    ).to_owned();
-    let mut args = sqlx::mysql::MySqlArguments::default();
-
-    if let Some(ref course_id) = params.course_id {
-        query.push_str(" AND `announcements`.`course_id` = ?");
-        args.add(course_id);
+    let mut course_id: Option<&str> = None;
+    if let Some(ref c_id) = params.course_id {
+        course_id = Some(&c_id);
     }
-
-    query.push_str(concat!(
-        " AND `unread_announcements`.`user_id` = ?",
-        " AND `registrations`.`user_id` = ?",
-        " ORDER BY `announcements`.`id` DESC",
-        " LIMIT ? OFFSET ?",
-    ));
-    args.add(&user_id);
-    args.add(&user_id);
 
     let page = if let Some(ref page_str) = params.page {
         match page_str.parse() {
@@ -65,14 +47,11 @@ pub async fn get_announcement_list(
     };
     let limit = 20;
     let offset = limit * (page - 1);
-    // limitより多く上限を設定し、実際にlimitより多くレコードが取得できた場合は次のページが存在する
-    args.add(limit + 1);
-    args.add(offset);
 
-    let mut announcements: Vec<AnnouncementWithoutDetail> =
-        sqlx::query_as_with(&query, args).fetch_all(&mut tx).await?;
+    let mut announcements = unread_announcement_repos
+        .find_unread_announcements_by_user_id_in_tx(&mut tx, &user_id, limit, offset, course_id)
+        .await?;
 
-    let unread_announcement_repos = UnreadAnnouncemntRepositoryImpl {};
     let unread_count = unread_announcement_repos
         .count_unread_by_user_id_in_tx(&mut tx, &user_id)
         .await?;
