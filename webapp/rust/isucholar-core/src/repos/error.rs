@@ -4,6 +4,8 @@ use thiserror::Error;
 pub enum ReposError {
     #[error("failed to execute query")]
     SqlError(#[from] sqlx::Error),
+    #[error("A announcement with the same code already exists.")]
+    AnnoucementDuplicate,
     #[error("A course with the same code already exists.")]
     CourseDepulicate,
     #[error("A class  with the same code already exists.")]
