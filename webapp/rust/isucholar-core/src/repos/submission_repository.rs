@@ -5,7 +5,7 @@ use async_trait::async_trait;
 #[async_trait]
 pub trait SubmissionRepository {
     async fn count_by_class_id(&self, pool: &DBPool, class_id: &str) -> Result<i64>;
-    async fn find_score_by_class_id_and_user_id(
+    async fn find_scores_by_class_id_and_user_id(
         &self,
         pool: &DBPool,
         class_id: &str,
@@ -26,7 +26,7 @@ impl SubmissionRepository for SubmissionRepositoryImpl {
         Ok(submissions_count)
     }
 
-    async fn find_score_by_class_id_and_user_id(
+    async fn find_scores_by_class_id_and_user_id(
         &self,
         pool: &DBPool,
         class_id: &str,
