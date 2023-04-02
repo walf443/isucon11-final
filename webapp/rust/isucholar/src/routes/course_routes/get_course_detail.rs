@@ -1,6 +1,5 @@
 use crate::responses::error::ResponseError::CourseNotFound;
 use crate::responses::error::{ResponseResult, SqlxError};
-use crate::responses::get_course_detail_response::GetCourseDetailResponse;
 use actix_web::{web, HttpResponse};
 use isucholar_core::repos::course_repository::{CourseRepository, CourseRepositoryImpl};
 
