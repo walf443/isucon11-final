@@ -11,6 +11,13 @@ pub trait SubmissionRepository {
         submission: &CreateSubmission,
     ) -> Result<()>;
     async fn count_by_class_id(&self, pool: &DBPool, class_id: &str) -> Result<i64>;
+    async fn update_score_by_user_code_and_class_id<'c>(
+        &self,
+        tx: &mut TxConn,
+        user_code: &str,
+        class_id: &str,
+        score: i64,
+    ) -> Result<()>;
     async fn find_score_by_class_id_and_user_id(
         &self,
         pool: &DBPool,
@@ -43,6 +50,23 @@ impl SubmissionRepository for SubmissionRepositoryImpl {
                 .fetch_one(pool)
                 .await?;
         Ok(submissions_count)
+    }
+
+    async fn update_score_by_user_code_and_class_id<'c>(
+        &self,
+        tx: &mut TxConn,
+        user_code: &str,
+        class_id: &str,
+        score: i64,
+    ) -> Result<()> {
+        sqlx::query("UPDATE `submissions` JOIN `users` ON `users`.`id` = `submissions`.`user_id` SET `score` = ? WHERE `users`.`code` = ? AND `class_id` = ?")
+            .bind(score)
+            .bind(user_code)
+            .bind(class_id)
+            .execute(tx)
+            .await?;
+
+        Ok(())
     }
 
     async fn find_score_by_class_id_and_user_id(

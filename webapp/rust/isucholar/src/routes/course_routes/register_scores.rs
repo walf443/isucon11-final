@@ -4,6 +4,9 @@ use actix_web::{web, HttpResponse};
 use isucholar_core::models::assignment_path::AssignmentPath;
 use isucholar_core::models::score::Score;
 use isucholar_core::repos::class_repository::{ClassRepository, ClassRepositoryImpl};
+use isucholar_core::repos::submission_repository::{
+    SubmissionRepository, SubmissionRepositoryImpl,
+};
 
 // PUT /api/courses/{course_id}/classes/{class_id}/assignments/scores 採点結果登録
 pub async fn register_scores(
@@ -27,12 +30,16 @@ pub async fn register_scores(
         return Err(ClassNotFound);
     }
 
+    let submission_repo = SubmissionRepositoryImpl {};
+
     for score in req.into_inner() {
-        sqlx::query("UPDATE `submissions` JOIN `users` ON `users`.`id` = `submissions`.`user_id` SET `score` = ? WHERE `users`.`code` = ? AND `class_id` = ?")
-            .bind(&score.score)
-            .bind(&score.user_code)
-            .bind(class_id)
-            .execute(&mut tx)
+        submission_repo
+            .update_score_by_user_code_and_class_id(
+                &mut tx,
+                &score.user_code,
+                &class_id,
+                score.score,
+            )
             .await?;
     }
 
