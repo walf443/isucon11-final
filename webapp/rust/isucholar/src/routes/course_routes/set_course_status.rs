@@ -26,10 +26,8 @@ pub async fn set_course_status(
         return Err(CourseNotFound);
     }
 
-    sqlx::query("UPDATE `courses` SET `status` = ? WHERE `id` = ?")
-        .bind(&req.status)
-        .bind(course_id)
-        .execute(&mut tx)
+    course_repo
+        .update_status_by_id_in_tx(&mut tx, course_id, &req.status)
         .await?;
 
     tx.commit().await?;
