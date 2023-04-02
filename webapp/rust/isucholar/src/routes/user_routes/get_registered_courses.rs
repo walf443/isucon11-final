@@ -2,8 +2,9 @@ use crate::responses::error::ResponseResult;
 use crate::responses::get_registered_course_response::GetRegisteredCourseResponseContent;
 use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
-use isucholar_core::models::course::Course;
-use isucholar_core::models::course_status::CourseStatus;
+use isucholar_core::repos::registration_course_repository::{
+    RegistrationCourseRepository, RegistrationCourseRepositoryImpl,
+};
 use isucholar_core::repos::user_repository::{UserRepository, UserRepositoryImpl};
 
 // GET /api/users/me/courses 履修中の科目一覧取得
@@ -14,17 +15,10 @@ pub async fn get_registered_courses(
     let (user_id, _, _) = get_user_info(session)?;
 
     let mut tx = pool.begin().await?;
-
-    let courses: Vec<Course> = sqlx::query_as(concat!(
-        "SELECT `courses`.*",
-        " FROM `courses`",
-        " JOIN `registrations` ON `courses`.`id` = `registrations`.`course_id`",
-        " WHERE `courses`.`status` != ? AND `registrations`.`user_id` = ?",
-    ))
-    .bind(CourseStatus::Closed)
-    .bind(&user_id)
-    .fetch_all(&mut tx)
-    .await?;
+    let registration_course_repo = RegistrationCourseRepositoryImpl {};
+    let courses = registration_course_repo
+        .find_open_courses_by_user_id_in_tx(&mut tx, &user_id)
+        .await?;
 
     // 履修科目が0件の時は空配列を返却
     let mut res = Vec::with_capacity(courses.len());

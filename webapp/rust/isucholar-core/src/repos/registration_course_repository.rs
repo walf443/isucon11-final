@@ -1,5 +1,6 @@
-use crate::db::DBPool;
+use crate::db::{DBPool, TxConn};
 use crate::models::course::Course;
+use crate::models::course_status::CourseStatus;
 use crate::repos::error::Result;
 use async_trait::async_trait;
 use futures::StreamExt;
@@ -8,6 +9,11 @@ use num_traits::ToPrimitive;
 #[async_trait]
 pub trait RegistrationCourseRepository {
     async fn find_courses_by_user_id(&self, pool: &DBPool, user_id: &str) -> Result<Vec<Course>>;
+    async fn find_open_courses_by_user_id_in_tx(
+        &self,
+        tx: &mut TxConn,
+        user_id: &str,
+    ) -> Result<Vec<Course>>;
     async fn find_total_scores_by_course_id_group_by_user_id(
         &self,
         pool: &DBPool,
@@ -31,6 +37,25 @@ impl RegistrationCourseRepository for RegistrationCourseRepositoryImpl {
         .await?;
 
         Ok(registered_courses)
+    }
+
+    async fn find_open_courses_by_user_id_in_tx(
+        &self,
+        tx: &mut TxConn,
+        user_id: &str,
+    ) -> Result<Vec<Course>> {
+        let courses: Vec<Course> = sqlx::query_as(concat!(
+            "SELECT `courses`.*",
+            " FROM `courses`",
+            " JOIN `registrations` ON `courses`.`id` = `registrations`.`course_id`",
+            " WHERE `courses`.`status` != ? AND `registrations`.`user_id` = ?",
+        ))
+        .bind(CourseStatus::Closed)
+        .bind(user_id)
+        .fetch_all(tx)
+        .await?;
+
+        Ok(courses)
     }
 
     async fn find_total_scores_by_course_id_group_by_user_id(
