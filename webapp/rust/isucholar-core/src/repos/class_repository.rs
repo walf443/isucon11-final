@@ -2,12 +2,17 @@ use crate::db::{DBPool, TxConn};
 use crate::models::class::{Class, ClassWithSubmitted, CreateClass};
 use crate::repos::error::ReposError::ClassDepulicate;
 use crate::repos::error::Result;
-use crate::MYSQL_ERR_NUM_DUPLICATE_ENTRY;
+use crate::{db, MYSQL_ERR_NUM_DUPLICATE_ENTRY};
 use async_trait::async_trait;
 
 #[async_trait]
 pub trait ClassRepository {
     async fn create_in_tx<'c>(&self, tx: &mut TxConn<'c>, class: &CreateClass) -> Result<()>;
+    async fn find_submission_closed_by_id_in_tx<'c>(
+        &self,
+        tx: &mut TxConn<'c>,
+        id: &str,
+    ) -> Result<Option<bool>>;
     async fn find_by_course_id_and_part(
         &self,
         pool: &DBPool,
@@ -52,6 +57,23 @@ impl ClassRepository for ClassRepositoryImpl {
         }
 
         Ok(())
+    }
+
+    async fn find_submission_closed_by_id_in_tx<'c>(
+        &self,
+        tx: &mut TxConn<'c>,
+        id: &str,
+    ) -> Result<Option<bool>> {
+        let submission_closed: Option<bool> = db::fetch_optional_scalar(
+            sqlx::query_scalar(
+                "SELECT `submission_closed` FROM `classes` WHERE `id` = ? FOR SHARE",
+            )
+            .bind(id),
+            tx,
+        )
+        .await?;
+
+        Ok(submission_closed)
     }
 
     async fn find_by_course_id_and_part(

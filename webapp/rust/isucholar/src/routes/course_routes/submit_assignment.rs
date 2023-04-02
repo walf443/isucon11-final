@@ -1,4 +1,3 @@
-use crate::db;
 use crate::responses::error::ResponseError::{
     ClassNotFound, CourseIsNotInProgress, CourseNotFound, InvalidFile, RegistrationAlready,
     SubmissionClosed,
@@ -9,6 +8,7 @@ use actix_web::{web, HttpResponse};
 use futures::{StreamExt, TryStreamExt};
 use isucholar_core::models::assignment_path::AssignmentPath;
 use isucholar_core::models::course_status::CourseStatus;
+use isucholar_core::repos::class_repository::{ClassRepository, ClassRepositoryImpl};
 use isucholar_core::repos::course_repository::{CourseRepository, CourseRepositoryImpl};
 use isucholar_core::repos::registration_repository::{
     RegistrationRepository, RegistrationRepositoryImpl,
@@ -50,12 +50,11 @@ pub async fn submit_assignment(
         return Err(RegistrationAlready);
     }
 
-    let submission_closed: Option<bool> = db::fetch_optional_scalar(
-        sqlx::query_scalar("SELECT `submission_closed` FROM `classes` WHERE `id` = ? FOR SHARE")
-            .bind(class_id),
-        &mut tx,
-    )
-    .await?;
+    let class_repo = ClassRepositoryImpl {};
+    let submission_closed = class_repo
+        .find_submission_closed_by_id_in_tx(&mut tx, course_id)
+        .await?;
+
     if let Some(submission_closed) = submission_closed {
         if submission_closed {
             return Err(SubmissionClosed);
