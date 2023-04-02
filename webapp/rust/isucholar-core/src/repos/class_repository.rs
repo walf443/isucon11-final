@@ -7,6 +7,7 @@ use async_trait::async_trait;
 
 #[async_trait]
 pub trait ClassRepository {
+    async fn for_update_by_id_in_tx<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<bool>;
     async fn create_in_tx<'c>(&self, tx: &mut TxConn<'c>, class: &CreateClass) -> Result<()>;
     async fn find_submission_closed_by_id_in_tx<'c>(
         &self,
@@ -32,6 +33,16 @@ pub struct ClassRepositoryImpl {}
 
 #[async_trait]
 impl ClassRepository for ClassRepositoryImpl {
+    async fn for_update_by_id_in_tx<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<bool> {
+        let class_count: i64 = db::fetch_one_scalar(
+            sqlx::query_scalar("SELECT COUNT(*) FROM `classes` WHERE `id` = ? FOR UPDATE").bind(id),
+            tx,
+        )
+        .await?;
+
+        Ok(class_count == 1)
+    }
+
     async fn create_in_tx<'c>(&self, tx: &mut TxConn<'c>, class: &CreateClass) -> Result<()> {
         let result = sqlx::query("INSERT INTO `classes` (`id`, `course_id`, `part`, `title`, `description`) VALUES (?, ?, ?, ?, ?)")
             .bind(&class.id)
