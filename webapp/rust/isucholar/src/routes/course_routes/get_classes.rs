@@ -2,7 +2,7 @@ use crate::responses::error::ResponseError::CourseNotFound;
 use crate::responses::error::ResponseResult;
 use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
-use isucholar_core::models::class::ClassWithSubmitted;
+use isucholar_core::repos::class_repository::{ClassRepository, ClassRepositoryImpl};
 use isucholar_core::repos::course_repository::{CourseRepository, CourseRepositoryImpl};
 
 #[derive(Debug, serde::Serialize)]
@@ -27,22 +27,15 @@ pub async fn get_classes(
 
     let mut tx = pool.begin().await?;
     let course_repo = CourseRepositoryImpl {};
+    let class_repo = ClassRepositoryImpl {};
     let is_exist = course_repo.exist_by_id_in_tx(&mut tx, course_id).await?;
 
     if !is_exist {
         return Err(CourseNotFound);
     }
 
-    let classes: Vec<ClassWithSubmitted> = sqlx::query_as(concat!(
-    "SELECT `classes`.*, `submissions`.`user_id` IS NOT NULL AS `submitted`",
-    " FROM `classes`",
-    " LEFT JOIN `submissions` ON `classes`.`id` = `submissions`.`class_id` AND `submissions`.`user_id` = ?",
-    " WHERE `classes`.`course_id` = ?",
-    " ORDER BY `classes`.`part`",
-    ))
-        .bind(&user_id)
-        .bind(course_id)
-        .fetch_all(&mut tx)
+    let classes = class_repo
+        .find_all_with_submitteed_by_user_id_and_course_id_in_tx(&mut tx, &user_id, course_id)
         .await?;
 
     tx.commit().await?;
