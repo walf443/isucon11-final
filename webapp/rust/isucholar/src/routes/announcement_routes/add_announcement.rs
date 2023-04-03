@@ -2,12 +2,12 @@ use crate::responses::error::ResponseError::{AnnouncementConflict, CourseNotFoun
 use crate::responses::error::ResponseResult;
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::announcement::Announcement;
-use isucholar_core::models::user::User;
 use isucholar_core::repos::announcement_repository::{
     AnnouncementRepository, AnnouncementRepositoryImpl,
 };
 use isucholar_core::repos::course_repository::{CourseRepository, CourseRepositoryImpl};
 use isucholar_core::repos::error::ReposError;
+use isucholar_core::repos::registration_repository::{RegistrationRepository, RegistrationRepositoryImpl};
 
 #[derive(Debug, serde::Deserialize)]
 pub struct AddAnnouncementRequest {
@@ -66,14 +66,8 @@ pub async fn add_announcement(
         }
     }
 
-    let targets: Vec<User> = sqlx::query_as(concat!(
-        "SELECT `users`.* FROM `users`",
-        " JOIN `registrations` ON `users`.`id` = `registrations`.`user_id`",
-        " WHERE `registrations`.`course_id` = ?",
-    ))
-    .bind(&req.course_id)
-    .fetch_all(&mut tx)
-    .await?;
+    let registration_repo = RegistrationRepositoryImpl{};
+    let targets = registration_repo.find_users_by_course_id_in_tx(&mut tx, &req.course_id).await?;
 
     for user in targets {
         sqlx::query(
