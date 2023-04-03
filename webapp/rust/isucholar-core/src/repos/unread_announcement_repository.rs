@@ -7,6 +7,12 @@ use sqlx::Arguments;
 
 #[async_trait]
 pub trait UnreadAnnouncementRepository {
+    async fn create_in_tx<'c>(
+        &self,
+        tx: &mut TxConn<'c>,
+        announcement_id: &str,
+        user_id: &str,
+    ) -> Result<()>;
     async fn count_unread_by_user_id_in_tx<'c>(
         &self,
         tx: &mut TxConn<'c>,
@@ -26,6 +32,22 @@ pub struct UnreadAnnouncementRepositoryImpl {}
 
 #[async_trait]
 impl UnreadAnnouncementRepository for UnreadAnnouncementRepositoryImpl {
+    async fn create_in_tx<'c>(
+        &self,
+        tx: &mut TxConn<'c>,
+        announcement_id: &str,
+        user_id: &str,
+    ) -> Result<()> {
+        sqlx::query(
+            "INSERT INTO `unread_announcements` (`announcement_id`, `user_id`) VALUES (?, ?)",
+        )
+        .bind(announcement_id)
+        .bind(user_id)
+        .execute(tx)
+        .await?;
+        Ok(())
+    }
+
     async fn count_unread_by_user_id_in_tx<'c>(
         &self,
         tx: &mut TxConn<'c>,

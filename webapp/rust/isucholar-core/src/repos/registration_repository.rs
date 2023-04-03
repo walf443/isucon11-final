@@ -1,8 +1,8 @@
 use crate::db;
 use crate::db::TxConn;
+use crate::models::user::User;
 use crate::repos::error::Result;
 use async_trait::async_trait;
-use crate::models::user::User;
 
 #[async_trait]
 pub trait RegistrationRepository {
@@ -18,7 +18,11 @@ pub trait RegistrationRepository {
         user_id: &str,
         course_id: &str,
     ) -> Result<bool>;
-    async fn find_users_by_course_id_in_tx<'c>(&self, tx: &mut TxConn<'c>, course_id: &str) -> Result<Vec<User>>;
+    async fn find_users_by_course_id_in_tx<'c>(
+        &self,
+        tx: &mut TxConn<'c>,
+        course_id: &str,
+    ) -> Result<Vec<User>>;
 }
 pub struct RegistrationRepositoryImpl {}
 
@@ -58,15 +62,19 @@ impl RegistrationRepository for RegistrationRepositoryImpl {
         Ok(registration_count != 0)
     }
 
-    async fn find_users_by_course_id_in_tx<'c>(&self, tx: &mut TxConn<'c>, course_id: &str) -> Result<Vec<User>> {
+    async fn find_users_by_course_id_in_tx<'c>(
+        &self,
+        tx: &mut TxConn<'c>,
+        course_id: &str,
+    ) -> Result<Vec<User>> {
         let users: Vec<User> = sqlx::query_as(concat!(
-        "SELECT `users`.* FROM `users`",
-        " JOIN `registrations` ON `users`.`id` = `registrations`.`user_id`",
-        " WHERE `registrations`.`course_id` = ?",
+            "SELECT `users`.* FROM `users`",
+            " JOIN `registrations` ON `users`.`id` = `registrations`.`user_id`",
+            " WHERE `registrations`.`course_id` = ?",
         ))
-            .bind(course_id)
-            .fetch_all(tx)
-            .await?;
+        .bind(course_id)
+        .fetch_all(tx)
+        .await?;
 
         Ok(users)
     }

@@ -7,7 +7,12 @@ use isucholar_core::repos::announcement_repository::{
 };
 use isucholar_core::repos::course_repository::{CourseRepository, CourseRepositoryImpl};
 use isucholar_core::repos::error::ReposError;
-use isucholar_core::repos::registration_repository::{RegistrationRepository, RegistrationRepositoryImpl};
+use isucholar_core::repos::registration_repository::{
+    RegistrationRepository, RegistrationRepositoryImpl,
+};
+use isucholar_core::repos::unread_announcement_repository::{
+    UnreadAnnouncementRepository, UnreadAnnouncementRepositoryImpl,
+};
 
 #[derive(Debug, serde::Deserialize)]
 pub struct AddAnnouncementRequest {
@@ -66,17 +71,16 @@ pub async fn add_announcement(
         }
     }
 
-    let registration_repo = RegistrationRepositoryImpl{};
-    let targets = registration_repo.find_users_by_course_id_in_tx(&mut tx, &req.course_id).await?;
-
-    for user in targets {
-        sqlx::query(
-            "INSERT INTO `unread_announcements` (`announcement_id`, `user_id`) VALUES (?, ?)",
-        )
-        .bind(&req.id)
-        .bind(user.id)
-        .execute(&mut tx)
+    let registration_repo = RegistrationRepositoryImpl {};
+    let targets = registration_repo
+        .find_users_by_course_id_in_tx(&mut tx, &req.course_id)
         .await?;
+
+    let unread_announcement_repo = UnreadAnnouncementRepositoryImpl {};
+    for user in targets {
+        unread_announcement_repo
+            .create_in_tx(&mut tx, &req.id, &user.id)
+            .await?;
     }
 
     tx.commit().await?;
