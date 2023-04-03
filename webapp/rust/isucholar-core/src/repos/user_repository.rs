@@ -11,6 +11,7 @@ use num_traits::ToPrimitive;
 #[async_trait]
 pub trait UserRepository {
     async fn find_in_tx<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<User>;
+    async fn find_by_code(&self, pool: &DBPool, code: &str) -> Result<Option<User>>;
     async fn find_code_by_id(&self, pool: &DBPool, id: &str) -> Result<String>;
     async fn find_gpas_group_by_user_id(&self, pool: &DBPool) -> Result<Vec<f64>>;
 }
@@ -26,6 +27,14 @@ impl UserRepository for UserRepositoryImpl {
         )
         .await?;
 
+        Ok(user)
+    }
+
+    async fn find_by_code(&self, pool: &DBPool, code: &str) -> Result<Option<User>> {
+        let user: Option<User> = sqlx::query_as("SELECT * FROM `users` WHERE `code` = ?")
+            .bind(code)
+            .fetch_optional(pool)
+            .await?;
         Ok(user)
     }
 

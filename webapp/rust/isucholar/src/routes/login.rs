@@ -1,7 +1,8 @@
-use crate::responses::error::SqlxError;
+use crate::responses::error::ResponseError::{AlreadyLogin, Unauthorized};
+use crate::responses::error::ResponseResult;
 use actix_web::{web, HttpResponse};
-use isucholar_core::models::user::User;
 use isucholar_core::models::user_type::UserType;
+use isucholar_core::repos::user_repository::{UserRepository, UserRepositoryImpl};
 
 #[derive(Debug, serde::Deserialize)]
 pub struct LoginRequest {
@@ -14,35 +15,24 @@ pub async fn login(
     session: actix_session::Session,
     pool: web::Data<sqlx::MySqlPool>,
     req: web::Json<LoginRequest>,
-) -> actix_web::Result<HttpResponse> {
-    let user: Option<User> = sqlx::query_as("SELECT * FROM `users` WHERE `code` = ?")
-        .bind(&req.code)
-        .fetch_optional(pool.as_ref())
-        .await
-        .map_err(SqlxError)?;
+) -> ResponseResult<HttpResponse> {
+    let user_repo = UserRepositoryImpl {};
+    let user = user_repo.find_by_code(&pool, &req.code).await?;
     if user.is_none() {
-        return Err(actix_web::error::ErrorUnauthorized(
-            "Code or Password is wrong.",
-        ));
+        return Err(Unauthorized);
     }
     let user = user.unwrap();
 
     if !bcrypt::verify(
         &req.password,
         &String::from_utf8(user.hashed_password).unwrap(),
-    )
-    .map_err(actix_web::error::ErrorInternalServerError)?
-    {
-        return Err(actix_web::error::ErrorUnauthorized(
-            "Code or Password is wrong.",
-        ));
+    )? {
+        return Err(Unauthorized);
     }
 
     if let Some(user_id) = session.get::<String>("userID")? {
         if user_id == user.id {
-            return Err(actix_web::error::ErrorBadRequest(
-                "You are already logged in.",
-            ));
+            return Err(AlreadyLogin);
         }
     }
 

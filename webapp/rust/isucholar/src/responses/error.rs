@@ -1,5 +1,6 @@
 use actix_multipart::MultipartError;
 use actix_web::HttpResponse;
+use bcrypt::BcryptError;
 use isucholar_core::repos::error::ReposError;
 use std::io;
 
@@ -12,6 +13,8 @@ pub enum ResponseError {
     ActixError(#[from] actix_web::Error),
     #[error("sqlx error")]
     SqlxError(#[from] sqlx::Error),
+    #[error("bcrypt error")]
+    BcryptError(#[from] BcryptError),
     #[error("io error")]
     IoError(#[from] io::Error),
     #[error("multipart error")]
@@ -22,6 +25,10 @@ pub enum ResponseError {
     InvalidPage,
     #[error("Invalid file.")]
     InvalidFile,
+    #[error("Code or Password is wrong.")]
+    Unauthorized,
+    #[error("You are already logged in.")]
+    AlreadyLogin,
     #[error("An announcement with the same id already exists.")]
     AnnouncementConflict,
     #[error("No such announcement.")]
@@ -45,6 +52,9 @@ pub enum ResponseError {
 impl actix_web::ResponseError for ResponseError {
     fn error_response(&self) -> HttpResponse {
         match self {
+            ResponseError::Unauthorized => HttpResponse::Unauthorized()
+                .content_type(mime::TEXT_PLAIN)
+                .body(self.to_string()),
             ResponseError::AnnouncementNotFound
             | ResponseError::CourseNotFound
             | ResponseError::ClassNotFound => HttpResponse::NotFound()
