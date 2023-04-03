@@ -1,9 +1,7 @@
-use crate::db;
 use crate::responses::error::ResponseError::AnnouncementNotFound;
 use crate::responses::error::ResponseResult;
 use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
-use isucholar_core::models::announcement_detail::AnnouncementDetail;
 use isucholar_core::repos::registration_repository::{
     RegistrationRepository, RegistrationRepositoryImpl,
 };
@@ -22,18 +20,14 @@ pub async fn get_announcement_detail(
     let announcement_id = &announcement_id.0;
 
     let mut tx = pool.begin().await?;
+    let unread_announcement_repo = UnreadAnnouncementRepositoryImpl {};
 
-    let announcement: Option<AnnouncementDetail> = db::fetch_optional_as(
-        sqlx::query_as(concat!(
-        "SELECT `announcements`.`id`, `courses`.`id` AS `course_id`, `courses`.`name` AS `course_name`, `announcements`.`title`, `announcements`.`message`, NOT `unread_announcements`.`is_deleted` AS `unread`",
-        " FROM `announcements`",
-        " JOIN `courses` ON `courses`.`id` = `announcements`.`course_id`",
-        " JOIN `unread_announcements` ON `unread_announcements`.`announcement_id` = `announcements`.`id`",
-        " WHERE `announcements`.`id` = ?",
-        " AND `unread_announcements`.`user_id` = ?",
-        )).bind(announcement_id).bind(&user_id),
-        &mut tx
-    )
+    let announcement = unread_announcement_repo
+        .find_announcement_detail_by_announcement_id_and_user_id_in_tx(
+            &mut tx,
+            announcement_id,
+            &user_id,
+        )
         .await?;
     if announcement.is_none() {
         return Err(AnnouncementNotFound);
@@ -48,7 +42,6 @@ pub async fn get_announcement_detail(
         return Err(AnnouncementNotFound);
     }
 
-    let unread_announcement_repo = UnreadAnnouncementRepositoryImpl {};
     unread_announcement_repo
         .mark_read(&mut tx, announcement_id, &user_id)
         .await?;

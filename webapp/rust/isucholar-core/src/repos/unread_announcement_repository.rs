@@ -1,6 +1,7 @@
 use crate::db;
 use crate::db::TxConn;
 use crate::models::announcement::AnnouncementWithoutDetail;
+use crate::models::announcement_detail::AnnouncementDetail;
 use crate::repos::error::Result;
 use async_trait::async_trait;
 use sqlx::Arguments;
@@ -27,6 +28,12 @@ pub trait UnreadAnnouncementRepository {
         offset: i64,
         course_id: Option<&str>,
     ) -> Result<Vec<AnnouncementWithoutDetail>>;
+    async fn find_announcement_detail_by_announcement_id_and_user_id_in_tx<'c>(
+        &self,
+        tx: &mut TxConn,
+        announcement_id: &str,
+        user_id: &str,
+    ) -> Result<Option<AnnouncementDetail>>;
 }
 
 pub struct UnreadAnnouncementRepositoryImpl {}
@@ -116,5 +123,26 @@ impl UnreadAnnouncementRepository for UnreadAnnouncementRepositoryImpl {
             sqlx::query_as_with(&query, args).fetch_all(tx).await?;
 
         Ok(announcements)
+    }
+
+    async fn find_announcement_detail_by_announcement_id_and_user_id_in_tx<'c>(
+        &self,
+        tx: &mut TxConn,
+        announcement_id: &str,
+        user_id: &str,
+    ) -> Result<Option<AnnouncementDetail>> {
+        let announcement: Option<AnnouncementDetail> = db::fetch_optional_as(
+            sqlx::query_as(concat!(
+            "SELECT `announcements`.`id`, `courses`.`id` AS `course_id`, `courses`.`name` AS `course_name`, `announcements`.`title`, `announcements`.`message`, NOT `unread_announcements`.`is_deleted` AS `unread`",
+            " FROM `announcements`",
+            " JOIN `courses` ON `courses`.`id` = `announcements`.`course_id`",
+            " JOIN `unread_announcements` ON `unread_announcements`.`announcement_id` = `announcements`.`id`",
+            " WHERE `announcements`.`id` = ?",
+            " AND `unread_announcements`.`user_id` = ?",
+            )).bind(announcement_id).bind(user_id),
+            tx
+        ).await?;
+
+        Ok(announcement)
     }
 }
