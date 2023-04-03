@@ -24,6 +24,8 @@ pub enum ResponseError {
     InvalidFile,
     #[error("An announcement with the same id already exists.")]
     AnnouncementConflict,
+    #[error("No such announcement.")]
+    AnnouncementNotFound,
     #[error("No such class.")]
     ClassNotFound,
     #[error("No such course.")]
@@ -43,11 +45,11 @@ pub enum ResponseError {
 impl actix_web::ResponseError for ResponseError {
     fn error_response(&self) -> HttpResponse {
         match self {
-            ResponseError::CourseNotFound | ResponseError::ClassNotFound => {
-                HttpResponse::NotFound()
-                    .content_type(mime::TEXT_PLAIN)
-                    .body(self.to_string())
-            }
+            ResponseError::AnnouncementNotFound
+            | ResponseError::CourseNotFound
+            | ResponseError::ClassNotFound => HttpResponse::NotFound()
+                .content_type(mime::TEXT_PLAIN)
+                .body(self.to_string()),
             ResponseError::CourseIsNotInProgress
             | ResponseError::ClassIsNotSubmissionClosed
             | ResponseError::InvalidFile

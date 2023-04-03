@@ -1,20 +1,24 @@
 use crate::db;
-use crate::responses::error::SqlxError;
+use crate::responses::error::ResponseError::AnnouncementNotFound;
+use crate::responses::error::ResponseResult;
 use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::announcement_detail::AnnouncementDetail;
+use isucholar_core::repos::registration_repository::{
+    RegistrationRepository, RegistrationRepositoryImpl,
+};
 
 // GET /api/announcements/{announcement_id} お知らせ詳細取得
 pub async fn get_announcement_detail(
     pool: web::Data<sqlx::MySqlPool>,
     session: actix_session::Session,
     announcement_id: web::Path<(String,)>,
-) -> actix_web::Result<HttpResponse> {
+) -> ResponseResult<HttpResponse> {
     let (user_id, _, _) = get_user_info(session)?;
 
     let announcement_id = &announcement_id.0;
 
-    let mut tx = pool.begin().await.map_err(SqlxError)?;
+    let mut tx = pool.begin().await?;
 
     let announcement: Option<AnnouncementDetail> = db::fetch_optional_as(
         sqlx::query_as(concat!(
@@ -27,35 +31,27 @@ pub async fn get_announcement_detail(
         )).bind(announcement_id).bind(&user_id),
         &mut tx
     )
-        .await
-        .map_err(SqlxError)?;
+        .await?;
     if announcement.is_none() {
-        return Err(actix_web::error::ErrorNotFound("No such announcement."));
+        return Err(AnnouncementNotFound);
     }
     let announcement = announcement.unwrap();
 
-    let registration_count: i64 = db::fetch_one_scalar(
-        sqlx::query_scalar(
-            "SELECT COUNT(*) FROM `registrations` WHERE `course_id` = ? AND `user_id` = ?",
-        )
-        .bind(&announcement.course_id)
-        .bind(&user_id),
-        &mut tx,
-    )
-    .await
-    .map_err(SqlxError)?;
-    if registration_count == 0 {
-        return Err(actix_web::error::ErrorNotFound("No such announcement."));
+    let registration_repo = RegistrationRepositoryImpl {};
+    let is_exist = registration_repo
+        .exist_by_user_id_and_course_id_in_tx(&mut tx, &user_id, &announcement.course_id)
+        .await?;
+    if !is_exist {
+        return Err(AnnouncementNotFound);
     }
 
     sqlx::query("UPDATE `unread_announcements` SET `is_deleted` = true WHERE `announcement_id` = ? AND `user_id` = ?")
         .bind(announcement_id)
         .bind(&user_id)
         .execute(&mut tx)
-        .await
-        .map_err(SqlxError)?;
+        .await?;
 
-    tx.commit().await.map_err(SqlxError)?;
+    tx.commit().await?;
 
     Ok(HttpResponse::Ok().json(announcement))
 }
