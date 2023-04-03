@@ -1,13 +1,35 @@
 use crate::db::{DBPool, TxConn};
 use crate::models::course::{Course, CourseWithTeacher, CreateCourse};
 use crate::models::course_status::CourseStatus;
+use crate::models::day_of_week::DayOfWeek;
 use crate::repos::error::{ReposError, Result};
 use crate::{db, MYSQL_ERR_NUM_DUPLICATE_ENTRY};
 use async_trait::async_trait;
+use sqlx::Arguments;
+
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
+pub struct SearchCoursesQuery {
+    #[serde(rename = "type")]
+    pub type_: Option<String>,
+    pub credit: Option<i64>,
+    pub teacher: Option<String>,
+    pub period: Option<i64>,
+    pub day_of_week: Option<DayOfWeek>,
+    pub keywords: Option<String>,
+    pub status: Option<String>,
+    pub page: Option<String>,
+}
 
 #[async_trait]
 pub trait CourseRepository {
     async fn create(&self, pool: &DBPool, course: &CreateCourse) -> Result<String>;
+    async fn find_all_with_teacher(
+        &self,
+        pool: &DBPool,
+        limit: i64,
+        offset: i64,
+        query: &SearchCoursesQuery,
+    ) -> Result<Vec<CourseWithTeacher>>;
     async fn find_status_for_share_lock_by_id_in_tx<'c>(
         &self,
         tx: &mut TxConn<'c>,
@@ -79,6 +101,91 @@ impl CourseRepository for CourseRepositoryImpl {
         result?;
 
         Ok(req.id.clone())
+    }
+
+    async fn find_all_with_teacher(
+        &self,
+        pool: &DBPool,
+        limit: i64,
+        offset: i64,
+        q: &SearchCoursesQuery,
+    ) -> Result<Vec<CourseWithTeacher>> {
+        let query = concat!(
+            "SELECT `courses`.*, `users`.`name` AS `teacher`",
+            " FROM `courses` JOIN `users` ON `courses`.`teacher_id` = `users`.`id`",
+            " WHERE 1=1",
+        );
+        let mut condition = String::new();
+        let mut args = sqlx::mysql::MySqlArguments::default();
+
+        // 無効な検索条件はエラーを返さず無視して良い
+
+        if let Some(ref course_type) = q.type_ {
+            condition.push_str(" AND `courses`.`type` = ?");
+            args.add(course_type);
+        }
+
+        if let Some(credit) = q.credit {
+            if credit > 0 {
+                condition.push_str(" AND `courses`.`credit` = ?");
+                args.add(credit);
+            }
+        }
+
+        if let Some(ref teacher) = q.teacher {
+            condition.push_str(" AND `users`.`name` = ?");
+            args.add(teacher);
+        }
+
+        if let Some(period) = q.period {
+            if period > 0 {
+                condition.push_str(" AND `courses`.`period` = ?");
+                args.add(period);
+            }
+        }
+
+        if let Some(ref day_of_week) = q.day_of_week {
+            condition.push_str(" AND `courses`.`day_of_week` = ?");
+            args.add(day_of_week);
+        }
+
+        if let Some(ref keywords) = q.keywords {
+            let arr = keywords.split(' ').collect::<Vec<_>>();
+            let mut name_condition = String::new();
+            for keyword in &arr {
+                name_condition.push_str(" AND `courses`.`name` LIKE ?");
+                args.add(format!("%{}%", keyword));
+            }
+            let mut keywords_condition = String::new();
+            for keyword in arr {
+                keywords_condition.push_str(" AND `courses`.`keywords` LIKE ?");
+                args.add(format!("%{}%", keyword));
+            }
+            condition.push_str(&format!(
+                " AND ((1=1{}) OR (1=1{}))",
+                name_condition, keywords_condition
+            ));
+        }
+
+        if let Some(ref status) = q.status {
+            condition.push_str(" AND `courses`.`status` = ?");
+            args.add(status);
+        }
+
+        condition.push_str(" ORDER BY `courses`.`code`");
+
+        // limitより多く上限を設定し、実際にlimitより多くレコードが取得できた場合は次のページが存在する
+        condition.push_str(" LIMIT ? OFFSET ?");
+        args.add(limit + 1);
+        args.add(offset);
+
+        // 結果が0件の時は空配列を返却
+        let courses: Vec<CourseWithTeacher> =
+            sqlx::query_as_with(&format!("{}{}", query, condition), args)
+                .fetch_all(pool)
+                .await?;
+
+        Ok(courses)
     }
 
     async fn find_status_for_share_lock_by_id_in_tx<'c>(
