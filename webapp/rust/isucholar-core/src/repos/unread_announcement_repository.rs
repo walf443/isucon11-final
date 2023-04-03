@@ -13,6 +13,7 @@ pub trait UnreadAnnouncementRepository {
         announcement_id: &str,
         user_id: &str,
     ) -> Result<()>;
+    async fn mark_read<'c>(&self, tx: &mut TxConn<'c>, id: &str, user_id: &str) -> Result<()>;
     async fn count_unread_by_user_id_in_tx<'c>(
         &self,
         tx: &mut TxConn<'c>,
@@ -45,6 +46,20 @@ impl UnreadAnnouncementRepository for UnreadAnnouncementRepositoryImpl {
         .bind(user_id)
         .execute(tx)
         .await?;
+        Ok(())
+    }
+    async fn mark_read<'c>(
+        &self,
+        tx: &mut TxConn<'c>,
+        announcement_id: &str,
+        user_id: &str,
+    ) -> Result<()> {
+        sqlx::query("UPDATE `unread_announcements` SET `is_deleted` = true WHERE `announcement_id` = ? AND `user_id` = ?")
+            .bind(announcement_id)
+            .bind(user_id)
+            .execute(tx)
+            .await?;
+
         Ok(())
     }
 

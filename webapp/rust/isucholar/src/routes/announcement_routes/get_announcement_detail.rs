@@ -7,6 +7,9 @@ use isucholar_core::models::announcement_detail::AnnouncementDetail;
 use isucholar_core::repos::registration_repository::{
     RegistrationRepository, RegistrationRepositoryImpl,
 };
+use isucholar_core::repos::unread_announcement_repository::{
+    UnreadAnnouncementRepository, UnreadAnnouncementRepositoryImpl,
+};
 
 // GET /api/announcements/{announcement_id} お知らせ詳細取得
 pub async fn get_announcement_detail(
@@ -45,10 +48,9 @@ pub async fn get_announcement_detail(
         return Err(AnnouncementNotFound);
     }
 
-    sqlx::query("UPDATE `unread_announcements` SET `is_deleted` = true WHERE `announcement_id` = ? AND `user_id` = ?")
-        .bind(announcement_id)
-        .bind(&user_id)
-        .execute(&mut tx)
+    let unread_announcement_repo = UnreadAnnouncementRepositoryImpl {};
+    unread_announcement_repo
+        .mark_read(&mut tx, announcement_id, &user_id)
         .await?;
 
     tx.commit().await?;
