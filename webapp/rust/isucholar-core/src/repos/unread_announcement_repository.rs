@@ -8,21 +8,22 @@ use sqlx::Arguments;
 
 #[async_trait]
 pub trait UnreadAnnouncementRepository {
+    type Tx<'c>;
     async fn create_in_tx<'c>(
         &self,
-        tx: &mut TxConn<'c>,
+        tx: &mut Self::Tx<'c>,
         announcement_id: &str,
         user_id: &str,
     ) -> Result<()>;
-    async fn mark_read<'c>(&self, tx: &mut TxConn<'c>, id: &str, user_id: &str) -> Result<()>;
+    async fn mark_read<'c>(&self, tx: &mut Self::Tx<'c>, id: &str, user_id: &str) -> Result<()>;
     async fn count_unread_by_user_id_in_tx<'c>(
         &self,
-        tx: &mut TxConn<'c>,
+        tx: &mut Self::Tx<'c>,
         user_id: &str,
     ) -> Result<i64>;
     async fn find_unread_announcements_by_user_id_in_tx<'c>(
         &self,
-        tx: &mut TxConn<'c>,
+        tx: &mut Self::Tx<'c>,
         user_id: &str,
         limit: i64,
         offset: i64,
@@ -30,7 +31,7 @@ pub trait UnreadAnnouncementRepository {
     ) -> Result<Vec<AnnouncementWithoutDetail>>;
     async fn find_announcement_detail_by_announcement_id_and_user_id_in_tx<'c>(
         &self,
-        tx: &mut TxConn,
+        tx: &mut Self::Tx<'c>,
         announcement_id: &str,
         user_id: &str,
     ) -> Result<Option<AnnouncementDetail>>;
@@ -40,9 +41,10 @@ pub struct UnreadAnnouncementRepositoryImpl {}
 
 #[async_trait]
 impl UnreadAnnouncementRepository for UnreadAnnouncementRepositoryImpl {
+    type Tx<'c> = TxConn<'c>;
     async fn create_in_tx<'c>(
         &self,
-        tx: &mut TxConn<'c>,
+        tx: &mut Self::Tx<'c>,
         announcement_id: &str,
         user_id: &str,
     ) -> Result<()> {
@@ -57,7 +59,7 @@ impl UnreadAnnouncementRepository for UnreadAnnouncementRepositoryImpl {
     }
     async fn mark_read<'c>(
         &self,
-        tx: &mut TxConn<'c>,
+        tx: &mut Self::Tx<'c>,
         announcement_id: &str,
         user_id: &str,
     ) -> Result<()> {
@@ -72,7 +74,7 @@ impl UnreadAnnouncementRepository for UnreadAnnouncementRepositoryImpl {
 
     async fn count_unread_by_user_id_in_tx<'c>(
         &self,
-        tx: &mut TxConn<'c>,
+        tx: &mut Self::Tx<'c>,
         user_id: &str,
     ) -> Result<i64> {
         let unread_count: i64 = db::fetch_one_scalar(
@@ -89,7 +91,7 @@ impl UnreadAnnouncementRepository for UnreadAnnouncementRepositoryImpl {
 
     async fn find_unread_announcements_by_user_id_in_tx<'c>(
         &self,
-        tx: &mut TxConn<'c>,
+        tx: &mut Self::Tx<'c>,
         user_id: &str,
         limit: i64,
         offset: i64,
@@ -127,7 +129,7 @@ impl UnreadAnnouncementRepository for UnreadAnnouncementRepositoryImpl {
 
     async fn find_announcement_detail_by_announcement_id_and_user_id_in_tx<'c>(
         &self,
-        tx: &mut TxConn,
+        tx: &mut Self::Tx<'c>,
         announcement_id: &str,
         user_id: &str,
     ) -> Result<Option<AnnouncementDetail>> {
