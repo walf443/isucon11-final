@@ -24,6 +24,13 @@ pub trait RegistrationRepository {
         course_id: &str,
     ) -> Result<Vec<User>>;
 }
+
+pub trait HaveRegistrationRepository {
+    type Repo: RegistrationRepository + Sync;
+
+    fn registration_repo(&self) -> &Self::Repo;
+}
+
 pub struct RegistrationRepositoryImpl {}
 
 #[async_trait]
