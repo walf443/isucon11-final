@@ -1,9 +1,14 @@
 use crate::db::DBPool;
 use crate::models::announcement_detail::AnnouncementDetail;
-use crate::repos::registration_repository::{HaveRegistrationRepository, RegistrationRepository};
-use crate::repos::transaction_repository::{HaveTransactionRepository, TransactionRepository};
+use crate::repos::registration_repository::{
+    HaveRegistrationRepository, RegistrationRepository, RegistrationRepositoryImpl,
+};
+use crate::repos::transaction_repository::{
+    HaveTransactionRepository, TransactionRepository, TransactionRepositoryImpl,
+};
 use crate::repos::unread_announcement_repository::{
     HaveUnreadAnnouncementRepository, UnreadAnnouncementRepository,
+    UnreadAnnouncementRepositoryImpl,
 };
 use crate::services::error::Error::AnnouncementNotFound;
 use crate::services::error::Result;
@@ -13,7 +18,7 @@ use async_trait::async_trait;
 pub trait UnreadAnnouncementService:
     HaveTransactionRepository + HaveUnreadAnnouncementRepository + HaveRegistrationRepository
 {
-    async fn find_detail(
+    async fn find_detail_and_mark_read(
         &self,
         pool: &DBPool,
         announcement_id: &str,
@@ -53,3 +58,45 @@ pub trait UnreadAnnouncementService:
         Ok(announcement)
     }
 }
+
+pub struct UnreadAnnouncementServiceImpl {
+    transaction: TransactionRepositoryImpl,
+    unread_announcement: UnreadAnnouncementRepositoryImpl,
+    registration: RegistrationRepositoryImpl,
+}
+
+impl UnreadAnnouncementServiceImpl {
+    pub fn new() -> Self {
+        Self {
+            transaction: TransactionRepositoryImpl {},
+            unread_announcement: UnreadAnnouncementRepositoryImpl {},
+            registration: RegistrationRepositoryImpl {},
+        }
+    }
+}
+
+impl HaveTransactionRepository for UnreadAnnouncementServiceImpl {
+    type Repo = TransactionRepositoryImpl;
+
+    fn transaction_repository(&self) -> &Self::Repo {
+        &self.transaction
+    }
+}
+
+impl HaveUnreadAnnouncementRepository for UnreadAnnouncementServiceImpl {
+    type Repo = UnreadAnnouncementRepositoryImpl;
+
+    fn unread_announcement_repo(&self) -> &Self::Repo {
+        &self.unread_announcement
+    }
+}
+
+impl HaveRegistrationRepository for UnreadAnnouncementServiceImpl {
+    type Repo = RegistrationRepositoryImpl;
+
+    fn registration_repo(&self) -> &Self::Repo {
+        &self.registration
+    }
+}
+
+impl UnreadAnnouncementService for UnreadAnnouncementServiceImpl {}

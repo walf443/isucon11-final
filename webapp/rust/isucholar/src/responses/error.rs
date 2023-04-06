@@ -4,11 +4,15 @@ use bcrypt::BcryptError;
 use isucholar_core::repos::error::ReposError;
 use std::io;
 
+use isucholar_core::services;
 use thiserror::Error;
+
 #[derive(Error, Debug)]
 pub enum ResponseError {
     #[error("repos error")]
     ReposError(#[from] ReposError),
+    #[error("repos error")]
+    ServiceError(#[from] services::error::Error),
     #[error("actix error")]
     ActixError(#[from] actix_web::Error),
     #[error("sqlx error")]
