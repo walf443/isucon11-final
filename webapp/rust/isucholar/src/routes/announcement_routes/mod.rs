@@ -3,6 +3,7 @@ use crate::routes::announcement_routes::add_announcement::add_announcement;
 use crate::routes::announcement_routes::get_announcement_detail::get_announcement_detail;
 use crate::routes::announcement_routes::get_announcement_list::get_announcement_list;
 use actix_web::{web, Scope};
+use isucholar_core::services::manager::ServiceManagerImpl;
 
 mod add_announcement;
 mod get_announcement_detail;
@@ -17,5 +18,8 @@ pub fn get_announcement_routes() -> Scope {
                 .wrap(IsAdmin)
                 .to(add_announcement),
         )
-        .route("/{announcement_id}", web::get().to(get_announcement_detail))
+        .route(
+            "/{announcement_id}",
+            web::get().to(get_announcement_detail::<ServiceManagerImpl>),
+        )
 }

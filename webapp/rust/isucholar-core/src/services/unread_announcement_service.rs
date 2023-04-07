@@ -14,9 +14,14 @@ use crate::services::error::Error::AnnouncementNotFound;
 use crate::services::error::Result;
 use async_trait::async_trait;
 
+pub trait HaveUnreadAnnounceService {
+    type Service: UnreadAnnouncementService;
+    fn unread_announcement_service(&self) -> &Self::Service;
+}
+
 #[async_trait]
 pub trait UnreadAnnouncementService:
-    HaveTransactionRepository + HaveUnreadAnnouncementRepository + HaveRegistrationRepository
+    Sync + HaveTransactionRepository + HaveUnreadAnnouncementRepository + HaveRegistrationRepository
 {
     async fn find_detail_and_mark_read(
         &self,
@@ -58,6 +63,8 @@ pub trait UnreadAnnouncementService:
         Ok(announcement)
     }
 }
+
+pub struct UnreadAnnouncementManager {}
 
 pub struct UnreadAnnouncementServiceImpl {
     transaction: TransactionRepositoryImpl,
