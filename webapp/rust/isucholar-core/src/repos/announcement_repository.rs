@@ -1,6 +1,6 @@
 use crate::db::{DBPool, TxConn};
 use crate::models::announcement::Announcement;
-use crate::repos::error::ReposError::AnnoucementDuplicate;
+use crate::repos::error::ReposError::AnnouncementDuplicate;
 use crate::repos::error::Result;
 use crate::MYSQL_ERR_NUM_DUPLICATE_ENTRY;
 use async_trait::async_trait;
@@ -36,7 +36,7 @@ impl AnnouncementRepository for AnnouncementRepositoryImpl {
                     db_error.try_downcast_ref::<sqlx::mysql::MySqlDatabaseError>()
                 {
                     if mysql_error.number() == MYSQL_ERR_NUM_DUPLICATE_ENTRY {
-                        return Err(AnnoucementDuplicate);
+                        return Err(AnnouncementDuplicate);
                     }
                 }
             }

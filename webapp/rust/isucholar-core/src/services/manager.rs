@@ -1,12 +1,14 @@
 use crate::services::unread_announcement_service::{
-    HaveUnreadAnnounceService, UnreadAnnouncementServiceImpl,
+    HaveUnreadAnnouncementService, UnreadAnnouncementServiceImpl,
 };
 
-pub trait ServiceManager: HaveUnreadAnnounceService {}
+pub trait ServiceManager: HaveUnreadAnnouncementService {}
 
 pub struct ServiceManagerImpl {
     unread_announcement_service: UnreadAnnouncementServiceImpl,
 }
+
+impl ServiceManager for ServiceManagerImpl {}
 
 impl ServiceManagerImpl {
     pub fn new() -> Self {
@@ -16,7 +18,7 @@ impl ServiceManagerImpl {
     }
 }
 
-impl HaveUnreadAnnounceService for ServiceManagerImpl {
+impl HaveUnreadAnnouncementService for ServiceManagerImpl {
     type Service = UnreadAnnouncementServiceImpl;
 
     fn unread_announcement_service(&self) -> &Self::Service {
@@ -24,4 +26,3 @@ impl HaveUnreadAnnounceService for ServiceManagerImpl {
     }
 }
 
-impl ServiceManager for ServiceManagerImpl {}

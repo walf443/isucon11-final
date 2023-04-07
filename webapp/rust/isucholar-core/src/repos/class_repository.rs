@@ -1,6 +1,6 @@
 use crate::db::{DBPool, TxConn};
 use crate::models::class::{Class, ClassWithSubmitted, CreateClass};
-use crate::repos::error::ReposError::ClassDepulicate;
+use crate::repos::error::ReposError::ClassDuplicate;
 use crate::repos::error::Result;
 use crate::{db, MYSQL_ERR_NUM_DUPLICATE_ENTRY};
 use async_trait::async_trait;
@@ -64,7 +64,7 @@ impl ClassRepository for ClassRepositoryImpl {
                     db_error.try_downcast_ref::<sqlx::mysql::MySqlDatabaseError>()
                 {
                     if mysql_error.number() == MYSQL_ERR_NUM_DUPLICATE_ENTRY {
-                        return Err(ClassDepulicate);
+                        return Err(ClassDuplicate);
                     }
                 }
             }

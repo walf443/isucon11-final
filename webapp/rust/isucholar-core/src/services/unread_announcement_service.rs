@@ -14,7 +14,7 @@ use crate::services::error::Error::AnnouncementNotFound;
 use crate::services::error::Result;
 use async_trait::async_trait;
 
-pub trait HaveUnreadAnnounceService {
+pub trait HaveUnreadAnnouncementService {
     type Service: UnreadAnnouncementService;
     fn unread_announcement_service(&self) -> &Self::Service;
 }

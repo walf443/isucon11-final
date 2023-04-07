@@ -55,7 +55,7 @@ pub async fn add_announcement(
         Err(e) => {
             let _ = tx.rollback().await;
             match e {
-                ReposError::AnnoucementDuplicate => {
+                ReposError::AnnouncementDuplicate => {
                     let announcement = announcement_repos.find_by_id(&pool, &req.id).await?;
                     if announcement.course_id != req.course_id
                         || announcement.title != req.title
