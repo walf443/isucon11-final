@@ -3,11 +3,12 @@ use crate::responses::error::ResponseResult;
 use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
 use isucholar_core::services::error::Error;
-use isucholar_core::services::manager::ServiceManager;
-use isucholar_core::services::unread_announcement_service::UnreadAnnouncementService;
+use isucholar_core::services::unread_announcement_service::{
+    HaveUnreadAnnouncementService, UnreadAnnouncementService,
+};
 
 // GET /api/announcements/{announcement_id} お知らせ詳細取得
-pub async fn get_announcement_detail<Service: ServiceManager>(
+pub async fn get_announcement_detail<Service: HaveUnreadAnnouncementService>(
     pool: web::Data<sqlx::MySqlPool>,
     service: web::Data<Service>,
     session: actix_session::Session,
