@@ -1,4 +1,4 @@
-#[derive(Debug, sqlx::FromRow, serde::Serialize)]
+#[derive(Debug, sqlx::FromRow, serde::Serialize, PartialEq, Clone)]
 pub struct AnnouncementDetail {
     pub id: String,
     pub course_id: String,
