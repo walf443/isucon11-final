@@ -12,11 +12,11 @@ pub async fn get_announcement_detail<Service: HaveUnreadAnnouncementService>(
     pool: web::Data<sqlx::MySqlPool>,
     service: web::Data<Service>,
     session: actix_session::Session,
-    announcement_id: web::Path<(String,)>,
+    announcement_id: web::Path<String>,
 ) -> ResponseResult<HttpResponse> {
     let (user_id, _, _) = get_user_info(session)?;
 
-    let announcement_id = &announcement_id.0;
+    let announcement_id = &announcement_id;
 
     let result = service
         .unread_announcement_service()

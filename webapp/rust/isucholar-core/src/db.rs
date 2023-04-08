@@ -34,7 +34,7 @@ pub async fn get_db_conn() -> Result<DBPool, sqlx::Error> {
     _get_db_conn(database).await
 }
 
-#[cfg(test)]
+#[cfg(any(test, feature = "test"))]
 pub async fn get_test_db_conn() -> Result<DBPool, sqlx::Error> {
     let database = &std::env::var("MYSQL_TEST_DATABASE").ok();
 
