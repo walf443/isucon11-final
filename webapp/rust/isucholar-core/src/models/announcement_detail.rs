@@ -7,3 +7,5 @@ pub struct AnnouncementDetail {
     pub message: String,
     pub unread: bool,
 }
+
+impl AnnouncementDetail {}
