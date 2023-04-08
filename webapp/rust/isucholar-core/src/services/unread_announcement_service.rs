@@ -110,31 +110,33 @@ impl UnreadAnnouncementService for UnreadAnnouncementServiceImpl {}
 
 #[cfg(test)]
 mod tests {
-    use crate::repos::registration_repository::{HaveRegistrationRepository, MockRegistrationRepository};
+    use crate::repos::registration_repository::{
+        HaveRegistrationRepository, MockRegistrationRepository,
+    };
     use crate::repos::transaction_repository::{
-        HaveTransactionRepository, MockTransactionRepository,
+        HaveTransactionRepository, TransactionRepositoryImpl,
     };
-    use crate::repos::unread_announcement_repository::{HaveUnreadAnnouncementRepository, MockUnreadAnnouncementRepository};
-    use crate::services::unread_announcement_service::{
-        UnreadAnnouncementService,
+    use crate::repos::unread_announcement_repository::{
+        HaveUnreadAnnouncementRepository, MockUnreadAnnouncementRepository,
     };
+    use crate::services::unread_announcement_service::UnreadAnnouncementService;
 
     struct S {
-        pub transaction_repo: MockTransactionRepository,
+        pub transaction_repo: TransactionRepositoryImpl,
         pub unread_announcement_repo: MockUnreadAnnouncementRepository,
         pub registration_repo: MockRegistrationRepository,
     }
     impl S {
         pub fn new() -> Self {
             Self {
-                transaction_repo: MockTransactionRepository::new(),
+                transaction_repo: TransactionRepositoryImpl {},
                 unread_announcement_repo: MockUnreadAnnouncementRepository::new(),
                 registration_repo: MockRegistrationRepository::new(),
             }
         }
     }
     impl HaveTransactionRepository for S {
-        type Repo = MockTransactionRepository;
+        type Repo = TransactionRepositoryImpl;
 
         fn transaction_repository(&self) -> &Self::Repo {
             &self.transaction_repo
@@ -157,23 +159,44 @@ mod tests {
     impl UnreadAnnouncementService for S {}
 
     mod find_detail_and_mark_read {
-        use crate::db::{get_test_db_conn};
-        use crate::repos::error;
-        use crate::services::unread_announcement_service::tests::S;
+        use crate::db::get_test_db_conn;
+        use crate::repos::error::ReposError::TestError;
         use crate::services::error::Result;
+        use crate::services::unread_announcement_service::tests::S;
         use crate::services::unread_announcement_service::UnreadAnnouncementService;
 
         #[tokio::test]
-        async fn transaction_begin_failed() -> Result<()> {
-            let pool = get_test_db_conn().await?;
+        #[should_panic(expected = "ReposError(TestError)")]
+        async fn find_announcement_detail_by_announcement_id_and_user_id_in_tx_err() -> () {
+            let pool = get_test_db_conn().await.unwrap();
 
             let mut service = S::new();
-            service.transaction_repo.expect_begin().returning(|_| Err(error::ReposError::AnnouncementDuplicate));
-            let result = service.find_detail_and_mark_read(&pool, "", "").await;
+            service
+                .unread_announcement_repo
+                .expect_find_announcement_detail_by_announcement_id_and_user_id_in_tx()
+                .returning(|_, _, _| Err(TestError));
 
-            assert!(result.is_err());
+            service
+                .find_detail_and_mark_read(&pool, "", "")
+                .await
+                .unwrap();
+        }
 
-            Ok(())
+        #[tokio::test]
+        #[should_panic(expected = "AnnouncementNotFound")]
+        async fn find_announcement_detail_by_announcement_id_and_user_id_in_tx_none() -> () {
+            let pool = get_test_db_conn().await.unwrap();
+
+            let mut service = S::new();
+            service
+                .unread_announcement_repo
+                .expect_find_announcement_detail_by_announcement_id_and_user_id_in_tx()
+                .returning(|_, _, _| Ok(None));
+
+            service
+                .find_detail_and_mark_read(&pool, "", "")
+                .await
+                .unwrap();
         }
 
         #[tokio::test]

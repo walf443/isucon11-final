@@ -36,16 +36,13 @@ pub async fn get_db_conn() -> Result<DBPool, sqlx::Error> {
 
 #[cfg(test)]
 pub async fn get_test_db_conn() -> Result<DBPool, sqlx::Error> {
-    let database = &std::env::var("MYSQL_TEST_DATABASE")
-        .ok();
+    let database = &std::env::var("MYSQL_TEST_DATABASE").ok();
 
     match database {
         None => {
             panic!("please set MYSQL_TEST_DATABASE");
         }
-        Some(database) => {
-            return _get_db_conn(&database).await
-        }
+        Some(database) => return _get_db_conn(&database).await,
     }
 }
 

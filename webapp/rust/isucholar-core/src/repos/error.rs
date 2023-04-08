@@ -2,6 +2,8 @@ use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum ReposError {
+    #[error("this is error for testing")]
+    TestError,
     #[error("failed to execute query")]
     SqlError(#[from] sqlx::Error),
     #[error("A announcement with the same code already exists.")]
