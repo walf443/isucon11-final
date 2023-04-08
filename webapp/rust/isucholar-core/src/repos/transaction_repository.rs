@@ -2,9 +2,10 @@ use crate::db::{DBPool, TxConn};
 use crate::repos::error::Result;
 use async_trait::async_trait;
 
+#[cfg_attr(any(test, feature = "test"), mockall::automock)]
 #[async_trait]
 pub trait TransactionRepository {
-    async fn begin(&self, pool: &DBPool) -> Result<TxConn>;
+    async fn begin<'c>(&self, pool: &DBPool) -> Result<TxConn<'c>>;
 }
 
 pub trait HaveTransactionRepository {
@@ -16,7 +17,7 @@ pub struct TransactionRepositoryImpl {}
 
 #[async_trait]
 impl TransactionRepository for TransactionRepositoryImpl {
-    async fn begin(&self, pool: &DBPool) -> Result<TxConn> {
+    async fn begin<'c>(&self, pool: &DBPool) -> Result<TxConn<'c>> {
         let txn = pool.begin().await?;
         Ok(txn)
     }

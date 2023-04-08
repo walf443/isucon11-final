@@ -4,6 +4,7 @@ use crate::models::user::User;
 use crate::repos::error::Result;
 use async_trait::async_trait;
 
+#[cfg_attr(any(test, feature = "test"), mockall::automock)]
 #[async_trait]
 pub trait RegistrationRepository {
     async fn create_or_update_in_tx<'c>(

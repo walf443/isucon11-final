@@ -25,4 +25,3 @@ impl HaveUnreadAnnouncementService for ServiceManagerImpl {
         &self.unread_announcement_service
     }
 }
-
