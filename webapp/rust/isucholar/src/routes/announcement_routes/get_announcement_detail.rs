@@ -9,7 +9,6 @@ use isucholar_core::services::unread_announcement_service::{
 
 // GET /api/announcements/{announcement_id} お知らせ詳細取得
 pub async fn get_announcement_detail<Service: HaveUnreadAnnouncementService>(
-    pool: web::Data<sqlx::MySqlPool>,
     service: web::Data<Service>,
     session: actix_session::Session,
     announcement_id: web::Path<(String,)>,
@@ -20,7 +19,7 @@ pub async fn get_announcement_detail<Service: HaveUnreadAnnouncementService>(
 
     let result = service
         .unread_announcement_service()
-        .find_detail_and_mark_read(&pool, announcement_id, &user_id)
+        .find_detail_and_mark_read(announcement_id, &user_id)
         .await;
     match result {
         Ok(_) => {}
@@ -61,13 +60,8 @@ mod tests {
         let _ = session.insert("userName", "1");
         let _ = session.insert("isAdmin", false);
 
-        get_announcement_detail(
-            Data::new(conn.clone()),
-            Data::new(service),
-            session,
-            announcement_id,
-        )
-        .await
-        .unwrap();
+        get_announcement_detail(Data::new(service), session, announcement_id)
+            .await
+            .unwrap();
     }
 }
