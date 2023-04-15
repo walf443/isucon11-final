@@ -12,3 +12,4 @@ thiserror = { version = "1" }
 num-traits = { version = "0.2" }
 futures = "0.3"
 tokio = { version = "1", features = ["fs", "process", "macros"] }
+serde_json = "1.0.96"

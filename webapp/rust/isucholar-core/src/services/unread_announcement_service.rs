@@ -16,11 +16,13 @@ use crate::services::HaveDBPool;
 use async_trait::async_trait;
 use std::sync::Arc;
 
+#[cfg_attr(any(test, feature = "test"), mockall::automock(type Service = MockUnreadAnnouncementServiceVirtual;))]
 pub trait HaveUnreadAnnouncementService {
     type Service: UnreadAnnouncementServiceVirtual;
     fn unread_announcement_service(&self) -> &Self::Service;
 }
 
+#[cfg_attr(any(test, feature = "test"), mockall::automock)]
 #[async_trait]
 pub trait UnreadAnnouncementServiceVirtual: Sync {
     async fn find_detail_and_mark_read(
