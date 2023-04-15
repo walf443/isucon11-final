@@ -1222,6 +1222,7 @@ dependencies = [
  "env_logger",
  "futures",
  "isucholar-core",
+ "isucholar-infra",
  "lazy_static",
  "listenfd",
  "log",
