@@ -3,8 +3,9 @@ use crate::responses::get_registered_course_response::GetRegisteredCourseRespons
 use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
 use isucholar_core::repos::registration_course_repository::RegistrationCourseRepository;
-use isucholar_core::repos::user_repository::{UserRepository, UserRepositoryImpl};
+use isucholar_core::repos::user_repository::UserRepository;
 use isucholar_infra::repos::registration_course_repository::RegistrationCourseRepositoryImpl;
+use isucholar_infra::repos::user_repository::UserRepositoryImpl;
 
 // GET /api/users/me/courses 履修中の科目一覧取得
 pub async fn get_registered_courses(

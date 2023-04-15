@@ -1,7 +1,8 @@
 use crate::responses::error::ResponseResult;
 use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
-use isucholar_core::repos::user_repository::{UserRepository, UserRepositoryImpl};
+use isucholar_core::repos::user_repository::UserRepository;
+use isucholar_infra::repos::user_repository::UserRepositoryImpl;
 
 #[derive(Debug, serde::Serialize)]
 pub struct GetMeResponse {
