@@ -1,5 +1,5 @@
 [workspace]
-members = ["isucholar-core", "isucholar"]
+members = ["core", "http"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

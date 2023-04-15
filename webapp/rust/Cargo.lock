@@ -1194,7 +1194,22 @@ dependencies = [
 ]
 
 [[package]]
-name = "isucholar"
+name = "isucholar-core"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "async-trait",
+ "futures",
+ "mockall",
+ "num-traits",
+ "serde",
+ "sqlx",
+ "thiserror",
+ "tokio",
+]
+
+[[package]]
+name = "isucholar-http"
 version = "0.1.0"
 dependencies = [
  "actix-files",
@@ -1219,21 +1234,6 @@ dependencies = [
  "thiserror",
  "tokio",
  "ulid",
-]
-
-[[package]]
-name = "isucholar-core"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "async-trait",
- "futures",
- "mockall",
- "num-traits",
- "serde",
- "sqlx",
- "thiserror",
- "tokio",
 ]
 
 [[package]]

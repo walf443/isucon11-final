@@ -1,12 +1,14 @@
 use actix_web::web;
-use isucholar::routes::announcement_routes::get_announcement_routes;
-use isucholar::routes::course_routes::get_course_routes;
-use isucholar::routes::initialize::initialize;
-use isucholar::routes::login::login;
-use isucholar::routes::logout::logout;
-use isucholar::routes::user_routes::get_user_routes;
+
 use isucholar_core::db::get_db_conn;
 use isucholar_core::services::manager::ServiceManagerImpl;
+use isucholar_http::routes::announcement_routes::get_announcement_routes;
+use isucholar_http::routes::course_routes::get_course_routes;
+use isucholar_http::routes::initialize::initialize;
+use isucholar_http::routes::login::login;
+use isucholar_http::routes::logout::logout;
+use isucholar_http::routes::user_routes::get_user_routes;
+use isucholar_http::middleware;
 
 const SESSION_NAME: &str = "isucholar_rust";
 
@@ -41,7 +43,7 @@ async fn main() -> std::io::Result<()> {
             .route("/logout", web::post().to(logout))
             .service(
                 web::scope("/api")
-                    .wrap(isucholar::middleware::IsLoggedIn)
+                    .wrap(middleware::IsLoggedIn)
                     .service(users_api)
                     .service(courses_api)
                     .service(announcements_api),
