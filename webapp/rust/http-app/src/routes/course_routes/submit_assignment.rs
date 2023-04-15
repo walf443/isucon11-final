@@ -13,12 +13,12 @@ use isucholar_http_core::responses::error::ResponseError::{
     SubmissionClosed,
 };
 use isucholar_http_core::responses::error::ResponseResult;
+use isucholar_http_core::routes::util::get_user_info;
 use isucholar_infra::repos::class_repository::ClassRepositoryImpl;
 use isucholar_infra::repos::course_repository::CourseRepositoryImpl;
 use isucholar_infra::repos::registration_repository::RegistrationRepositoryImpl;
 use isucholar_infra::repos::submission_repository::SubmissionRepositoryImpl;
 use tokio::io::AsyncWriteExt;
-use isucholar_http_core::routes::util::get_user_info;
 
 // POST /api/courses/{course_id}/classes/{class_id}/assignments 課題の提出
 pub async fn submit_assignment(
