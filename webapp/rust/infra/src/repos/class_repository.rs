@@ -1,10 +1,11 @@
+use crate::db;
 use async_trait::async_trait;
 use isucholar_core::db::{DBPool, TxConn};
 use isucholar_core::models::class::{Class, ClassWithSubmitted, CreateClass};
 use isucholar_core::repos::class_repository::ClassRepository;
 use isucholar_core::repos::error::ReposError::ClassDuplicate;
 use isucholar_core::repos::error::Result;
-use isucholar_core::{db, MYSQL_ERR_NUM_DUPLICATE_ENTRY};
+use isucholar_core::MYSQL_ERR_NUM_DUPLICATE_ENTRY;
 
 pub struct ClassRepositoryImpl {}
 

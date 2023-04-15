@@ -1,10 +1,11 @@
+use crate::db;
 use async_trait::async_trait;
 use isucholar_core::db::{DBPool, TxConn};
 use isucholar_core::models::course::{Course, CourseWithTeacher, CreateCourse};
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::repos::course_repository::{CourseRepository, SearchCoursesQuery};
 use isucholar_core::repos::error::{ReposError, Result};
-use isucholar_core::{db, MYSQL_ERR_NUM_DUPLICATE_ENTRY};
+use isucholar_core::MYSQL_ERR_NUM_DUPLICATE_ENTRY;
 use sqlx::Arguments;
 
 pub struct CourseRepositoryImpl {}

@@ -1,6 +1,6 @@
+use crate::db;
 use async_trait::async_trait;
 use futures::StreamExt;
-use isucholar_core::db;
 use isucholar_core::db::{DBPool, TxConn};
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::models::user::User;

@@ -1,5 +1,5 @@
+use crate::db;
 use async_trait::async_trait;
-use isucholar_core::db;
 use isucholar_core::db::TxConn;
 use isucholar_core::models::user::User;
 use isucholar_core::repos::error::Result;
