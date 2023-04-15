@@ -7,7 +7,6 @@ pub trait ServiceManager: HaveUnreadAnnouncementService {}
 
 #[derive(Clone)]
 pub struct ServiceManagerImpl {
-    db_pool: DBPool,
     unread_announcement_service: UnreadAnnouncementServiceImpl,
 }
 
@@ -16,7 +15,6 @@ impl ServiceManager for ServiceManagerImpl {}
 impl ServiceManagerImpl {
     pub fn new(db_pool: DBPool) -> Self {
         Self {
-            db_pool: db_pool.clone(),
             unread_announcement_service: UnreadAnnouncementServiceImpl::new(db_pool),
         }
     }
