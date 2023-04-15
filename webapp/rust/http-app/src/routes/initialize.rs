@@ -1,7 +1,7 @@
-use crate::responses::error::SqlxError;
 use actix_web::{web, HttpResponse};
 use futures::StreamExt;
 use isucholar_core::{ASSIGNMENTS_DIRECTORY, INIT_DATA_DIRECTORY, SQL_DIRECTORY};
+use isucholar_http_core::responses::error::SqlxError;
 use sqlx::Executor;
 
 #[derive(Debug, serde::Serialize)]

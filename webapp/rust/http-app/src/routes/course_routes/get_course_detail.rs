@@ -1,7 +1,7 @@
-use crate::responses::error::ResponseError::CourseNotFound;
-use crate::responses::error::ResponseResult;
 use actix_web::{web, HttpResponse};
 use isucholar_core::repos::course_repository::CourseRepository;
+use isucholar_http_core::responses::error::ResponseError::CourseNotFound;
+use isucholar_http_core::responses::error::ResponseResult;
 use isucholar_infra::repos::course_repository::CourseRepositoryImpl;
 
 // GET /api/courses/{course_id} 科目詳細の取得

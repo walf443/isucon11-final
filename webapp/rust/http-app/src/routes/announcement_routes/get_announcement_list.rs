@@ -1,9 +1,9 @@
-use crate::responses::error::ResponseError::InvalidPage;
-use crate::responses::error::ResponseResult;
 use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::announcement::AnnouncementWithoutDetail;
 use isucholar_core::repos::unread_announcement_repository::UnreadAnnouncementRepository;
+use isucholar_http_core::responses::error::ResponseError::InvalidPage;
+use isucholar_http_core::responses::error::ResponseResult;
 use isucholar_infra::repos::unread_announcement_repository::UnreadAnnouncementRepositoryImpl;
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]

@@ -1,7 +1,7 @@
-use crate::responses::error::ResponseError::InvalidPage;
-use crate::responses::error::ResponseResult;
 use actix_web::{web, HttpResponse};
 use isucholar_core::repos::course_repository::{CourseRepository, SearchCoursesQuery};
+use isucholar_http_core::responses::error::ResponseError::InvalidPage;
+use isucholar_http_core::responses::error::ResponseResult;
 use isucholar_infra::repos::course_repository::CourseRepositoryImpl;
 
 // GET /api/courses 科目検索
