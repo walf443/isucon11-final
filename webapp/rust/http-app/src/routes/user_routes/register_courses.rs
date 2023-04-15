@@ -4,13 +4,14 @@ use crate::responses::register_courses_error_response::RegisterCoursesErrorRespo
 use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::course_status::CourseStatus;
-use isucholar_core::repos::course_repository::{CourseRepository, CourseRepositoryImpl};
+use isucholar_core::repos::course_repository::CourseRepository;
 use isucholar_core::repos::registration_course_repository::{
     RegistrationCourseRepository, RegistrationCourseRepositoryImpl,
 };
 use isucholar_core::repos::registration_repository::{
     RegistrationRepository, RegistrationRepositoryImpl,
 };
+use isucholar_infra::repos::course_repository::CourseRepositoryImpl;
 
 // PUT /api/users/me/courses 履修登録
 pub async fn register_courses(

@@ -2,9 +2,10 @@ use crate::responses::error::ResponseError::CourseNotFound;
 use crate::responses::error::ResponseResult;
 use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
-use isucholar_core::repos::class_repository::{ClassRepository};
-use isucholar_core::repos::course_repository::{CourseRepository, CourseRepositoryImpl};
+use isucholar_core::repos::class_repository::ClassRepository;
+use isucholar_core::repos::course_repository::CourseRepository;
 use isucholar_infra::repos::class_repository::ClassRepositoryImpl;
+use isucholar_infra::repos::course_repository::CourseRepositoryImpl;
 
 #[derive(Debug, serde::Serialize)]
 struct GetClassResponse {

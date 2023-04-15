@@ -7,7 +7,7 @@ use isucholar_core::models::class_score::ClassScore;
 use isucholar_core::models::course_result::CourseResult;
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::models::summary::Summary;
-use isucholar_core::repos::class_repository::{ClassRepository};
+use isucholar_core::repos::class_repository::ClassRepository;
 use isucholar_core::repos::registration_course_repository::{
     RegistrationCourseRepository, RegistrationCourseRepositoryImpl,
 };

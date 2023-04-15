@@ -3,7 +3,7 @@ use crate::responses::error::ResponseResult;
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::announcement::Announcement;
 use isucholar_core::repos::announcement_repository::AnnouncementRepository;
-use isucholar_core::repos::course_repository::{CourseRepository, CourseRepositoryImpl};
+use isucholar_core::repos::course_repository::CourseRepository;
 use isucholar_core::repos::error::ReposError;
 use isucholar_core::repos::registration_repository::{
     RegistrationRepository, RegistrationRepositoryImpl,
@@ -12,6 +12,7 @@ use isucholar_core::repos::unread_announcement_repository::{
     UnreadAnnouncementRepository, UnreadAnnouncementRepositoryImpl,
 };
 use isucholar_infra::repos::announcement_repository::AnnouncementRepositoryImpl;
+use isucholar_infra::repos::course_repository::CourseRepositoryImpl;
 
 #[derive(Debug, serde::Deserialize)]
 pub struct AddAnnouncementRequest {

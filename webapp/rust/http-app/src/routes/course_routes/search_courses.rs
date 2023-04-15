@@ -1,9 +1,8 @@
 use crate::responses::error::ResponseError::InvalidPage;
 use crate::responses::error::ResponseResult;
 use actix_web::{web, HttpResponse};
-use isucholar_core::repos::course_repository::{
-    CourseRepository, CourseRepositoryImpl, SearchCoursesQuery,
-};
+use isucholar_core::repos::course_repository::{CourseRepository, SearchCoursesQuery};
+use isucholar_infra::repos::course_repository::CourseRepositoryImpl;
 
 // GET /api/courses 科目検索
 pub async fn search_courses(

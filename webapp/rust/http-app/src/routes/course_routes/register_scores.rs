@@ -3,7 +3,7 @@ use crate::responses::error::ResponseResult;
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::assignment_path::AssignmentPath;
 use isucholar_core::models::score::Score;
-use isucholar_core::repos::class_repository::{ClassRepository};
+use isucholar_core::repos::class_repository::ClassRepository;
 use isucholar_core::repos::submission_repository::{
     SubmissionRepository, SubmissionRepositoryImpl,
 };

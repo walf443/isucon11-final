@@ -5,7 +5,8 @@ use actix_web::{web, HttpResponse};
 use isucholar_core::models::course::CreateCourse;
 use isucholar_core::models::course_type::CourseType;
 use isucholar_core::models::day_of_week::DayOfWeek;
-use isucholar_core::repos::course_repository::{CourseRepository, CourseRepositoryImpl};
+use isucholar_core::repos::course_repository::CourseRepository;
+use isucholar_infra::repos::course_repository::CourseRepositoryImpl;
 
 #[derive(Debug, serde::Deserialize)]
 pub struct AddCourseRequest {

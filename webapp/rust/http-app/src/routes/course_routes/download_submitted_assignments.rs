@@ -3,7 +3,7 @@ use crate::responses::error::ResponseResult;
 use actix_web::web;
 use isucholar_core::models::assignment_path::AssignmentPath;
 use isucholar_core::models::submission::Submission;
-use isucholar_core::repos::class_repository::{ClassRepository};
+use isucholar_core::repos::class_repository::ClassRepository;
 use isucholar_core::repos::submission_repository::{
     SubmissionRepository, SubmissionRepositoryImpl,
 };
@@ -19,9 +19,7 @@ pub async fn download_submitted_assignments(
 
     let mut tx = pool.begin().await?;
     let class_repo = ClassRepositoryImpl {};
-    let is_exist = class_repo
-        .for_update_by_id_in_tx(&mut tx, class_id)
-        .await?;
+    let is_exist = class_repo.for_update_by_id_in_tx(&mut tx, class_id).await?;
 
     if !is_exist {
         return Err(ClassNotFound);

@@ -2,7 +2,8 @@ use crate::responses::error::ResponseError::CourseNotFound;
 use crate::responses::error::ResponseResult;
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::course_status::CourseStatus;
-use isucholar_core::repos::course_repository::{CourseRepository, CourseRepositoryImpl};
+use isucholar_core::repos::course_repository::CourseRepository;
+use isucholar_infra::repos::course_repository::CourseRepositoryImpl;
 
 #[derive(Debug, serde::Deserialize)]
 pub struct SetCourseStatusRequest {
