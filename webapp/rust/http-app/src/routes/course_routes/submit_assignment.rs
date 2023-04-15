@@ -11,15 +11,14 @@ use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::models::submission::CreateSubmission;
 use isucholar_core::repos::class_repository::ClassRepository;
 use isucholar_core::repos::course_repository::CourseRepository;
-use isucholar_core::repos::registration_repository::{
-    RegistrationRepository, RegistrationRepositoryImpl,
-};
+use isucholar_core::repos::registration_repository::RegistrationRepository;
 use isucholar_core::repos::submission_repository::{
     SubmissionRepository, SubmissionRepositoryImpl,
 };
 use isucholar_core::ASSIGNMENTS_DIRECTORY;
 use isucholar_infra::repos::class_repository::ClassRepositoryImpl;
 use isucholar_infra::repos::course_repository::CourseRepositoryImpl;
+use isucholar_infra::repos::registration_repository::RegistrationRepositoryImpl;
 use tokio::io::AsyncWriteExt;
 
 // POST /api/courses/{course_id}/classes/{class_id}/assignments 課題の提出

@@ -1,7 +1,6 @@
+use crate::repos::registration_repository::RegistrationRepositoryImpl;
 use isucholar_core::db::DBPool;
-use isucholar_core::repos::registration_repository::{
-    HaveRegistrationRepository, RegistrationRepositoryImpl,
-};
+use isucholar_core::repos::registration_repository::HaveRegistrationRepository;
 use isucholar_core::repos::transaction_repository::{
     HaveTransactionRepository, TransactionRepositoryImpl,
 };
