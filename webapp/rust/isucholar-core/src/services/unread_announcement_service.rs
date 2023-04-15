@@ -17,8 +17,17 @@ use async_trait::async_trait;
 use std::sync::Arc;
 
 pub trait HaveUnreadAnnouncementService {
-    type Service: UnreadAnnouncementService;
+    type Service: UnreadAnnouncementServiceVirtual;
     fn unread_announcement_service(&self) -> &Self::Service;
+}
+
+#[async_trait]
+pub trait UnreadAnnouncementServiceVirtual: Sync {
+    async fn find_detail_and_mark_read(
+        &self,
+        announcement_id: &str,
+        user_id: &str,
+    ) -> Result<AnnouncementDetail>;
 }
 
 #[async_trait]
@@ -67,6 +76,17 @@ pub trait UnreadAnnouncementService:
         tx.commit().await?;
 
         Ok(announcement)
+    }
+}
+
+#[async_trait]
+impl<S: UnreadAnnouncementService> UnreadAnnouncementServiceVirtual for S {
+    async fn find_detail_and_mark_read(
+        &self,
+        announcement_id: &str,
+        user_id: &str,
+    ) -> Result<AnnouncementDetail> {
+        UnreadAnnouncementService::find_detail_and_mark_read(self, announcement_id, user_id).await
     }
 }
 

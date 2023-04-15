@@ -4,7 +4,7 @@ use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
 use isucholar_core::services::error::Error;
 use isucholar_core::services::unread_announcement_service::{
-    HaveUnreadAnnouncementService, UnreadAnnouncementService,
+    HaveUnreadAnnouncementService, UnreadAnnouncementServiceVirtual,
 };
 
 // GET /api/announcements/{announcement_id} お知らせ詳細取得
