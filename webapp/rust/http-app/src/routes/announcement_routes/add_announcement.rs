@@ -2,9 +2,7 @@ use crate::responses::error::ResponseError::{AnnouncementConflict, CourseNotFoun
 use crate::responses::error::ResponseResult;
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::announcement::Announcement;
-use isucholar_core::repos::announcement_repository::{
-    AnnouncementRepository, AnnouncementRepositoryImpl,
-};
+use isucholar_core::repos::announcement_repository::AnnouncementRepository;
 use isucholar_core::repos::course_repository::{CourseRepository, CourseRepositoryImpl};
 use isucholar_core::repos::error::ReposError;
 use isucholar_core::repos::registration_repository::{
@@ -13,6 +11,7 @@ use isucholar_core::repos::registration_repository::{
 use isucholar_core::repos::unread_announcement_repository::{
     UnreadAnnouncementRepository, UnreadAnnouncementRepositoryImpl,
 };
+use isucholar_infra::repos::announcement_repository::AnnouncementRepositoryImpl;
 
 #[derive(Debug, serde::Deserialize)]
 pub struct AddAnnouncementRequest {
