@@ -1237,6 +1237,34 @@ dependencies = [
 ]
 
 [[package]]
+name = "isucholar-http-core"
+version = "0.1.0"
+dependencies = [
+ "actix-files",
+ "actix-multipart",
+ "actix-session",
+ "actix-web",
+ "anyhow",
+ "bcrypt",
+ "chrono",
+ "env_logger",
+ "futures",
+ "isucholar-core",
+ "lazy_static",
+ "listenfd",
+ "log",
+ "mime",
+ "num-traits",
+ "serde",
+ "serde_json",
+ "serde_urlencoded",
+ "sqlx",
+ "thiserror",
+ "tokio",
+ "ulid",
+]
+
+[[package]]
 name = "itertools"
 version = "0.10.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
