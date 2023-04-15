@@ -1,12 +1,11 @@
 use crate::repos::registration_repository::RegistrationRepositoryImpl;
+use crate::repos::unread_announcement_repository::UnreadAnnouncementRepositoryImpl;
 use isucholar_core::db::DBPool;
 use isucholar_core::repos::registration_repository::HaveRegistrationRepository;
 use isucholar_core::repos::transaction_repository::{
     HaveTransactionRepository, TransactionRepositoryImpl,
 };
-use isucholar_core::repos::unread_announcement_repository::{
-    HaveUnreadAnnouncementRepository, UnreadAnnouncementRepositoryImpl,
-};
+use isucholar_core::repos::unread_announcement_repository::HaveUnreadAnnouncementRepository;
 use isucholar_core::services::unread_announcement_service::UnreadAnnouncementService;
 use isucholar_core::services::HaveDBPool;
 use std::sync::Arc;

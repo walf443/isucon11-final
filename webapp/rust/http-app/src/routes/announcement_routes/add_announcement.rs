@@ -6,12 +6,11 @@ use isucholar_core::repos::announcement_repository::AnnouncementRepository;
 use isucholar_core::repos::course_repository::CourseRepository;
 use isucholar_core::repos::error::ReposError;
 use isucholar_core::repos::registration_repository::RegistrationRepository;
-use isucholar_core::repos::unread_announcement_repository::{
-    UnreadAnnouncementRepository, UnreadAnnouncementRepositoryImpl,
-};
+use isucholar_core::repos::unread_announcement_repository::UnreadAnnouncementRepository;
 use isucholar_infra::repos::announcement_repository::AnnouncementRepositoryImpl;
 use isucholar_infra::repos::course_repository::CourseRepositoryImpl;
 use isucholar_infra::repos::registration_repository::RegistrationRepositoryImpl;
+use isucholar_infra::repos::unread_announcement_repository::UnreadAnnouncementRepositoryImpl;
 
 #[derive(Debug, serde::Deserialize)]
 pub struct AddAnnouncementRequest {

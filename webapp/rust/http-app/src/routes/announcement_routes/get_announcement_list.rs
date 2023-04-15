@@ -3,9 +3,8 @@ use crate::responses::error::ResponseResult;
 use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::announcement::AnnouncementWithoutDetail;
-use isucholar_core::repos::unread_announcement_repository::{
-    UnreadAnnouncementRepository, UnreadAnnouncementRepositoryImpl,
-};
+use isucholar_core::repos::unread_announcement_repository::UnreadAnnouncementRepository;
+use isucholar_infra::repos::unread_announcement_repository::UnreadAnnouncementRepositoryImpl;
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct GetAnnouncementsQuery {
