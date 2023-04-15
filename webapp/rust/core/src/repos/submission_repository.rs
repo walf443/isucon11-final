@@ -30,4 +30,3 @@ pub trait SubmissionRepository {
         class_id: &str,
     ) -> Result<Vec<Submission>>;
 }
-

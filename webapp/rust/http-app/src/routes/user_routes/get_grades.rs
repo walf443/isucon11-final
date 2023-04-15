@@ -9,9 +9,7 @@ use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::models::summary::Summary;
 use isucholar_core::repos::class_repository::ClassRepository;
 use isucholar_core::repos::registration_course_repository::RegistrationCourseRepository;
-use isucholar_core::repos::submission_repository::{
-    SubmissionRepository,
-};
+use isucholar_core::repos::submission_repository::SubmissionRepository;
 use isucholar_core::repos::user_repository::{UserRepository, UserRepositoryImpl};
 use isucholar_infra::repos::class_repository::ClassRepositoryImpl;
 use isucholar_infra::repos::registration_course_repository::RegistrationCourseRepositoryImpl;
