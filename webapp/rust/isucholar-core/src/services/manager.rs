@@ -16,8 +16,8 @@ impl ServiceManager for ServiceManagerImpl {}
 impl ServiceManagerImpl {
     pub fn new(db_pool: DBPool) -> Self {
         Self {
-            db_pool,
-            unread_announcement_service: UnreadAnnouncementServiceImpl::new(),
+            db_pool: db_pool.clone(),
+            unread_announcement_service: UnreadAnnouncementServiceImpl::new(db_pool),
         }
     }
 }

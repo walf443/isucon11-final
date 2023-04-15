@@ -12,6 +12,7 @@ use crate::repos::unread_announcement_repository::{
 };
 use crate::services::error::Error::AnnouncementNotFound;
 use crate::services::error::Result;
+use crate::services::HaveDBPool;
 use async_trait::async_trait;
 
 pub trait HaveUnreadAnnouncementService {
@@ -21,14 +22,18 @@ pub trait HaveUnreadAnnouncementService {
 
 #[async_trait]
 pub trait UnreadAnnouncementService:
-    Sync + HaveTransactionRepository + HaveUnreadAnnouncementRepository + HaveRegistrationRepository
+    Sync
+    + HaveDBPool
+    + HaveTransactionRepository
+    + HaveUnreadAnnouncementRepository
+    + HaveRegistrationRepository
 {
     async fn find_detail_and_mark_read(
         &self,
-        pool: &DBPool,
         announcement_id: &str,
         user_id: &str,
     ) -> Result<AnnouncementDetail> {
+        let pool = self.get_db_pool();
         let mut tx = self.transaction_repository().begin(pool).await?;
 
         let announcement = self
@@ -68,14 +73,16 @@ pub struct UnreadAnnouncementManager {}
 
 #[derive(Clone)]
 pub struct UnreadAnnouncementServiceImpl {
+    db_pool: DBPool,
     transaction: TransactionRepositoryImpl,
     unread_announcement: UnreadAnnouncementRepositoryImpl,
     registration: RegistrationRepositoryImpl,
 }
 
 impl UnreadAnnouncementServiceImpl {
-    pub fn new() -> Self {
+    pub fn new(db_pool: DBPool) -> Self {
         Self {
+            db_pool,
             transaction: TransactionRepositoryImpl {},
             unread_announcement: UnreadAnnouncementRepositoryImpl {},
             registration: RegistrationRepositoryImpl {},
@@ -107,10 +114,17 @@ impl HaveRegistrationRepository for UnreadAnnouncementServiceImpl {
     }
 }
 
+impl HaveDBPool for UnreadAnnouncementServiceImpl {
+    fn get_db_pool(&self) -> &DBPool {
+        &self.db_pool
+    }
+}
+
 impl UnreadAnnouncementService for UnreadAnnouncementServiceImpl {}
 
 #[cfg(test)]
 mod tests {
+    use crate::db::{get_test_db_conn, DBPool};
     use crate::repos::registration_repository::{
         HaveRegistrationRepository, MockRegistrationRepository,
     };
@@ -121,15 +135,19 @@ mod tests {
         HaveUnreadAnnouncementRepository, MockUnreadAnnouncementRepository,
     };
     use crate::services::unread_announcement_service::UnreadAnnouncementService;
+    use crate::services::HaveDBPool;
 
     struct S {
+        db_pool: DBPool,
         pub transaction_repo: TransactionRepositoryImpl,
         pub unread_announcement_repo: MockUnreadAnnouncementRepository,
         pub registration_repo: MockRegistrationRepository,
     }
     impl S {
-        pub fn new() -> Self {
+        pub async fn new() -> Self {
+            let pool = get_test_db_conn().await.unwrap();
             Self {
+                db_pool: pool,
                 transaction_repo: TransactionRepositoryImpl {},
                 unread_announcement_repo: MockUnreadAnnouncementRepository::new(),
                 registration_repo: MockRegistrationRepository::new(),
@@ -157,10 +175,16 @@ mod tests {
             &self.registration_repo
         }
     }
+
+    impl HaveDBPool for S {
+        fn get_db_pool(&self) -> &DBPool {
+            &self.db_pool
+        }
+    }
+
     impl UnreadAnnouncementService for S {}
 
     mod find_detail_and_mark_read {
-        use crate::db::get_test_db_conn;
         use crate::models::announcement_detail::AnnouncementDetail;
         use crate::repos::error::ReposError::TestError;
         use crate::services::error::Result;
@@ -170,43 +194,31 @@ mod tests {
         #[tokio::test]
         #[should_panic(expected = "ReposError(TestError)")]
         async fn find_announcement_detail_by_announcement_id_and_user_id_in_tx_err() -> () {
-            let pool = get_test_db_conn().await.unwrap();
-
-            let mut service = S::new();
+            let mut service = S::new().await;
             service
                 .unread_announcement_repo
                 .expect_find_announcement_detail_by_announcement_id_and_user_id_in_tx()
                 .returning(|_, _, _| Err(TestError));
 
-            service
-                .find_detail_and_mark_read(&pool, "", "")
-                .await
-                .unwrap();
+            service.find_detail_and_mark_read("", "").await.unwrap();
         }
 
         #[tokio::test]
         #[should_panic(expected = "AnnouncementNotFound")]
         async fn find_announcement_detail_by_announcement_id_and_user_id_in_tx_none() -> () {
-            let pool = get_test_db_conn().await.unwrap();
-
-            let mut service = S::new();
+            let mut service = S::new().await;
             service
                 .unread_announcement_repo
                 .expect_find_announcement_detail_by_announcement_id_and_user_id_in_tx()
                 .returning(|_, _, _| Ok(None));
 
-            service
-                .find_detail_and_mark_read(&pool, "", "")
-                .await
-                .unwrap();
+            service.find_detail_and_mark_read("", "").await.unwrap();
         }
 
         #[tokio::test]
         #[should_panic(expected = "ReposError(TestError)")]
         async fn exist_by_user_id_and_course_id_in_tx_err() -> () {
-            let pool = get_test_db_conn().await.unwrap();
-
-            let mut service = S::new();
+            let mut service = S::new().await;
             service
                 .unread_announcement_repo
                 .expect_find_announcement_detail_by_announcement_id_and_user_id_in_tx()
@@ -226,18 +238,13 @@ mod tests {
                 .expect_exist_by_user_id_and_course_id_in_tx()
                 .returning(|_, _, _| Err(TestError));
 
-            service
-                .find_detail_and_mark_read(&pool, "", "")
-                .await
-                .unwrap();
+            service.find_detail_and_mark_read("", "").await.unwrap();
         }
 
         #[tokio::test]
         #[should_panic(expected = "AnnouncementNotFound")]
         async fn exist_by_user_id_and_course_id_in_tx_false() -> () {
-            let pool = get_test_db_conn().await.unwrap();
-
-            let mut service = S::new();
+            let mut service = S::new().await;
             service
                 .unread_announcement_repo
                 .expect_find_announcement_detail_by_announcement_id_and_user_id_in_tx()
@@ -257,18 +264,13 @@ mod tests {
                 .expect_exist_by_user_id_and_course_id_in_tx()
                 .returning(|_, _, _| Ok(false));
 
-            service
-                .find_detail_and_mark_read(&pool, "", "")
-                .await
-                .unwrap();
+            service.find_detail_and_mark_read("", "").await.unwrap();
         }
 
         #[tokio::test]
         #[should_panic(expected = "ReposError(TestError)")]
         async fn mark_read_failed() -> () {
-            let pool = get_test_db_conn().await.unwrap();
-
-            let mut service = S::new();
+            let mut service = S::new().await;
             service
                 .unread_announcement_repo
                 .expect_find_announcement_detail_by_announcement_id_and_user_id_in_tx()
@@ -293,17 +295,12 @@ mod tests {
                 .expect_mark_read()
                 .returning(|_, _, _| Err(TestError));
 
-            service
-                .find_detail_and_mark_read(&pool, "", "")
-                .await
-                .unwrap();
+            service.find_detail_and_mark_read("", "").await.unwrap();
         }
 
         #[tokio::test]
         async fn success_case() -> Result<()> {
-            let pool = get_test_db_conn().await.unwrap();
-
-            let mut service = S::new();
+            let mut service = S::new().await;
             let expected = AnnouncementDetail {
                 id: "aid".to_string(),
                 course_id: "course_id".to_string(),
@@ -333,7 +330,7 @@ mod tests {
                 .returning(|_, _, _| Ok(()));
 
             let detail = service
-                .find_detail_and_mark_read(&pool, "aid", "user_id")
+                .find_detail_and_mark_read("aid", "user_id")
                 .await
                 .unwrap();
 
