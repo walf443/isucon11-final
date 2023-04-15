@@ -14,6 +14,7 @@ use crate::services::error::Error::AnnouncementNotFound;
 use crate::services::error::Result;
 use crate::services::HaveDBPool;
 use async_trait::async_trait;
+use std::sync::Arc;
 
 pub trait HaveUnreadAnnouncementService {
     type Service: UnreadAnnouncementService;
@@ -73,14 +74,14 @@ pub struct UnreadAnnouncementManager {}
 
 #[derive(Clone)]
 pub struct UnreadAnnouncementServiceImpl {
-    db_pool: DBPool,
+    db_pool: Arc<DBPool>,
     transaction: TransactionRepositoryImpl,
     unread_announcement: UnreadAnnouncementRepositoryImpl,
     registration: RegistrationRepositoryImpl,
 }
 
 impl UnreadAnnouncementServiceImpl {
-    pub fn new(db_pool: DBPool) -> Self {
+    pub fn new(db_pool: Arc<DBPool>) -> Self {
         Self {
             db_pool,
             transaction: TransactionRepositoryImpl {},
