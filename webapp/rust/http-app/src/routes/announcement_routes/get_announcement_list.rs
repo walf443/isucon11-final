@@ -1,10 +1,11 @@
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::announcement::AnnouncementWithoutDetail;
-use isucholar_core::repos::unread_announcement_repository::UnreadAnnouncementRepository;
+use isucholar_core::services::unread_announcement_service::{
+    HaveUnreadAnnouncementService, UnreadAnnouncementServiceVirtual,
+};
 use isucholar_http_core::responses::error::ResponseError::InvalidPage;
 use isucholar_http_core::responses::error::ResponseResult;
 use isucholar_http_core::routes::util::get_user_info;
-use isucholar_infra::repos::unread_announcement_repository::UnreadAnnouncementRepositoryImpl;
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]
 pub struct GetAnnouncementsQuery {
@@ -19,17 +20,14 @@ struct GetAnnouncementsResponse {
 }
 
 // GET /api/announcements お知らせ一覧取得
-pub async fn get_announcement_list(
+pub async fn get_announcement_list<S: HaveUnreadAnnouncementService>(
     pool: web::Data<sqlx::MySqlPool>,
+    service: web::Data<S>,
     session: actix_session::Session,
     params: web::Query<GetAnnouncementsQuery>,
     request: actix_web::HttpRequest,
 ) -> ResponseResult<HttpResponse> {
     let (user_id, _, _) = get_user_info(session)?;
-
-    let unread_announcement_repos = UnreadAnnouncementRepositoryImpl {};
-
-    let mut tx = pool.begin().await?;
 
     let mut course_id: Option<&str> = None;
     if let Some(ref c_id) = params.course_id {
@@ -45,17 +43,11 @@ pub async fn get_announcement_list(
         1
     };
     let limit = 20;
-    let offset = limit * (page - 1);
 
-    let mut announcements = unread_announcement_repos
-        .find_unread_announcements_by_user_id_in_tx(&mut tx, &user_id, limit, offset, course_id)
+    let (mut announcements, unread_count) = service
+        .unread_announcement_service()
+        .find_all_with_count(&user_id, limit, page, course_id)
         .await?;
-
-    let unread_count = unread_announcement_repos
-        .count_unread_by_user_id_in_tx(&mut tx, &user_id)
-        .await?;
-
-    tx.commit().await?;
 
     let uri = request.uri();
     let mut params = params.into_inner();

@@ -1,3 +1,4 @@
+use crate::models::announcement::AnnouncementWithoutDetail;
 use crate::models::announcement_detail::AnnouncementDetail;
 use crate::repos::registration_repository::{HaveRegistrationRepository, RegistrationRepository};
 use crate::repos::transaction_repository::{HaveTransactionRepository, TransactionRepository};
@@ -18,6 +19,14 @@ pub trait HaveUnreadAnnouncementService {
 #[cfg_attr(any(test, feature = "test"), mockall::automock)]
 #[async_trait]
 pub trait UnreadAnnouncementServiceVirtual: Sync {
+    async fn find_all_with_count<'c>(
+        &self,
+        user_id: &str,
+        limit: i64,
+        page: i64,
+        course_id: Option<&'c str>,
+    ) -> Result<(Vec<AnnouncementWithoutDetail>, i64)>;
+
     async fn find_detail_and_mark_read(
         &self,
         announcement_id: &str,
@@ -33,6 +42,31 @@ pub trait UnreadAnnouncementService:
     + HaveUnreadAnnouncementRepository
     + HaveRegistrationRepository
 {
+    async fn find_all_with_count<'c>(
+        &self,
+        user_id: &str,
+        limit: i64,
+        page: i64,
+        course_id: Option<&'c str>,
+    ) -> Result<(Vec<AnnouncementWithoutDetail>, i64)> {
+        let pool = self.get_db_pool();
+        let mut tx = self.transaction_repository().begin(pool).await?;
+        let offset = limit * (page - 1);
+
+        let repo = self.unread_announcement_repo();
+        let announcements = repo
+            .find_unread_announcements_by_user_id_in_tx(&mut tx, &user_id, limit, offset, course_id)
+            .await?;
+
+        let unread_count = repo
+            .count_unread_by_user_id_in_tx(&mut tx, &user_id)
+            .await?;
+
+        tx.commit().await?;
+
+        Ok((announcements, unread_count))
+    }
+
     async fn find_detail_and_mark_read(
         &self,
         announcement_id: &str,
@@ -76,6 +110,16 @@ pub trait UnreadAnnouncementService:
 
 #[async_trait]
 impl<S: UnreadAnnouncementService> UnreadAnnouncementServiceVirtual for S {
+    async fn find_all_with_count<'c>(
+        &self,
+        user_id: &str,
+        limit: i64,
+        page: i64,
+        course_id: Option<&'c str>,
+    ) -> Result<(Vec<AnnouncementWithoutDetail>, i64)> {
+        UnreadAnnouncementService::find_all_with_count(self, user_id, limit, page, course_id).await
+    }
+
     async fn find_detail_and_mark_read(
         &self,
         announcement_id: &str,

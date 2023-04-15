@@ -10,7 +10,7 @@ mod get_announcement_list;
 
 pub fn get_announcement_routes<Service: ServiceManager + 'static>() -> Scope {
     web::scope("/announcements")
-        .route("", web::get().to(get_announcement_list))
+        .route("", web::get().to(get_announcement_list::<Service>))
         .service(
             web::resource("")
                 .guard(actix_web::guard::Post())
