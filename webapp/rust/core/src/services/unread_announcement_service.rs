@@ -1,20 +1,13 @@
-use crate::db::DBPool;
 use crate::models::announcement_detail::AnnouncementDetail;
-use crate::repos::registration_repository::{
-    HaveRegistrationRepository, RegistrationRepository, RegistrationRepositoryImpl,
-};
-use crate::repos::transaction_repository::{
-    HaveTransactionRepository, TransactionRepository, TransactionRepositoryImpl,
-};
+use crate::repos::registration_repository::{HaveRegistrationRepository, RegistrationRepository};
+use crate::repos::transaction_repository::{HaveTransactionRepository, TransactionRepository};
 use crate::repos::unread_announcement_repository::{
     HaveUnreadAnnouncementRepository, UnreadAnnouncementRepository,
-    UnreadAnnouncementRepositoryImpl,
 };
 use crate::services::error::Error::AnnouncementNotFound;
 use crate::services::error::Result;
 use crate::services::HaveDBPool;
 use async_trait::async_trait;
-use std::sync::Arc;
 
 #[cfg_attr(any(test, feature = "test"), mockall::automock(type Service = MockUnreadAnnouncementServiceVirtual;))]
 pub trait HaveUnreadAnnouncementService {
@@ -93,57 +86,6 @@ impl<S: UnreadAnnouncementService> UnreadAnnouncementServiceVirtual for S {
 }
 
 pub struct UnreadAnnouncementManager {}
-
-#[derive(Clone)]
-pub struct UnreadAnnouncementServiceImpl {
-    db_pool: Arc<DBPool>,
-    transaction: TransactionRepositoryImpl,
-    unread_announcement: UnreadAnnouncementRepositoryImpl,
-    registration: RegistrationRepositoryImpl,
-}
-
-impl UnreadAnnouncementServiceImpl {
-    pub fn new(db_pool: Arc<DBPool>) -> Self {
-        Self {
-            db_pool,
-            transaction: TransactionRepositoryImpl {},
-            unread_announcement: UnreadAnnouncementRepositoryImpl {},
-            registration: RegistrationRepositoryImpl {},
-        }
-    }
-}
-
-impl HaveTransactionRepository for UnreadAnnouncementServiceImpl {
-    type Repo = TransactionRepositoryImpl;
-
-    fn transaction_repository(&self) -> &Self::Repo {
-        &self.transaction
-    }
-}
-
-impl HaveUnreadAnnouncementRepository for UnreadAnnouncementServiceImpl {
-    type Repo = UnreadAnnouncementRepositoryImpl;
-
-    fn unread_announcement_repo(&self) -> &Self::Repo {
-        &self.unread_announcement
-    }
-}
-
-impl HaveRegistrationRepository for UnreadAnnouncementServiceImpl {
-    type Repo = RegistrationRepositoryImpl;
-
-    fn registration_repo(&self) -> &Self::Repo {
-        &self.registration
-    }
-}
-
-impl HaveDBPool for UnreadAnnouncementServiceImpl {
-    fn get_db_pool(&self) -> &DBPool {
-        &self.db_pool
-    }
-}
-
-impl UnreadAnnouncementService for UnreadAnnouncementServiceImpl {}
 
 #[cfg(test)]
 mod tests {
