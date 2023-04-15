@@ -1209,7 +1209,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "isucholar-http"
+name = "isucholar-http-app"
 version = "0.1.0"
 dependencies = [
  "actix-files",
