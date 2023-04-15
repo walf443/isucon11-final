@@ -5,6 +5,7 @@ use crate::services::unread_announcement_service::{
 
 pub trait ServiceManager: HaveUnreadAnnouncementService {}
 
+#[derive(Clone)]
 pub struct ServiceManagerImpl {
     db_pool: DBPool,
     unread_announcement_service: UnreadAnnouncementServiceImpl,

@@ -16,6 +16,7 @@ async fn main() -> std::io::Result<()> {
         .init();
 
     let pool = get_db_conn().await.expect("failed to connect db");
+    let service = ServiceManagerImpl::new(pool.clone());
 
     let mut session_key = b"trapnomura".to_vec();
     session_key.resize(32, 0);
@@ -27,7 +28,7 @@ async fn main() -> std::io::Result<()> {
 
         actix_web::App::new()
             .app_data(web::Data::new(pool.clone()))
-            .app_data(web::Data::new(ServiceManagerImpl::new(pool.clone())))
+            .app_data(web::Data::new(service.clone()))
             .wrap(actix_web::middleware::Logger::default())
             .wrap(
                 actix_session::CookieSession::signed(&session_key)

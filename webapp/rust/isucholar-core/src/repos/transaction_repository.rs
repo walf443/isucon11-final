@@ -13,6 +13,7 @@ pub trait HaveTransactionRepository {
     fn transaction_repository(&self) -> &Self::Repo;
 }
 
+#[derive(Clone)]
 pub struct TransactionRepositoryImpl {}
 
 #[async_trait]

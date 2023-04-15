@@ -66,6 +66,7 @@ pub trait UnreadAnnouncementService:
 
 pub struct UnreadAnnouncementManager {}
 
+#[derive(Clone)]
 pub struct UnreadAnnouncementServiceImpl {
     transaction: TransactionRepositoryImpl,
     unread_announcement: UnreadAnnouncementRepositoryImpl,

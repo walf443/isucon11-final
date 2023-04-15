@@ -42,6 +42,7 @@ pub trait HaveUnreadAnnouncementRepository {
     fn unread_announcement_repo(&self) -> &Self::Repo;
 }
 
+#[derive(Clone)]
 pub struct UnreadAnnouncementRepositoryImpl {}
 
 #[async_trait]

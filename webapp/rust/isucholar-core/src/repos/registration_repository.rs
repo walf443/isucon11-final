@@ -32,6 +32,7 @@ pub trait HaveRegistrationRepository {
     fn registration_repo(&self) -> &Self::Repo;
 }
 
+#[derive(Clone)]
 pub struct RegistrationRepositoryImpl {}
 
 #[async_trait]
