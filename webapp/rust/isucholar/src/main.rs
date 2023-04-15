@@ -27,7 +27,7 @@ async fn main() -> std::io::Result<()> {
 
         actix_web::App::new()
             .app_data(web::Data::new(pool.clone()))
-            .app_data(web::Data::new(ServiceManagerImpl::new()))
+            .app_data(web::Data::new(ServiceManagerImpl::new(pool.clone())))
             .wrap(actix_web::middleware::Logger::default())
             .wrap(
                 actix_session::CookieSession::signed(&session_key)

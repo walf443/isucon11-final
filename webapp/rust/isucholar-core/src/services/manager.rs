@@ -1,3 +1,4 @@
+use crate::db::DBPool;
 use crate::services::unread_announcement_service::{
     HaveUnreadAnnouncementService, UnreadAnnouncementServiceImpl,
 };
@@ -5,14 +6,16 @@ use crate::services::unread_announcement_service::{
 pub trait ServiceManager: HaveUnreadAnnouncementService {}
 
 pub struct ServiceManagerImpl {
+    db_pool: DBPool,
     unread_announcement_service: UnreadAnnouncementServiceImpl,
 }
 
 impl ServiceManager for ServiceManagerImpl {}
 
 impl ServiceManagerImpl {
-    pub fn new() -> Self {
+    pub fn new(db_pool: DBPool) -> Self {
         Self {
+            db_pool,
             unread_announcement_service: UnreadAnnouncementServiceImpl::new(),
         }
     }

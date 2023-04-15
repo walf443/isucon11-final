@@ -50,7 +50,7 @@ mod tests {
     #[should_panic(expected = "AnnouncementNotFound")]
     async fn test_not_found_case() {
         let conn = get_test_db_conn().await.unwrap();
-        let service = ServiceManagerImpl::new();
+        let service = ServiceManagerImpl::new(conn.clone());
 
         let req = TestRequest::with_uri("/announcements/1")
             .param("announcement_id", "1".to_owned())
