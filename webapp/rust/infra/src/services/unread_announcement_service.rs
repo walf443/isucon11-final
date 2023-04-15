@@ -29,6 +29,8 @@ impl UnreadAnnouncementServiceImpl {
     }
 }
 
+impl UnreadAnnouncementService for UnreadAnnouncementServiceImpl {}
+
 impl HaveTransactionRepository for UnreadAnnouncementServiceImpl {
     type Repo = TransactionRepositoryImpl;
 
@@ -58,5 +60,3 @@ impl HaveDBPool for UnreadAnnouncementServiceImpl {
         &self.db_pool
     }
 }
-
-impl UnreadAnnouncementService for UnreadAnnouncementServiceImpl {}
