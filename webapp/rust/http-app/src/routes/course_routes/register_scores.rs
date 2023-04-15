@@ -5,9 +5,10 @@ use isucholar_core::models::assignment_path::AssignmentPath;
 use isucholar_core::models::score::Score;
 use isucholar_core::repos::class_repository::ClassRepository;
 use isucholar_core::repos::submission_repository::{
-    SubmissionRepository, SubmissionRepositoryImpl,
+    SubmissionRepository,
 };
 use isucholar_infra::repos::class_repository::ClassRepositoryImpl;
+use isucholar_infra::repos::submission_repository::SubmissionRepositoryImpl;
 
 // PUT /api/courses/{course_id}/classes/{class_id}/assignments/scores 採点結果登録
 pub async fn register_scores(

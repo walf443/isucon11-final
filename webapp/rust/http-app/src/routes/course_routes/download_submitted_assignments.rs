@@ -5,10 +5,11 @@ use isucholar_core::models::assignment_path::AssignmentPath;
 use isucholar_core::models::submission::Submission;
 use isucholar_core::repos::class_repository::ClassRepository;
 use isucholar_core::repos::submission_repository::{
-    SubmissionRepository, SubmissionRepositoryImpl,
+    SubmissionRepository,
 };
 use isucholar_core::ASSIGNMENTS_DIRECTORY;
 use isucholar_infra::repos::class_repository::ClassRepositoryImpl;
+use isucholar_infra::repos::submission_repository::SubmissionRepositoryImpl;
 
 // GET /api/courses/{course_id}/classes/{class_id}/assignments/export 提出済みの課題ファイルをzip形式で一括ダウンロード
 pub async fn download_submitted_assignments(
