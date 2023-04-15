@@ -1,5 +1,5 @@
 [workspace]
-members = ["core", "http-core", "http"]
+members = ["core", "infra", "http-core", "http"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
