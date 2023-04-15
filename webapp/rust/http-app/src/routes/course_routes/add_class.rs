@@ -1,10 +1,10 @@
-use crate::util;
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::class::CreateClass;
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::repos::class_repository::ClassRepository;
 use isucholar_core::repos::course_repository::CourseRepository;
 use isucholar_core::repos::error::ReposError;
+use isucholar_core::util;
 use isucholar_http_core::responses::error::ResponseError::{
     CourseConflict, CourseIsNotInProgress, CourseNotFound,
 };

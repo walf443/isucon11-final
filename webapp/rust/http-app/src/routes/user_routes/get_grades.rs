@@ -1,5 +1,3 @@
-use crate::routes::util::get_user_info;
-use crate::util;
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::class_score::ClassScore;
 use isucholar_core::models::course_result::CourseResult;
@@ -9,8 +7,10 @@ use isucholar_core::repos::class_repository::ClassRepository;
 use isucholar_core::repos::registration_course_repository::RegistrationCourseRepository;
 use isucholar_core::repos::submission_repository::SubmissionRepository;
 use isucholar_core::repos::user_repository::UserRepository;
+use isucholar_core::util;
 use isucholar_http_core::responses::error::ResponseResult;
 use isucholar_http_core::responses::get_grade_response::GetGradeResponse;
+use isucholar_http_core::routes::util::get_user_info;
 use isucholar_infra::repos::class_repository::ClassRepositoryImpl;
 use isucholar_infra::repos::registration_course_repository::RegistrationCourseRepositoryImpl;
 use isucholar_infra::repos::submission_repository::SubmissionRepositoryImpl;

@@ -2,6 +2,7 @@ pub mod db;
 pub mod models;
 pub mod repos;
 pub mod services;
+pub mod util;
 
 pub const ASSIGNMENTS_DIRECTORY: &str = "../assignments/";
 pub const SQL_DIRECTORY: &str = "../sql/";

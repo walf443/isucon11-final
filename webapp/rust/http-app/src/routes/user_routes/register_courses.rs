@@ -1,4 +1,3 @@
-use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::repos::course_repository::CourseRepository;
@@ -7,6 +6,7 @@ use isucholar_core::repos::registration_repository::RegistrationRepository;
 use isucholar_http_core::requests::register_course_request::RegisterCourseRequestContent;
 use isucholar_http_core::responses::error::ResponseResult;
 use isucholar_http_core::responses::register_courses_error_response::RegisterCoursesErrorResponse;
+use isucholar_http_core::routes::util::get_user_info;
 use isucholar_infra::repos::course_repository::CourseRepositoryImpl;
 use isucholar_infra::repos::registration_course_repository::RegistrationCourseRepositoryImpl;
 use isucholar_infra::repos::registration_repository::RegistrationRepositoryImpl;

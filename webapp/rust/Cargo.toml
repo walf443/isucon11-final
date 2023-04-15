@@ -13,3 +13,5 @@ num-traits = { version = "0.2" }
 futures = "0.3"
 tokio = { version = "1", features = ["fs", "process", "macros"] }
 serde_json = "1.0.96"
+lazy_static = { version = "1" }
+ulid = { version = "0.4" }

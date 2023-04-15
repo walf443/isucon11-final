@@ -16,6 +16,8 @@ anyhow.workspace = true
 num-traits.workspace = true
 futures.workspace = true
 tokio.workspace = true
+lazy_static.workspace = true
+ulid.workspace = true
 
 mockall = { version = "0.11", optional = true }
 

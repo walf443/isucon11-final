@@ -1200,12 +1200,14 @@ dependencies = [
  "anyhow",
  "async-trait",
  "futures",
+ "lazy_static",
  "mockall",
  "num-traits",
  "serde",
  "sqlx",
  "thiserror",
  "tokio",
+ "ulid",
 ]
 
 [[package]]
