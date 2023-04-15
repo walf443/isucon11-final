@@ -3,11 +3,12 @@ use crate::responses::error::ResponseResult;
 use actix_web::web;
 use isucholar_core::models::assignment_path::AssignmentPath;
 use isucholar_core::models::submission::Submission;
-use isucholar_core::repos::class_repository::{ClassRepository, ClassRepositoryImpl};
+use isucholar_core::repos::class_repository::{ClassRepository};
 use isucholar_core::repos::submission_repository::{
     SubmissionRepository, SubmissionRepositoryImpl,
 };
 use isucholar_core::ASSIGNMENTS_DIRECTORY;
+use isucholar_infra::repos::class_repository::ClassRepositoryImpl;
 
 // GET /api/courses/{course_id}/classes/{class_id}/assignments/export 提出済みの課題ファイルをzip形式で一括ダウンロード
 pub async fn download_submitted_assignments(
@@ -17,8 +18,8 @@ pub async fn download_submitted_assignments(
     let class_id = &path.class_id;
 
     let mut tx = pool.begin().await?;
-    let class_repository = ClassRepositoryImpl {};
-    let is_exist = class_repository
+    let class_repo = ClassRepositoryImpl {};
+    let is_exist = class_repo
         .for_update_by_id_in_tx(&mut tx, class_id)
         .await?;
 
@@ -33,7 +34,6 @@ pub async fn download_submitted_assignments(
     let zip_file_path = format!("{}{}.zip", ASSIGNMENTS_DIRECTORY, class_id);
     create_submissions_zip(&zip_file_path, class_id, &submissions).await?;
 
-    let class_repo = ClassRepositoryImpl {};
     class_repo
         .update_submission_closed_by_id_in_tx(&mut tx, &class_id)
         .await?;

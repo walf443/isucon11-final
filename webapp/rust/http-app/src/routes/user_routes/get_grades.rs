@@ -7,7 +7,7 @@ use isucholar_core::models::class_score::ClassScore;
 use isucholar_core::models::course_result::CourseResult;
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::models::summary::Summary;
-use isucholar_core::repos::class_repository::{ClassRepository, ClassRepositoryImpl};
+use isucholar_core::repos::class_repository::{ClassRepository};
 use isucholar_core::repos::registration_course_repository::{
     RegistrationCourseRepository, RegistrationCourseRepositoryImpl,
 };
@@ -15,6 +15,7 @@ use isucholar_core::repos::submission_repository::{
     SubmissionRepository, SubmissionRepositoryImpl,
 };
 use isucholar_core::repos::user_repository::{UserRepository, UserRepositoryImpl};
+use isucholar_infra::repos::class_repository::ClassRepositoryImpl;
 
 // GET /api/users/me/grades 成績取得
 pub async fn get_grades(
