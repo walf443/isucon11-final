@@ -1,4 +1,3 @@
-pub mod announcement_routes;
 pub mod course_routes;
 pub mod initialize;
 pub mod login;

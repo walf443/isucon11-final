@@ -1,12 +1,12 @@
 use actix_web::web;
 
-use isucholar_http_app::routes::announcement_routes::get_announcement_routes;
 use isucholar_http_app::routes::course_routes::get_course_routes;
 use isucholar_http_app::routes::initialize::initialize;
 use isucholar_http_app::routes::login::login;
 use isucholar_http_app::routes::logout::logout;
 use isucholar_http_app::routes::user_routes::get_user_routes;
 use isucholar_http_core::middleware::IsLoggedIn;
+use isucholar_http_core::routes::announcement_routes::get_announcement_routes;
 use isucholar_infra::db::get_db_conn;
 use isucholar_infra::services::manager::ServiceManagerImpl;
 
