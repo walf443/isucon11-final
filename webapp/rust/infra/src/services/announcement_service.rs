@@ -37,6 +37,8 @@ impl AnnouncementServiceInfra {
     }
 }
 
+impl AnnouncementServiceImpl for AnnouncementServiceInfra {}
+
 impl HaveDBPool for AnnouncementServiceInfra {
     fn get_db_pool(&self) -> &DBPool {
         &self.db_pool
@@ -83,4 +85,3 @@ impl HaveUnreadAnnouncementRepository for AnnouncementServiceInfra {
     }
 }
 
-impl AnnouncementServiceImpl for AnnouncementServiceInfra {}
