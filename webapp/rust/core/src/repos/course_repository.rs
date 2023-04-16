@@ -53,3 +53,9 @@ pub trait CourseRepository {
         id: &str,
     ) -> Result<Option<CourseWithTeacher>>;
 }
+
+pub trait HaveCourseRepository {
+    type Repo: CourseRepository + Sync;
+
+    fn course_repo(&self) -> &Self::Repo;
+}

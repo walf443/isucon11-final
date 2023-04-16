@@ -12,3 +12,8 @@ pub trait AnnouncementRepository {
     ) -> Result<()>;
     async fn find_by_id(&self, pool: &DBPool, id: &str) -> Result<Announcement>;
 }
+
+pub trait HaveAnnouncementRepository {
+    type Repo: Sync + AnnouncementRepository;
+    fn announcement_repo(&self) -> &Self::Repo;
+}

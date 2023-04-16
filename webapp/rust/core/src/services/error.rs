@@ -11,6 +11,10 @@ pub enum Error {
     SqlxError(#[from] sqlx::Error),
     #[error("no such announcement.")]
     AnnouncementNotFound,
+    #[error("announcement is duplicated.")]
+    AnnouncementDuplicate,
+    #[error("no such course.")]
+    CourseNotFound,
 }
 
 pub type Result<T> = std::result::Result<T, Error>;

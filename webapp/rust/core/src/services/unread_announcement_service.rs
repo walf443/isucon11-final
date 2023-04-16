@@ -117,7 +117,8 @@ impl<S: UnreadAnnouncementServiceImpl> UnreadAnnouncementService for S {
         page: i64,
         course_id: Option<&'c str>,
     ) -> Result<(Vec<AnnouncementWithoutDetail>, i64)> {
-        UnreadAnnouncementServiceImpl::find_all_with_count(self, user_id, limit, page, course_id).await
+        UnreadAnnouncementServiceImpl::find_all_with_count(self, user_id, limit, page, course_id)
+            .await
     }
 
     async fn find_detail_and_mark_read(
@@ -125,7 +126,8 @@ impl<S: UnreadAnnouncementServiceImpl> UnreadAnnouncementService for S {
         announcement_id: &str,
         user_id: &str,
     ) -> Result<AnnouncementDetail> {
-        UnreadAnnouncementServiceImpl::find_detail_and_mark_read(self, announcement_id, user_id).await
+        UnreadAnnouncementServiceImpl::find_detail_and_mark_read(self, announcement_id, user_id)
+            .await
     }
 }
 

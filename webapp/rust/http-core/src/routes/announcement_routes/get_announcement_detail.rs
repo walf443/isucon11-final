@@ -50,9 +50,7 @@ mod tests {
     };
     use std::str::from_utf8;
 
-    fn wrap_manager(
-        service: MockUnreadAnnouncementService,
-    ) -> MockHaveUnreadAnnouncementService {
+    fn wrap_manager(service: MockUnreadAnnouncementService) -> MockHaveUnreadAnnouncementService {
         let mut manager = MockHaveUnreadAnnouncementService::new();
         manager
             .expect_unread_announcement_service()
