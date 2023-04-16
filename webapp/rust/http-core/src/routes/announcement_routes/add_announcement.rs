@@ -4,8 +4,8 @@ use isucholar_core::services::announcement_service::{
     AnnouncementService, HaveAnnouncementService,
 };
 use isucholar_core::services::error::Error;
-use isucholar_http_core::responses::error::ResponseError::{AnnouncementConflict, CourseNotFound};
-use isucholar_http_core::responses::error::ResponseResult;
+use crate::responses::error::ResponseError::{AnnouncementConflict, CourseNotFound};
+use crate::responses::error::ResponseResult;
 
 #[derive(Debug, serde::Deserialize)]
 pub struct AddAnnouncementRequest {
