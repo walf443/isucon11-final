@@ -1,10 +1,10 @@
+use crate::services::announcement_service::AnnouncementServiceInfra;
 use crate::services::unread_announcement_service::UnreadAnnouncementServiceInfra;
 use isucholar_core::db::DBPool;
+use isucholar_core::services::announcement_service::HaveAnnouncementService;
 use isucholar_core::services::manager::ServiceManager;
 use isucholar_core::services::unread_announcement_service::HaveUnreadAnnouncementService;
 use std::sync::Arc;
-use isucholar_core::services::announcement_service::HaveAnnouncementService;
-use crate::services::announcement_service::AnnouncementServiceInfra;
 
 #[derive(Clone)]
 pub struct ServiceManagerImpl {

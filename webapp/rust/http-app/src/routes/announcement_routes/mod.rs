@@ -14,7 +14,7 @@ pub fn get_announcement_routes<Service: ServiceManager + 'static>() -> Scope {
             web::resource("")
                 .guard(actix_web::guard::Post())
                 .wrap(IsAdmin)
-                .to(add_announcement),
+                .to(add_announcement::<Service>),
         )
         .route(
             "/{announcement_id}",

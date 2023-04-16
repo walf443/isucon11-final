@@ -1,16 +1,18 @@
-use std::sync::Arc;
-use isucholar_core::db::DBPool;
-use isucholar_core::repos::announcement_repository::HaveAnnouncementRepository;
-use isucholar_core::repos::course_repository::HaveCourseRepository;
-use isucholar_core::repos::registration_repository::HaveRegistrationRepository;
-use isucholar_core::repos::transaction_repository::{HaveTransactionRepository, TransactionRepositoryImpl};
-use isucholar_core::repos::unread_announcement_repository::HaveUnreadAnnouncementRepository;
-use isucholar_core::services::announcement_service::AnnouncementServiceImpl;
-use isucholar_core::services::HaveDBPool;
 use crate::repos::announcement_repository::AnnouncementRepositoryImpl;
 use crate::repos::course_repository::CourseRepositoryImpl;
 use crate::repos::registration_repository::RegistrationRepositoryImpl;
 use crate::repos::unread_announcement_repository::UnreadAnnouncementRepositoryImpl;
+use isucholar_core::db::DBPool;
+use isucholar_core::repos::announcement_repository::HaveAnnouncementRepository;
+use isucholar_core::repos::course_repository::HaveCourseRepository;
+use isucholar_core::repos::registration_repository::HaveRegistrationRepository;
+use isucholar_core::repos::transaction_repository::{
+    HaveTransactionRepository, TransactionRepositoryImpl,
+};
+use isucholar_core::repos::unread_announcement_repository::HaveUnreadAnnouncementRepository;
+use isucholar_core::services::announcement_service::AnnouncementServiceImpl;
+use isucholar_core::services::HaveDBPool;
+use std::sync::Arc;
 
 #[derive(Clone)]
 pub struct AnnouncementServiceInfra {
