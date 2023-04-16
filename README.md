@@ -1,5 +1,9 @@
 # ISUCHOLAR - isucon11-final
 
+## このforkについて
+
+元の [webapp/rust](webapp/rust) 実装を実践的なファイル構成に変更しています。
+
 ## ディレクトリ構成
 
 競技用サーバーにはwebapp以下が配布されます。
