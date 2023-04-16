@@ -10,12 +10,6 @@ use crate::services::error::Result;
 use crate::services::HaveDBPool;
 use async_trait::async_trait;
 
-#[cfg_attr(any(test, feature = "test"), mockall::automock(type Service = MockUnreadAnnouncementService;))]
-pub trait HaveUnreadAnnouncementService {
-    type Service: UnreadAnnouncementService;
-    fn unread_announcement_service(&self) -> &Self::Service;
-}
-
 #[cfg_attr(any(test, feature = "test"), mockall::automock)]
 #[async_trait]
 pub trait UnreadAnnouncementService: Sync {
@@ -32,6 +26,12 @@ pub trait UnreadAnnouncementService: Sync {
         announcement_id: &str,
         user_id: &str,
     ) -> Result<AnnouncementDetail>;
+}
+
+#[cfg_attr(any(test, feature = "test"), mockall::automock(type Service = MockUnreadAnnouncementService;))]
+pub trait HaveUnreadAnnouncementService {
+    type Service: UnreadAnnouncementService;
+    fn unread_announcement_service(&self) -> &Self::Service;
 }
 
 #[async_trait]
