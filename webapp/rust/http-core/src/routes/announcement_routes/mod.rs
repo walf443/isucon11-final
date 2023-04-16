@@ -1,13 +1,13 @@
-use actix_web::{Scope, web};
-use isucholar_core::services::manager::ServiceManager;
 use crate::middleware::IsAdmin;
 use crate::routes::announcement_routes::add_announcement::add_announcement;
 use crate::routes::announcement_routes::get_announcement_detail::get_announcement_detail;
 use crate::routes::announcement_routes::get_announcement_list::get_announcement_list;
+use actix_web::{web, Scope};
+use isucholar_core::services::manager::ServiceManager;
 
+mod add_announcement;
 mod get_announcement_detail;
 mod get_announcement_list;
-mod add_announcement;
 
 pub fn get_announcement_routes<Service: ServiceManager + 'static>() -> Scope {
     web::scope("/announcements")

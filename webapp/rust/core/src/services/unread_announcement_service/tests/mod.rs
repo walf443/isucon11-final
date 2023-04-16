@@ -1,19 +1,15 @@
 use crate::db::{get_test_db_conn, DBPool};
 use crate::repos::registration_repository::{
-HaveRegistrationRepository, MockRegistrationRepository,
+    HaveRegistrationRepository, MockRegistrationRepository,
 };
-use crate::repos::transaction_repository::{
-HaveTransactionRepository, TransactionRepositoryImpl,
-};
+use crate::repos::transaction_repository::{HaveTransactionRepository, TransactionRepositoryImpl};
 use crate::repos::unread_announcement_repository::{
-HaveUnreadAnnouncementRepository, MockUnreadAnnouncementRepository,
+    HaveUnreadAnnouncementRepository, MockUnreadAnnouncementRepository,
 };
 use crate::services::unread_announcement_service::UnreadAnnouncementServiceImpl;
 use crate::services::HaveDBPool;
 
-mod find_detail_and_mark_read;
-
-struct S {
+pub(crate) struct S {
     db_pool: DBPool,
     pub transaction_repo: TransactionRepositoryImpl,
     pub unread_announcement_repo: MockUnreadAnnouncementRepository,
@@ -37,27 +33,29 @@ impl HaveTransactionRepository for S {
     type Repo = TransactionRepositoryImpl;
 
     fn transaction_repository(&self) -> &Self::Repo {
-                                                  &self.transaction_repo
-                                                                        }
+        &self.transaction_repo
+    }
 }
 impl HaveUnreadAnnouncementRepository for S {
     type Repo = MockUnreadAnnouncementRepository;
 
     fn unread_announcement_repo(&self) -> &Self::Repo {
-                                                    &self.unread_announcement_repo
-                                                                                  }
+        &self.unread_announcement_repo
+    }
 }
 impl HaveRegistrationRepository for S {
     type Repo = MockRegistrationRepository;
 
     fn registration_repo(&self) -> &Self::Repo {
-                                             &self.registration_repo
-                                                                    }
+        &self.registration_repo
+    }
 }
 
 impl HaveDBPool for S {
     fn get_db_pool(&self) -> &DBPool {
-                                   &self.db_pool
-                                                }
+        &self.db_pool
+    }
 }
 
+mod find_all_with_count;
+mod find_detail_and_mark_read;

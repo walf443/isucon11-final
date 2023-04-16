@@ -135,4 +135,3 @@ impl<S: UnreadAnnouncementServiceImpl> UnreadAnnouncementService for S {
 }
 
 pub struct UnreadAnnouncementManager {}
-

@@ -84,4 +84,3 @@ impl HaveUnreadAnnouncementRepository for AnnouncementServiceInfra {
         &self.unread_announcement
     }
 }
-
