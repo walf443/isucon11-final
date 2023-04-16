@@ -10,15 +10,15 @@ use crate::services::error::Result;
 use crate::services::HaveDBPool;
 use async_trait::async_trait;
 
-#[cfg_attr(any(test, feature = "test"), mockall::automock(type Service = MockUnreadAnnouncementServiceVirtual;))]
+#[cfg_attr(any(test, feature = "test"), mockall::automock(type Service = MockUnreadAnnouncementService;))]
 pub trait HaveUnreadAnnouncementService {
-    type Service: UnreadAnnouncementServiceVirtual;
+    type Service: UnreadAnnouncementService;
     fn unread_announcement_service(&self) -> &Self::Service;
 }
 
 #[cfg_attr(any(test, feature = "test"), mockall::automock)]
 #[async_trait]
-pub trait UnreadAnnouncementServiceVirtual: Sync {
+pub trait UnreadAnnouncementService: Sync {
     async fn find_all_with_count<'c>(
         &self,
         user_id: &str,
@@ -35,7 +35,7 @@ pub trait UnreadAnnouncementServiceVirtual: Sync {
 }
 
 #[async_trait]
-pub trait UnreadAnnouncementService:
+pub trait UnreadAnnouncementServiceImpl:
     Sync
     + HaveDBPool
     + HaveTransactionRepository
@@ -109,7 +109,7 @@ pub trait UnreadAnnouncementService:
 }
 
 #[async_trait]
-impl<S: UnreadAnnouncementService> UnreadAnnouncementServiceVirtual for S {
+impl<S: UnreadAnnouncementServiceImpl> UnreadAnnouncementService for S {
     async fn find_all_with_count<'c>(
         &self,
         user_id: &str,
@@ -117,7 +117,7 @@ impl<S: UnreadAnnouncementService> UnreadAnnouncementServiceVirtual for S {
         page: i64,
         course_id: Option<&'c str>,
     ) -> Result<(Vec<AnnouncementWithoutDetail>, i64)> {
-        UnreadAnnouncementService::find_all_with_count(self, user_id, limit, page, course_id).await
+        UnreadAnnouncementServiceImpl::find_all_with_count(self, user_id, limit, page, course_id).await
     }
 
     async fn find_detail_and_mark_read(
@@ -125,7 +125,7 @@ impl<S: UnreadAnnouncementService> UnreadAnnouncementServiceVirtual for S {
         announcement_id: &str,
         user_id: &str,
     ) -> Result<AnnouncementDetail> {
-        UnreadAnnouncementService::find_detail_and_mark_read(self, announcement_id, user_id).await
+        UnreadAnnouncementServiceImpl::find_detail_and_mark_read(self, announcement_id, user_id).await
     }
 }
 
@@ -143,7 +143,7 @@ mod tests {
     use crate::repos::unread_announcement_repository::{
         HaveUnreadAnnouncementRepository, MockUnreadAnnouncementRepository,
     };
-    use crate::services::unread_announcement_service::UnreadAnnouncementService;
+    use crate::services::unread_announcement_service::UnreadAnnouncementServiceImpl;
     use crate::services::HaveDBPool;
 
     struct S {
@@ -191,14 +191,14 @@ mod tests {
         }
     }
 
-    impl UnreadAnnouncementService for S {}
+    impl UnreadAnnouncementServiceImpl for S {}
 
     mod find_detail_and_mark_read {
         use crate::models::announcement_detail::AnnouncementDetail;
         use crate::repos::error::ReposError::TestError;
         use crate::services::error::Result;
         use crate::services::unread_announcement_service::tests::S;
-        use crate::services::unread_announcement_service::UnreadAnnouncementService;
+        use crate::services::unread_announcement_service::UnreadAnnouncementServiceImpl;
 
         #[tokio::test]
         #[should_panic(expected = "ReposError(TestError)")]

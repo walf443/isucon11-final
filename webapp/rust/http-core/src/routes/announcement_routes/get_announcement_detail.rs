@@ -4,7 +4,7 @@ use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
 use isucholar_core::services::error::Error;
 use isucholar_core::services::unread_announcement_service::{
-    HaveUnreadAnnouncementService, UnreadAnnouncementServiceVirtual,
+    HaveUnreadAnnouncementService, UnreadAnnouncementService,
 };
 
 // GET /api/announcements/{announcement_id} お知らせ詳細取得
@@ -46,12 +46,12 @@ mod tests {
     use isucholar_core::models::announcement_detail::AnnouncementDetail;
     use isucholar_core::services::error::Error::{AnnouncementNotFound, TestError};
     use isucholar_core::services::unread_announcement_service::{
-        MockHaveUnreadAnnouncementService, MockUnreadAnnouncementServiceVirtual,
+        MockHaveUnreadAnnouncementService, MockUnreadAnnouncementService,
     };
     use std::str::from_utf8;
 
     fn wrap_manager(
-        service: MockUnreadAnnouncementServiceVirtual,
+        service: MockUnreadAnnouncementService,
     ) -> MockHaveUnreadAnnouncementService {
         let mut manager = MockHaveUnreadAnnouncementService::new();
         manager
@@ -64,7 +64,7 @@ mod tests {
     #[actix_web::test]
     #[should_panic(expected = "AnnouncementNotFound")]
     async fn test_not_found_case() {
-        let mut service = MockUnreadAnnouncementServiceVirtual::new();
+        let mut service = MockUnreadAnnouncementService::new();
         service
             .expect_find_detail_and_mark_read()
             .returning(|_, _| Err(AnnouncementNotFound));
@@ -88,7 +88,7 @@ mod tests {
     #[actix_web::test]
     #[should_panic(expected = "ServiceError(TestError)")]
     async fn test_err_but_not_not_found_error() {
-        let mut service = MockUnreadAnnouncementServiceVirtual::new();
+        let mut service = MockUnreadAnnouncementService::new();
         service
             .expect_find_detail_and_mark_read()
             .returning(|_, _| Err(TestError));
@@ -121,7 +121,7 @@ mod tests {
 
     #[actix_web::test]
     async fn success() {
-        let mut service = MockUnreadAnnouncementServiceVirtual::new();
+        let mut service = MockUnreadAnnouncementService::new();
         service
             .expect_find_detail_and_mark_read()
             .returning(|_, _| {

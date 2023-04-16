@@ -4,7 +4,7 @@ use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::announcement::AnnouncementWithoutDetail;
 use isucholar_core::services::unread_announcement_service::{
-    HaveUnreadAnnouncementService, UnreadAnnouncementServiceVirtual,
+    HaveUnreadAnnouncementService, UnreadAnnouncementService,
 };
 
 #[derive(Debug, serde::Deserialize, serde::Serialize)]

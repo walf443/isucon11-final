@@ -6,7 +6,7 @@ use isucholar_core::repos::transaction_repository::{
     HaveTransactionRepository, TransactionRepositoryImpl,
 };
 use isucholar_core::repos::unread_announcement_repository::HaveUnreadAnnouncementRepository;
-use isucholar_core::services::unread_announcement_service::UnreadAnnouncementService;
+use isucholar_core::services::unread_announcement_service::UnreadAnnouncementServiceImpl;
 use isucholar_core::services::HaveDBPool;
 use std::sync::Arc;
 
@@ -29,7 +29,7 @@ impl UnreadAnnouncementServiceInfra {
     }
 }
 
-impl UnreadAnnouncementService for UnreadAnnouncementServiceInfra {}
+impl UnreadAnnouncementServiceImpl for UnreadAnnouncementServiceInfra {}
 
 impl HaveTransactionRepository for UnreadAnnouncementServiceInfra {
     type Repo = TransactionRepositoryImpl;
