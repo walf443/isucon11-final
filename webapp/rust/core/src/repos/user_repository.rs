@@ -10,3 +10,8 @@ pub trait UserRepository {
     async fn find_code_by_id(&self, pool: &DBPool, id: &str) -> Result<String>;
     async fn find_gpas_group_by_user_id(&self, pool: &DBPool) -> Result<Vec<f64>>;
 }
+
+pub trait HaveUserRepository {
+    type Repo: UserRepository + Sync;
+    fn user_repo(&self) -> &Self::Repo;
+}
