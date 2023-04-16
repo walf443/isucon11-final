@@ -15,16 +15,17 @@ $ docker-compose up -d
 flowchart LR
   http-app --> http-core
   http-app --> infra
+  http-app --> core
   http-core --> core
   infra --> core
 ```
 
 ## http-app
-handle http request using actix-web.
+This crate handles http request using actix-web.
 combine infra API.
 
 ## http-core
-this crate does not depend on infra layer.
+This crate does not depend on infra layer.
 
 ```mermaid
 
@@ -36,16 +37,16 @@ flowchart LR
 ```
 
 ## infra
-handle DB code. don't handle HTTP
-
-## core
-core application API. don't handle HTTP
+This crate handles DB code. don't handle HTTP
 
 ```mermaid
 
 flowchart LR
-  Service --> Repository
-  Repository --> DB[(MySQL)]
-  Repository -- models --> Service
+  ServiceInfra --> RepositoryImpl
+  RepositoryImpl --> DB[(MySQL)]
+  RepositoryImpl -- models --> ServiceInfra
 ```
+
+## core
+core application API. don't handle HTTP
 
