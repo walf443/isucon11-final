@@ -21,7 +21,6 @@ struct GetAnnouncementsResponse {
 
 // GET /api/announcements お知らせ一覧取得
 pub async fn get_announcement_list<S: HaveUnreadAnnouncementService>(
-    pool: web::Data<sqlx::MySqlPool>,
     service: web::Data<S>,
     session: actix_session::Session,
     params: web::Query<GetAnnouncementsQuery>,
