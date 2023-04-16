@@ -18,8 +18,6 @@ pub enum Error {
     AnnouncementDuplicate,
     #[error("no such course.")]
     CourseNotFound,
-    #[error("invalid password.")]
-    InvalidPassword,
 }
 
 pub type Result<T> = std::result::Result<T, Error>;

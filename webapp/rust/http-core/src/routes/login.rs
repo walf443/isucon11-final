@@ -23,9 +23,12 @@ pub async fn login<Service: HaveUserService>(
     }
     let user = user.unwrap();
 
-    service
+    let is_valid_password = service
         .user_service()
         .verify_password(&user, &req.password)?;
+    if !is_valid_password {
+        return Err(Unauthorized);
+    }
 
     if let Some(user_id) = session.get::<String>("userID")? {
         if user_id == user.id {

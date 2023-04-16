@@ -1,6 +1,5 @@
 use crate::models::user::User;
 use crate::repos::user_repository::{HaveUserRepository, UserRepository};
-use crate::services::error::Error::InvalidPassword;
 use crate::services::error::Result;
 use crate::services::HaveDBPool;
 use async_trait::async_trait;
@@ -8,7 +7,7 @@ use async_trait::async_trait;
 #[async_trait]
 pub trait UserService: Sync {
     async fn find_by_code(&self, code: &str) -> Result<Option<User>>;
-    fn verify_password(&self, user: &User, password: &str) -> Result<()>;
+    fn verify_password(&self, user: &User, password: &str) -> Result<bool>;
 }
 
 pub trait HaveUserService {
@@ -24,15 +23,15 @@ pub trait UserServiceImpl: Sync + HaveDBPool + HaveUserRepository {
         Ok(result)
     }
 
-    fn verify_password(&self, user: &User, password: &str) -> Result<()> {
+    fn verify_password(&self, user: &User, password: &str) -> Result<bool> {
         if !bcrypt::verify(
             password,
             &String::from_utf8(user.hashed_password.clone()).unwrap(),
         )? {
-            return Err(InvalidPassword);
+            return Ok(false);
         }
 
-        Ok(())
+        Ok(true)
     }
 }
 
@@ -42,7 +41,7 @@ impl<S: UserServiceImpl> UserService for S {
         UserServiceImpl::find_by_code(self, code).await
     }
 
-    fn verify_password(&self, user: &User, password: &str) -> Result<()> {
+    fn verify_password(&self, user: &User, password: &str) -> Result<bool> {
         UserServiceImpl::verify_password(self, user, password)
     }
 }
