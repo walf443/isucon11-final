@@ -8,15 +8,14 @@ pub async fn logout(session: actix_session::Session) -> actix_web::Result<HttpRe
 
 #[cfg(test)]
 mod tests {
+    use crate::routes::logout::logout;
     use actix_session::UserSession;
     use actix_web::http::StatusCode;
     use actix_web::test::TestRequest;
-    use crate::routes::logout::logout;
 
     #[actix_web::test]
     async fn success_case() {
-        let req = TestRequest::with_uri("/logout")
-            .to_http_request();
+        let req = TestRequest::with_uri("/logout").to_http_request();
 
         let session = req.get_session();
         let _ = session.insert("userID", "1");
