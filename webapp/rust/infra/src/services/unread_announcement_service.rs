@@ -11,14 +11,14 @@ use isucholar_core::services::HaveDBPool;
 use std::sync::Arc;
 
 #[derive(Clone)]
-pub struct UnreadAnnouncementServiceImpl {
+pub struct UnreadAnnouncementServiceInfra {
     db_pool: Arc<DBPool>,
     transaction: TransactionRepositoryImpl,
     unread_announcement: UnreadAnnouncementRepositoryImpl,
     registration: RegistrationRepositoryImpl,
 }
 
-impl UnreadAnnouncementServiceImpl {
+impl UnreadAnnouncementServiceInfra {
     pub fn new(db_pool: Arc<DBPool>) -> Self {
         Self {
             db_pool,
@@ -29,9 +29,9 @@ impl UnreadAnnouncementServiceImpl {
     }
 }
 
-impl UnreadAnnouncementService for UnreadAnnouncementServiceImpl {}
+impl UnreadAnnouncementService for UnreadAnnouncementServiceInfra {}
 
-impl HaveTransactionRepository for UnreadAnnouncementServiceImpl {
+impl HaveTransactionRepository for UnreadAnnouncementServiceInfra {
     type Repo = TransactionRepositoryImpl;
 
     fn transaction_repository(&self) -> &Self::Repo {
@@ -39,7 +39,7 @@ impl HaveTransactionRepository for UnreadAnnouncementServiceImpl {
     }
 }
 
-impl HaveUnreadAnnouncementRepository for UnreadAnnouncementServiceImpl {
+impl HaveUnreadAnnouncementRepository for UnreadAnnouncementServiceInfra {
     type Repo = UnreadAnnouncementRepositoryImpl;
 
     fn unread_announcement_repo(&self) -> &Self::Repo {
@@ -47,7 +47,7 @@ impl HaveUnreadAnnouncementRepository for UnreadAnnouncementServiceImpl {
     }
 }
 
-impl HaveRegistrationRepository for UnreadAnnouncementServiceImpl {
+impl HaveRegistrationRepository for UnreadAnnouncementServiceInfra {
     type Repo = RegistrationRepositoryImpl;
 
     fn registration_repo(&self) -> &Self::Repo {
@@ -55,7 +55,7 @@ impl HaveRegistrationRepository for UnreadAnnouncementServiceImpl {
     }
 }
 
-impl HaveDBPool for UnreadAnnouncementServiceImpl {
+impl HaveDBPool for UnreadAnnouncementServiceInfra {
     fn get_db_pool(&self) -> &DBPool {
         &self.db_pool
     }
