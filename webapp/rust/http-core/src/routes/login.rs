@@ -1,8 +1,8 @@
+use crate::responses::error::ResponseError::{AlreadyLogin, Unauthorized};
+use crate::responses::error::ResponseResult;
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::user_type::UserType;
 use isucholar_core::services::user_service::{HaveUserService, UserService};
-use isucholar_http_core::responses::error::ResponseError::{AlreadyLogin, Unauthorized};
-use isucholar_http_core::responses::error::ResponseResult;
 
 #[derive(Debug, serde::Deserialize)]
 pub struct LoginRequest {
@@ -23,7 +23,9 @@ pub async fn login<Service: HaveUserService>(
     }
     let user = user.unwrap();
 
-    service.user_service().verify_password(&user, &req.password)?;
+    service
+        .user_service()
+        .verify_password(&user, &req.password)?;
 
     if let Some(user_id) = session.get::<String>("userID")? {
         if user_id == user.id {
