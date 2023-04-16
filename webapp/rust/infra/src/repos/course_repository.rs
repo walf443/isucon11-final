@@ -8,6 +8,7 @@ use isucholar_core::repos::error::{ReposError, Result};
 use isucholar_core::MYSQL_ERR_NUM_DUPLICATE_ENTRY;
 use sqlx::Arguments;
 
+#[derive(Clone)]
 pub struct CourseRepositoryImpl {}
 
 #[async_trait]
