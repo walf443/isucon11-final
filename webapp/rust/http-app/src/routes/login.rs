@@ -1,9 +1,8 @@
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::user_type::UserType;
-use isucholar_core::repos::user_repository::UserRepository;
+use isucholar_core::services::user_service::{HaveUserService, UserService};
 use isucholar_http_core::responses::error::ResponseError::{AlreadyLogin, Unauthorized};
 use isucholar_http_core::responses::error::ResponseResult;
-use isucholar_infra::repos::user_repository::UserRepositoryImpl;
 
 #[derive(Debug, serde::Deserialize)]
 pub struct LoginRequest {
@@ -12,24 +11,19 @@ pub struct LoginRequest {
 }
 
 // POST /login ログイン
-pub async fn login(
+pub async fn login<Service: HaveUserService>(
+    service: web::Data<Service>,
     session: actix_session::Session,
-    pool: web::Data<sqlx::MySqlPool>,
     req: web::Json<LoginRequest>,
 ) -> ResponseResult<HttpResponse> {
-    let user_repo = UserRepositoryImpl {};
-    let user = user_repo.find_by_code(&pool, &req.code).await?;
+    let user = service.user_service().find_by_code(&req.code).await?;
+
     if user.is_none() {
         return Err(Unauthorized);
     }
     let user = user.unwrap();
 
-    if !bcrypt::verify(
-        &req.password,
-        &String::from_utf8(user.hashed_password).unwrap(),
-    )? {
-        return Err(Unauthorized);
-    }
+    service.user_service().verify_password(&user, &req.password)?;
 
     if let Some(user_id) = session.get::<String>("userID")? {
         if user_id == user.id {

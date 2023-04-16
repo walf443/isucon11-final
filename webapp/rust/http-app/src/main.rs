@@ -39,7 +39,7 @@ async fn main() -> std::io::Result<()> {
                     .max_age(3600),
             )
             .route("/initialize", web::post().to(initialize))
-            .route("/login", web::post().to(login))
+            .route("/login", web::post().to(login::<ServiceManagerImpl>))
             .route("/logout", web::post().to(logout))
             .service(
                 web::scope("/api")

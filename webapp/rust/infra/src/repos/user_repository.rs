@@ -9,6 +9,7 @@ use isucholar_core::repos::error::Result;
 use isucholar_core::repos::user_repository::UserRepository;
 use num_traits::ToPrimitive;
 
+#[derive(Clone)]
 pub struct UserRepositoryImpl {}
 
 #[async_trait]
