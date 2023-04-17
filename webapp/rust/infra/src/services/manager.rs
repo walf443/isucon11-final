@@ -18,6 +18,20 @@ pub struct ServiceManagerImpl {
     course_service: CourseServiceInfra,
 }
 
+impl ServiceManager for ServiceManagerImpl {}
+
+impl ServiceManagerImpl {
+    pub fn new(db_pool: DBPool) -> Self {
+        let pool = Arc::new(db_pool);
+        Self {
+            announcement_service: AnnouncementServiceInfra::new(pool.clone()),
+            unread_announcement_service: UnreadAnnouncementServiceInfra::new(pool.clone()),
+            user_service: UserServiceInfra::new(pool.clone()),
+            course_service: CourseServiceInfra::new(pool.clone()),
+        }
+    }
+}
+
 impl HaveAnnouncementService for ServiceManagerImpl {
     type Service = AnnouncementServiceInfra;
 
@@ -31,20 +45,6 @@ impl HaveCourseService for ServiceManagerImpl {
 
     fn course_service(&self) -> &Self::Service {
         &self.course_service
-    }
-}
-
-impl ServiceManager for ServiceManagerImpl {}
-
-impl ServiceManagerImpl {
-    pub fn new(db_pool: DBPool) -> Self {
-        let pool = Arc::new(db_pool);
-        Self {
-            announcement_service: AnnouncementServiceInfra::new(pool.clone()),
-            unread_announcement_service: UnreadAnnouncementServiceInfra::new(pool.clone()),
-            user_service: UserServiceInfra::new(pool.clone()),
-            course_service: CourseServiceInfra::new(pool.clone()),
-        }
     }
 }
 
