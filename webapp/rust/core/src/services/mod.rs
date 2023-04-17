@@ -1,6 +1,7 @@
 use crate::db::DBPool;
 
 pub mod announcement_service;
+pub mod course_service;
 pub mod error;
 pub mod manager;
 pub mod unread_announcement_service;

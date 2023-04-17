@@ -17,3 +17,9 @@ pub trait RegistrationCourseRepository {
         course_id: &str,
     ) -> Result<Vec<i64>>;
 }
+
+pub trait HaveRegistrationCourseRepository {
+    type Repo: Sync + RegistrationCourseRepository;
+
+    fn registration_course_repo(&self) -> &Self::Repo;
+}
