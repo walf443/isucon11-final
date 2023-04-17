@@ -1,8 +1,8 @@
 use actix_web::{web, HttpResponse};
 use isucholar_core::services::course_service::{CourseService, HaveCourseService};
-use isucholar_http_core::responses::error::ResponseResult;
-use isucholar_http_core::responses::get_registered_course_response::GetRegisteredCourseResponseContent;
-use isucholar_http_core::routes::util::get_user_info;
+use crate::responses::error::ResponseResult;
+use crate::responses::get_registered_course_response::GetRegisteredCourseResponseContent;
+use crate::routes::util::get_user_info;
 
 // GET /api/users/me/courses 履修中の科目一覧取得
 pub async fn get_registered_courses<Service: HaveCourseService>(
