@@ -10,7 +10,7 @@ pub trait TransactionRepository {
 
 pub trait HaveTransactionRepository {
     type Repo: TransactionRepository + Sync;
-    fn transaction_repository(&self) -> &Self::Repo;
+    fn transaction_repo(&self) -> &Self::Repo;
 }
 
 #[derive(Clone)]

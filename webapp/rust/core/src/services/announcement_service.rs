@@ -36,7 +36,7 @@ pub trait AnnouncementServiceImpl:
 {
     async fn create(&self, announcement: &Announcement) -> Result<()> {
         let pool = self.get_db_pool();
-        let mut tx = self.transaction_repository().begin(&pool).await?;
+        let mut tx = self.transaction_repo().begin(&pool).await?;
 
         let is_exist = self
             .course_repo()

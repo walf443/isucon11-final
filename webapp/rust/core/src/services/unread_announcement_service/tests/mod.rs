@@ -32,7 +32,7 @@ impl UnreadAnnouncementServiceImpl for S {}
 impl HaveTransactionRepository for S {
     type Repo = TransactionRepositoryImpl;
 
-    fn transaction_repository(&self) -> &Self::Repo {
+    fn transaction_repo(&self) -> &Self::Repo {
         &self.transaction_repo
     }
 }

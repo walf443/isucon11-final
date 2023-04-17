@@ -48,7 +48,7 @@ impl HaveDBPool for AnnouncementServiceInfra {
 impl HaveTransactionRepository for AnnouncementServiceInfra {
     type Repo = TransactionRepositoryImpl;
 
-    fn transaction_repository(&self) -> &Self::Repo {
+    fn transaction_repo(&self) -> &Self::Repo {
         &self.transaction
     }
 }

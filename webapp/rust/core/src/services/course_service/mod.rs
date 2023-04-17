@@ -29,7 +29,7 @@ pub trait CourseServiceImpl:
 {
     async fn find_open_courses_by_user_id(&self, user_id: &str) -> Result<Vec<(Course, User)>> {
         let db_pool = self.get_db_pool();
-        let mut tx = self.transaction_repository().begin(db_pool).await?;
+        let mut tx = self.transaction_repo().begin(db_pool).await?;
 
         let courses = self
             .registration_course_repo()

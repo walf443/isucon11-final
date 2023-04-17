@@ -53,7 +53,7 @@ pub trait UnreadAnnouncementServiceImpl:
         course_id: Option<&'c str>,
     ) -> Result<(Vec<AnnouncementWithoutDetail>, i64)> {
         let pool = self.get_db_pool();
-        let mut tx = self.transaction_repository().begin(pool).await?;
+        let mut tx = self.transaction_repo().begin(pool).await?;
         let offset = limit * (page - 1);
 
         let repo = self.unread_announcement_repo();
@@ -76,7 +76,7 @@ pub trait UnreadAnnouncementServiceImpl:
         user_id: &str,
     ) -> Result<AnnouncementDetail> {
         let pool = self.get_db_pool();
-        let mut tx = self.transaction_repository().begin(pool).await?;
+        let mut tx = self.transaction_repo().begin(pool).await?;
 
         let announcement = self
             .unread_announcement_repo()
