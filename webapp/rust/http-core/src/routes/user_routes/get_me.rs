@@ -1,8 +1,8 @@
-use actix_web::{web, HttpResponse};
-use isucholar_core::services::user_service::{HaveUserService, UserService};
 use crate::responses::error::ResponseError::UserNotFound;
 use crate::responses::error::ResponseResult;
 use crate::routes::util::get_user_info;
+use actix_web::{web, HttpResponse};
+use isucholar_core::services::user_service::{HaveUserService, UserService};
 
 #[derive(Debug, serde::Serialize)]
 pub struct GetMeResponse {
