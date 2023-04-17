@@ -24,7 +24,7 @@ async fn main() -> std::io::Result<()> {
     session_key.resize(32, 0);
 
     let server = actix_web::HttpServer::new(move || {
-        let users_api = get_user_routes();
+        let users_api = get_user_routes::<ServiceManagerImpl>();
         let courses_api = get_course_routes();
         let announcements_api = get_announcement_routes::<ServiceManagerImpl>();
 

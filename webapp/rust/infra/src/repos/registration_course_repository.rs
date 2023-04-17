@@ -7,6 +7,7 @@ use isucholar_core::repos::error::Result;
 use isucholar_core::repos::registration_course_repository::RegistrationCourseRepository;
 use num_traits::ToPrimitive;
 
+#[derive(Clone)]
 pub struct RegistrationCourseRepositoryImpl {}
 
 #[async_trait]
