@@ -47,6 +47,8 @@ pub enum ResponseError {
     CourseIsNotInProgress,
     #[error("A class with the same part already exists.")]
     CourseConflict,
+    #[error("No such user.")]
+    UserNotFound,
     #[error("You have not taken this course.")]
     RegistrationAlready,
     #[error("Submission has been closed for this class.")]

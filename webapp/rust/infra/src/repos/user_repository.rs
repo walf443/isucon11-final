@@ -32,11 +32,12 @@ impl UserRepository for UserRepositoryImpl {
         Ok(user)
     }
 
-    async fn find_code_by_id(&self, pool: &DBPool, id: &str) -> Result<String> {
-        let user_code = sqlx::query_scalar("SELECT `code` FROM `users` WHERE `id` = ?")
-            .bind(&id)
-            .fetch_one(pool)
-            .await?;
+    async fn find_code_by_id(&self, pool: &DBPool, id: &str) -> Result<Option<String>> {
+        let user_code: Option<String> =
+            sqlx::query_scalar("SELECT `code` FROM `users` WHERE `id` = ?")
+                .bind(&id)
+                .fetch_optional(pool)
+                .await?;
 
         Ok(user_code)
     }
