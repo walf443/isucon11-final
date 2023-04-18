@@ -1,9 +1,11 @@
 use crate::services::announcement_service::AnnouncementServiceInfra;
+use crate::services::class_service::ClassServiceInfra;
 use crate::services::unread_announcement_service::UnreadAnnouncementServiceInfra;
 use crate::services::user_service::UserServiceInfra;
 use crate::services::CourseServiceInfra;
 use isucholar_core::db::DBPool;
 use isucholar_core::services::announcement_service::HaveAnnouncementService;
+use isucholar_core::services::class_service::HaveClassService;
 use isucholar_core::services::course_service::HaveCourseService;
 use isucholar_core::services::manager::ServiceManager;
 use isucholar_core::services::unread_announcement_service::HaveUnreadAnnouncementService;
@@ -16,6 +18,7 @@ pub struct ServiceManagerImpl {
     unread_announcement_service: UnreadAnnouncementServiceInfra,
     user_service: UserServiceInfra,
     course_service: CourseServiceInfra,
+    class_service: ClassServiceInfra,
 }
 
 impl ServiceManager for ServiceManagerImpl {}
@@ -28,6 +31,7 @@ impl ServiceManagerImpl {
             unread_announcement_service: UnreadAnnouncementServiceInfra::new(pool.clone()),
             user_service: UserServiceInfra::new(pool.clone()),
             course_service: CourseServiceInfra::new(pool.clone()),
+            class_service: ClassServiceInfra::new(pool.clone()),
         }
     }
 }
@@ -60,5 +64,12 @@ impl HaveUserService for ServiceManagerImpl {
 
     fn user_service(&self) -> &Self::Service {
         &self.user_service
+    }
+}
+impl HaveClassService for ServiceManagerImpl {
+    type Service = ClassServiceInfra;
+
+    fn class_service(&self) -> &Self::Service {
+        &self.class_service
     }
 }

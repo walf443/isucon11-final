@@ -30,3 +30,9 @@ pub trait SubmissionRepository {
         class_id: &str,
     ) -> Result<Vec<Submission>>;
 }
+
+pub trait HaveSubmissionRepository {
+    type Repo: Sync + SubmissionRepository;
+
+    fn submission_repo(&self) -> &Self::Repo;
+}

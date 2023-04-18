@@ -4,6 +4,7 @@ use isucholar_core::models::submission::{CreateSubmission, Submission};
 use isucholar_core::repos::error::Result;
 use isucholar_core::repos::submission_repository::SubmissionRepository;
 
+#[derive(Clone)]
 pub struct SubmissionRepositoryImpl {}
 
 #[async_trait]

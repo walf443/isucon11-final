@@ -1,24 +1,20 @@
 use actix_web::{web, HttpResponse};
-use isucholar_core::models::class_score::ClassScore;
-use isucholar_core::models::course_result::CourseResult;
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::models::summary::Summary;
-use isucholar_core::repos::class_repository::ClassRepository;
 use isucholar_core::repos::registration_course_repository::RegistrationCourseRepository;
-use isucholar_core::repos::submission_repository::SubmissionRepository;
 use isucholar_core::repos::user_repository::UserRepository;
+use isucholar_core::services::class_service::{ClassService, HaveClassService};
 use isucholar_core::util;
 use isucholar_http_core::responses::error::ResponseResult;
 use isucholar_http_core::responses::get_grade_response::GetGradeResponse;
 use isucholar_http_core::routes::util::get_user_info;
-use isucholar_infra::repos::class_repository::ClassRepositoryImpl;
 use isucholar_infra::repos::registration_course_repository::RegistrationCourseRepositoryImpl;
-use isucholar_infra::repos::submission_repository::SubmissionRepositoryImpl;
 use isucholar_infra::repos::user_repository::UserRepositoryImpl;
 
 // GET /api/users/me/grades 成績取得
-pub async fn get_grades(
+pub async fn get_grades<Service: HaveClassService>(
     pool: web::Data<sqlx::MySqlPool>,
+    service: web::Data<Service>,
     session: actix_session::Session,
 ) -> ResponseResult<HttpResponse> {
     let (user_id, _, _) = get_user_info(session)?;
@@ -32,57 +28,15 @@ pub async fn get_grades(
     let mut course_results = Vec::with_capacity(registered_courses.len());
     let mut my_gpa = 0f64;
     let mut my_credits = 0;
-    let class_repo = ClassRepositoryImpl {};
-    let submission_repo = SubmissionRepositoryImpl {};
     let user_repo = UserRepositoryImpl {};
 
     for course in registered_courses {
-        let classes = class_repo.find_all_by_course_id(&pool, &course.id).await?;
-
-        // 講義毎の成績計算処理
-        let mut class_scores = Vec::with_capacity(classes.len());
-        let mut my_total_score = 0;
-        for class in classes {
-            let submissions_count = submission_repo.count_by_class_id(&pool, &class.id).await?;
-            let my_score = submission_repo
-                .find_score_by_class_id_and_user_id(&pool, &class.id, &user_id)
-                .await?;
-
-            if let Some(Some(my_score)) = my_score {
-                let my_score = my_score as i64;
-                my_total_score += my_score;
-                class_scores.push(ClassScore {
-                    class_id: class.id,
-                    part: class.part,
-                    title: class.title,
-                    score: Some(my_score),
-                    submitters: submissions_count,
-                });
-            } else {
-                class_scores.push(ClassScore {
-                    class_id: class.id,
-                    part: class.part,
-                    title: class.title,
-                    score: None,
-                    submitters: submissions_count,
-                });
-            }
-        }
-
-        let totals = registration_course_repo
-            .find_total_scores_by_course_id_group_by_user_id(&pool, &course.id)
+        let course_result = service
+            .class_service()
+            .get_user_course_result_by_course(&user_id, &course)
             .await?;
-
-        course_results.push(CourseResult {
-            name: course.name,
-            code: course.code,
-            total_score: my_total_score,
-            total_score_t_score: util::t_score_int(my_total_score, &totals),
-            total_score_avg: util::average_int(&totals, 0.0),
-            total_score_max: util::max_int(&totals, 0),
-            total_score_min: util::min_int(&totals, 0),
-            class_scores,
-        });
+        let my_total_score = course_result.total_score;
+        course_results.push(course_result);
 
         // 自分のGPA計算
         if course.status == CourseStatus::Closed {

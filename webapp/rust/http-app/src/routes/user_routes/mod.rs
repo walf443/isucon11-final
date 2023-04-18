@@ -16,5 +16,5 @@ pub fn get_user_routes<Service: ServiceManager + 'static>() -> Scope {
             web::get().to(get_registered_courses::<Service>),
         )
         .route("/me/courses", web::put().to(register_courses))
-        .route("/me/grades", web::get().to(get_grades))
+        .route("/me/grades", web::get().to(get_grades::<Service>))
 }

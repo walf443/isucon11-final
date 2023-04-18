@@ -11,6 +11,7 @@ use isucholar_core::services::HaveDBPool;
 use std::sync::Arc;
 
 pub mod announcement_service;
+pub mod class_service;
 pub mod course_service;
 pub mod manager;
 pub mod unread_announcement_service;

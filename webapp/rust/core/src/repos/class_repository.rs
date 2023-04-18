@@ -31,3 +31,9 @@ pub trait ClassRepository {
         course_id: &str,
     ) -> Result<Vec<ClassWithSubmitted>>;
 }
+
+pub trait HaveClassRepository {
+    type Repo: Sync + ClassRepository;
+
+    fn class_repo(&self) -> &Self::Repo;
+}

@@ -7,6 +7,7 @@ use isucholar_core::repos::error::ReposError::ClassDuplicate;
 use isucholar_core::repos::error::Result;
 use isucholar_core::MYSQL_ERR_NUM_DUPLICATE_ENTRY;
 
+#[derive(Clone)]
 pub struct ClassRepositoryImpl {}
 
 #[async_trait]
