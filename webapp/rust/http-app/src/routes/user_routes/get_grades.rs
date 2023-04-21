@@ -2,17 +2,16 @@ use actix_web::{web, HttpResponse};
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::models::summary::Summary;
 use isucholar_core::repos::registration_course_repository::RegistrationCourseRepository;
-use isucholar_core::repos::user_repository::UserRepository;
 use isucholar_core::services::class_service::{ClassService, HaveClassService};
+use isucholar_core::services::user_service::{HaveUserService, UserService};
 use isucholar_core::util;
 use isucholar_http_core::responses::error::ResponseResult;
 use isucholar_http_core::responses::get_grade_response::GetGradeResponse;
 use isucholar_http_core::routes::util::get_user_info;
 use isucholar_infra::repos::registration_course_repository::RegistrationCourseRepositoryImpl;
-use isucholar_infra::repos::user_repository::UserRepositoryImpl;
 
 // GET /api/users/me/grades 成績取得
-pub async fn get_grades<Service: HaveClassService>(
+pub async fn get_grades<Service: HaveClassService + HaveUserService>(
     pool: web::Data<sqlx::MySqlPool>,
     service: web::Data<Service>,
     session: actix_session::Session,
@@ -28,11 +27,11 @@ pub async fn get_grades<Service: HaveClassService>(
     let mut course_results = Vec::with_capacity(registered_courses.len());
     let mut my_gpa = 0f64;
     let mut my_credits = 0;
-    let user_repo = UserRepositoryImpl {};
+
+    let class_service = service.class_service();
 
     for course in registered_courses {
-        let course_result = service
-            .class_service()
+        let course_result = class_service
             .get_user_course_result_by_course(&user_id, &course)
             .await?;
         let my_total_score = course_result.total_score;
@@ -48,7 +47,7 @@ pub async fn get_grades<Service: HaveClassService>(
         my_gpa = my_gpa / 100.0 / my_credits as f64;
     }
 
-    let gpas = user_repo.find_gpas_group_by_user_id(&pool).await?;
+    let gpas = service.user_service().find_gpas_group_by_user_id().await?;
 
     Ok(HttpResponse::Ok().json(GetGradeResponse {
         course_results,
