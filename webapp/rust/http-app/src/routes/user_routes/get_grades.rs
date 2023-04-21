@@ -1,26 +1,28 @@
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::models::summary::Summary;
-use isucholar_core::repos::registration_course_repository::RegistrationCourseRepository;
 use isucholar_core::services::class_service::{ClassService, HaveClassService};
+use isucholar_core::services::registration_course_service::{
+    HaveRegistrationCourseService, RegistrationCourseService,
+};
 use isucholar_core::services::user_service::{HaveUserService, UserService};
 use isucholar_core::util;
 use isucholar_http_core::responses::error::ResponseResult;
 use isucholar_http_core::responses::get_grade_response::GetGradeResponse;
 use isucholar_http_core::routes::util::get_user_info;
-use isucholar_infra::repos::registration_course_repository::RegistrationCourseRepositoryImpl;
 
 // GET /api/users/me/grades 成績取得
-pub async fn get_grades<Service: HaveClassService + HaveUserService>(
-    pool: web::Data<sqlx::MySqlPool>,
+pub async fn get_grades<
+    Service: HaveClassService + HaveUserService + HaveRegistrationCourseService,
+>(
     service: web::Data<Service>,
     session: actix_session::Session,
 ) -> ResponseResult<HttpResponse> {
     let (user_id, _, _) = get_user_info(session)?;
 
-    let registration_course_repo = RegistrationCourseRepositoryImpl {};
-    let registered_courses = registration_course_repo
-        .find_courses_by_user_id(&pool, &user_id)
+    let registered_courses = service
+        .registration_course_service()
+        .find_courses_by_user_id(&user_id)
         .await?;
 
     // 科目毎の成績計算処理
