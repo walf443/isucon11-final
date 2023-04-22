@@ -6,9 +6,9 @@ use isucholar_core::services::grade_summary_service::{
 use isucholar_core::services::registration_course_service::{
     HaveRegistrationCourseService, RegistrationCourseService,
 };
-use isucholar_http_core::responses::error::ResponseResult;
-use isucholar_http_core::responses::get_grade_response::GetGradeResponse;
-use isucholar_http_core::routes::util::get_user_info;
+use crate::responses::error::ResponseResult;
+use crate::responses::get_grade_response::GetGradeResponse;
+use crate::routes::util::get_user_info;
 
 // GET /api/users/me/grades 成績取得
 pub async fn get_grades<
