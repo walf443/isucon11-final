@@ -1,6 +1,6 @@
-use crate::repos::class_repository::ClassRepositoryImpl;
-use crate::repos::registration_course_repository::RegistrationCourseRepositoryImpl;
-use crate::repos::submission_repository::SubmissionRepositoryImpl;
+use crate::repos::class_repository::ClassRepositoryInfra;
+use crate::repos::registration_course_repository::RegistrationCourseRepositoryInfra;
+use crate::repos::submission_repository::SubmissionRepositoryInfra;
 use isucholar_core::db::DBPool;
 use isucholar_core::repos::class_repository::HaveClassRepository;
 use isucholar_core::repos::registration_course_repository::HaveRegistrationCourseRepository;
@@ -12,18 +12,18 @@ use std::sync::Arc;
 #[derive(Clone)]
 pub struct ClassServiceInfra {
     db_pool: Arc<DBPool>,
-    class_repo: ClassRepositoryImpl,
-    submission_repo: SubmissionRepositoryImpl,
-    registration_course_repo: RegistrationCourseRepositoryImpl,
+    class_repo: ClassRepositoryInfra,
+    submission_repo: SubmissionRepositoryInfra,
+    registration_course_repo: RegistrationCourseRepositoryInfra,
 }
 
 impl ClassServiceInfra {
     pub fn new(db_pool: Arc<DBPool>) -> Self {
         Self {
             db_pool,
-            class_repo: ClassRepositoryImpl {},
-            submission_repo: SubmissionRepositoryImpl {},
-            registration_course_repo: RegistrationCourseRepositoryImpl {},
+            class_repo: ClassRepositoryInfra {},
+            submission_repo: SubmissionRepositoryInfra {},
+            registration_course_repo: RegistrationCourseRepositoryInfra {},
         }
     }
 }
@@ -37,7 +37,7 @@ impl HaveDBPool for ClassServiceInfra {
 }
 
 impl HaveClassRepository for ClassServiceInfra {
-    type Repo = ClassRepositoryImpl;
+    type Repo = ClassRepositoryInfra;
 
     fn class_repo(&self) -> &Self::Repo {
         &self.class_repo
@@ -45,14 +45,14 @@ impl HaveClassRepository for ClassServiceInfra {
 }
 
 impl HaveSubmissionRepository for ClassServiceInfra {
-    type Repo = SubmissionRepositoryImpl;
+    type Repo = SubmissionRepositoryInfra;
 
     fn submission_repo(&self) -> &Self::Repo {
         &self.submission_repo
     }
 }
 impl HaveRegistrationCourseRepository for ClassServiceInfra {
-    type Repo = RegistrationCourseRepositoryImpl;
+    type Repo = RegistrationCourseRepositoryInfra;
 
     fn registration_course_repo(&self) -> &Self::Repo {
         &self.registration_course_repo

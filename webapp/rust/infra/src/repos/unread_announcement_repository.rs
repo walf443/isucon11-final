@@ -8,10 +8,10 @@ use isucholar_core::repos::unread_announcement_repository::UnreadAnnouncementRep
 use sqlx::Arguments;
 
 #[derive(Clone)]
-pub struct UnreadAnnouncementRepositoryImpl {}
+pub struct UnreadAnnouncementRepositoryInfra {}
 
 #[async_trait]
-impl UnreadAnnouncementRepository for UnreadAnnouncementRepositoryImpl {
+impl UnreadAnnouncementRepository for UnreadAnnouncementRepositoryInfra {
     async fn create_in_tx<'c>(
         &self,
         tx: &mut TxConn<'c>,

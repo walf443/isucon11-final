@@ -1,7 +1,7 @@
-use crate::repos::announcement_repository::AnnouncementRepositoryImpl;
-use crate::repos::course_repository::CourseRepositoryImpl;
-use crate::repos::registration_repository::RegistrationRepositoryImpl;
-use crate::repos::unread_announcement_repository::UnreadAnnouncementRepositoryImpl;
+use crate::repos::announcement_repository::AnnouncementRepositoryInfra;
+use crate::repos::course_repository::CourseRepositoryInfra;
+use crate::repos::registration_repository::RegistrationRepositoryInfra;
+use crate::repos::unread_announcement_repository::UnreadAnnouncementRepositoryInfra;
 use isucholar_core::db::DBPool;
 use isucholar_core::repos::announcement_repository::HaveAnnouncementRepository;
 use isucholar_core::repos::course_repository::HaveCourseRepository;
@@ -18,10 +18,10 @@ use std::sync::Arc;
 pub struct AnnouncementServiceInfra {
     db_pool: Arc<DBPool>,
     transaction: TransactionRepositoryImpl,
-    announcement: AnnouncementRepositoryImpl,
-    course: CourseRepositoryImpl,
-    registration: RegistrationRepositoryImpl,
-    unread_announcement: UnreadAnnouncementRepositoryImpl,
+    announcement: AnnouncementRepositoryInfra,
+    course: CourseRepositoryInfra,
+    registration: RegistrationRepositoryInfra,
+    unread_announcement: UnreadAnnouncementRepositoryInfra,
 }
 
 impl AnnouncementServiceInfra {
@@ -29,10 +29,10 @@ impl AnnouncementServiceInfra {
         Self {
             db_pool,
             transaction: TransactionRepositoryImpl {},
-            announcement: AnnouncementRepositoryImpl {},
-            course: CourseRepositoryImpl {},
-            registration: RegistrationRepositoryImpl {},
-            unread_announcement: UnreadAnnouncementRepositoryImpl {},
+            announcement: AnnouncementRepositoryInfra {},
+            course: CourseRepositoryInfra {},
+            registration: RegistrationRepositoryInfra {},
+            unread_announcement: UnreadAnnouncementRepositoryInfra {},
         }
     }
 }
@@ -54,7 +54,7 @@ impl HaveTransactionRepository for AnnouncementServiceInfra {
 }
 
 impl HaveCourseRepository for AnnouncementServiceInfra {
-    type Repo = CourseRepositoryImpl;
+    type Repo = CourseRepositoryInfra;
 
     fn course_repo(&self) -> &Self::Repo {
         &self.course
@@ -62,7 +62,7 @@ impl HaveCourseRepository for AnnouncementServiceInfra {
 }
 
 impl HaveAnnouncementRepository for AnnouncementServiceInfra {
-    type Repo = AnnouncementRepositoryImpl;
+    type Repo = AnnouncementRepositoryInfra;
 
     fn announcement_repo(&self) -> &Self::Repo {
         &self.announcement
@@ -70,7 +70,7 @@ impl HaveAnnouncementRepository for AnnouncementServiceInfra {
 }
 
 impl HaveRegistrationRepository for AnnouncementServiceInfra {
-    type Repo = RegistrationRepositoryImpl;
+    type Repo = RegistrationRepositoryInfra;
 
     fn registration_repo(&self) -> &Self::Repo {
         &self.registration
@@ -78,7 +78,7 @@ impl HaveRegistrationRepository for AnnouncementServiceInfra {
 }
 
 impl HaveUnreadAnnouncementRepository for AnnouncementServiceInfra {
-    type Repo = UnreadAnnouncementRepositoryImpl;
+    type Repo = UnreadAnnouncementRepositoryInfra;
 
     fn unread_announcement_repo(&self) -> &Self::Repo {
         &self.unread_announcement

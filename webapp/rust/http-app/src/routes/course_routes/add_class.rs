@@ -9,8 +9,8 @@ use isucholar_http_core::responses::error::ResponseError::{
     CourseConflict, CourseIsNotInProgress, CourseNotFound,
 };
 use isucholar_http_core::responses::error::ResponseResult;
-use isucholar_infra::repos::class_repository::ClassRepositoryImpl;
-use isucholar_infra::repos::course_repository::CourseRepositoryImpl;
+use isucholar_infra::repos::class_repository::ClassRepositoryInfra;
+use isucholar_infra::repos::course_repository::CourseRepositoryInfra;
 
 #[derive(Debug, serde::Deserialize)]
 pub struct AddClassRequest {
@@ -34,7 +34,7 @@ pub async fn add_class(
 
     let mut tx = pool.begin().await?;
 
-    let course_repo = CourseRepositoryImpl {};
+    let course_repo = CourseRepositoryInfra {};
     let course = course_repo
         .find_for_share_lock_by_id_in_tx(&mut tx, course_id)
         .await?;
@@ -46,7 +46,7 @@ pub async fn add_class(
         return Err(CourseIsNotInProgress);
     }
 
-    let class_repo = ClassRepositoryImpl {};
+    let class_repo = ClassRepositoryInfra {};
     let class_id = util::new_ulid().await;
     let form = CreateClass {
         id: class_id.clone(),

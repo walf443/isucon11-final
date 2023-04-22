@@ -2,7 +2,7 @@ use actix_web::{web, HttpResponse};
 use isucholar_core::repos::course_repository::{CourseRepository, SearchCoursesQuery};
 use isucholar_http_core::responses::error::ResponseError::InvalidPage;
 use isucholar_http_core::responses::error::ResponseResult;
-use isucholar_infra::repos::course_repository::CourseRepositoryImpl;
+use isucholar_infra::repos::course_repository::CourseRepositoryInfra;
 
 // GET /api/courses 科目検索
 pub async fn search_courses(
@@ -21,7 +21,7 @@ pub async fn search_courses(
     let limit = 20;
     let offset = limit * (page - 1);
 
-    let course_repo = CourseRepositoryImpl {};
+    let course_repo = CourseRepositoryInfra {};
     let mut res = course_repo
         .find_all_with_teacher(&pool, limit, offset, &params)
         .await?;

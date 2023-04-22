@@ -1,4 +1,4 @@
-use crate::repos::user_repository::UserRepositoryImpl;
+use crate::repos::user_repository::UserRepositoryInfra;
 use isucholar_core::db::DBPool;
 use isucholar_core::repos::user_repository::HaveUserRepository;
 use isucholar_core::services::user_service::UserServiceImpl;
@@ -8,14 +8,14 @@ use std::sync::Arc;
 #[derive(Clone)]
 pub struct UserServiceInfra {
     db_pool: Arc<DBPool>,
-    user_repo: UserRepositoryImpl,
+    user_repo: UserRepositoryInfra,
 }
 
 impl UserServiceInfra {
     pub fn new(db_pool: Arc<DBPool>) -> Self {
         Self {
             db_pool,
-            user_repo: UserRepositoryImpl {},
+            user_repo: UserRepositoryInfra {},
         }
     }
 }
@@ -29,7 +29,7 @@ impl HaveDBPool for UserServiceInfra {
 }
 
 impl HaveUserRepository for UserServiceInfra {
-    type Repo = UserRepositoryImpl;
+    type Repo = UserRepositoryInfra;
 
     fn user_repo(&self) -> &Self::Repo {
         &self.user_repo

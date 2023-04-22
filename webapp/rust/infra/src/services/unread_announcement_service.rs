@@ -1,5 +1,5 @@
-use crate::repos::registration_repository::RegistrationRepositoryImpl;
-use crate::repos::unread_announcement_repository::UnreadAnnouncementRepositoryImpl;
+use crate::repos::registration_repository::RegistrationRepositoryInfra;
+use crate::repos::unread_announcement_repository::UnreadAnnouncementRepositoryInfra;
 use isucholar_core::db::DBPool;
 use isucholar_core::repos::registration_repository::HaveRegistrationRepository;
 use isucholar_core::repos::transaction_repository::{
@@ -14,8 +14,8 @@ use std::sync::Arc;
 pub struct UnreadAnnouncementServiceInfra {
     db_pool: Arc<DBPool>,
     transaction: TransactionRepositoryImpl,
-    unread_announcement: UnreadAnnouncementRepositoryImpl,
-    registration: RegistrationRepositoryImpl,
+    unread_announcement: UnreadAnnouncementRepositoryInfra,
+    registration: RegistrationRepositoryInfra,
 }
 
 impl UnreadAnnouncementServiceInfra {
@@ -23,8 +23,8 @@ impl UnreadAnnouncementServiceInfra {
         Self {
             db_pool,
             transaction: TransactionRepositoryImpl {},
-            unread_announcement: UnreadAnnouncementRepositoryImpl {},
-            registration: RegistrationRepositoryImpl {},
+            unread_announcement: UnreadAnnouncementRepositoryInfra {},
+            registration: RegistrationRepositoryInfra {},
         }
     }
 }
@@ -40,7 +40,7 @@ impl HaveTransactionRepository for UnreadAnnouncementServiceInfra {
 }
 
 impl HaveUnreadAnnouncementRepository for UnreadAnnouncementServiceInfra {
-    type Repo = UnreadAnnouncementRepositoryImpl;
+    type Repo = UnreadAnnouncementRepositoryInfra;
 
     fn unread_announcement_repo(&self) -> &Self::Repo {
         &self.unread_announcement
@@ -48,7 +48,7 @@ impl HaveUnreadAnnouncementRepository for UnreadAnnouncementServiceInfra {
 }
 
 impl HaveRegistrationRepository for UnreadAnnouncementServiceInfra {
-    type Repo = RegistrationRepositoryImpl;
+    type Repo = RegistrationRepositoryInfra;
 
     fn registration_repo(&self) -> &Self::Repo {
         &self.registration

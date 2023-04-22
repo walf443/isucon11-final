@@ -3,7 +3,7 @@ use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::repos::course_repository::CourseRepository;
 use isucholar_http_core::responses::error::ResponseError::CourseNotFound;
 use isucholar_http_core::responses::error::ResponseResult;
-use isucholar_infra::repos::course_repository::CourseRepositoryImpl;
+use isucholar_infra::repos::course_repository::CourseRepositoryInfra;
 
 #[derive(Debug, serde::Deserialize)]
 pub struct SetCourseStatusRequest {
@@ -19,7 +19,7 @@ pub async fn set_course_status(
     let course_id = &course_id.0;
 
     let mut tx = pool.begin().await?;
-    let course_repo = CourseRepositoryImpl {};
+    let course_repo = CourseRepositoryInfra {};
     let is_exist = course_repo
         .for_update_by_id_in_tx(&mut tx, course_id)
         .await?;

@@ -6,10 +6,10 @@ use isucholar_core::repos::error::Result;
 use isucholar_core::repos::registration_repository::RegistrationRepository;
 
 #[derive(Clone)]
-pub struct RegistrationRepositoryImpl {}
+pub struct RegistrationRepositoryInfra {}
 
 #[async_trait]
-impl RegistrationRepository for RegistrationRepositoryImpl {
+impl RegistrationRepository for RegistrationRepositoryInfra {
     async fn create_or_update_in_tx<'c>(
         &self,
         tx: &mut TxConn<'c>,

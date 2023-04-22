@@ -8,10 +8,10 @@ use isucholar_core::repos::error::Result;
 use isucholar_core::MYSQL_ERR_NUM_DUPLICATE_ENTRY;
 
 #[derive(Clone)]
-pub struct ClassRepositoryImpl {}
+pub struct ClassRepositoryInfra {}
 
 #[async_trait]
-impl ClassRepository for ClassRepositoryImpl {
+impl ClassRepository for ClassRepositoryInfra {
     async fn for_update_by_id_in_tx<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<bool> {
         let class_count: i64 = db::fetch_one_scalar(
             sqlx::query_scalar("SELECT COUNT(*) FROM `classes` WHERE `id` = ? FOR UPDATE").bind(id),

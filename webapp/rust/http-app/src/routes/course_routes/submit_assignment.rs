@@ -14,10 +14,10 @@ use isucholar_http_core::responses::error::ResponseError::{
 };
 use isucholar_http_core::responses::error::ResponseResult;
 use isucholar_http_core::routes::util::get_user_info;
-use isucholar_infra::repos::class_repository::ClassRepositoryImpl;
-use isucholar_infra::repos::course_repository::CourseRepositoryImpl;
-use isucholar_infra::repos::registration_repository::RegistrationRepositoryImpl;
-use isucholar_infra::repos::submission_repository::SubmissionRepositoryImpl;
+use isucholar_infra::repos::class_repository::ClassRepositoryInfra;
+use isucholar_infra::repos::course_repository::CourseRepositoryInfra;
+use isucholar_infra::repos::registration_repository::RegistrationRepositoryInfra;
+use isucholar_infra::repos::submission_repository::SubmissionRepositoryInfra;
 use tokio::io::AsyncWriteExt;
 
 // POST /api/courses/{course_id}/classes/{class_id}/assignments 課題の提出
@@ -33,7 +33,7 @@ pub async fn submit_assignment(
     let class_id = &path.class_id;
 
     let mut tx = pool.begin().await?;
-    let course_repo = CourseRepositoryImpl {};
+    let course_repo = CourseRepositoryInfra {};
     let status = course_repo
         .find_status_for_share_lock_by_id_in_tx(&mut tx, course_id)
         .await?;
@@ -45,7 +45,7 @@ pub async fn submit_assignment(
         return Err(CourseNotFound);
     }
 
-    let registration_repo = RegistrationRepositoryImpl {};
+    let registration_repo = RegistrationRepositoryInfra {};
 
     let is_registered = registration_repo
         .exist_by_user_id_and_course_id_in_tx(&mut tx, &user_id, &course_id)
@@ -54,7 +54,7 @@ pub async fn submit_assignment(
         return Err(RegistrationAlready);
     }
 
-    let class_repo = ClassRepositoryImpl {};
+    let class_repo = ClassRepositoryInfra {};
     let submission_closed = class_repo
         .find_submission_closed_by_id_in_tx(&mut tx, course_id)
         .await?;
@@ -83,7 +83,7 @@ pub async fn submit_assignment(
     }
     let file = file.unwrap();
 
-    let submission_repo = SubmissionRepositoryImpl {};
+    let submission_repo = SubmissionRepositoryInfra {};
     submission_repo
         .create_in_tx(
             &mut tx,

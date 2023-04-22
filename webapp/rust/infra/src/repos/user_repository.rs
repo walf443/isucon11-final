@@ -10,10 +10,10 @@ use isucholar_core::repos::user_repository::UserRepository;
 use num_traits::ToPrimitive;
 
 #[derive(Clone)]
-pub struct UserRepositoryImpl {}
+pub struct UserRepositoryInfra {}
 
 #[async_trait]
-impl UserRepository for UserRepositoryImpl {
+impl UserRepository for UserRepositoryInfra {
     async fn find_in_tx<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<User> {
         let user: User = db::fetch_one_as(
             sqlx::query_as("SELECT * FROM `users` WHERE `id` = ?").bind(id),

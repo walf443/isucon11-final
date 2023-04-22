@@ -7,8 +7,8 @@ use isucholar_http_core::responses::error::ResponseError::{
     ClassIsNotSubmissionClosed, ClassNotFound,
 };
 use isucholar_http_core::responses::error::ResponseResult;
-use isucholar_infra::repos::class_repository::ClassRepositoryImpl;
-use isucholar_infra::repos::submission_repository::SubmissionRepositoryImpl;
+use isucholar_infra::repos::class_repository::ClassRepositoryInfra;
+use isucholar_infra::repos::submission_repository::SubmissionRepositoryInfra;
 
 // PUT /api/courses/{course_id}/classes/{class_id}/assignments/scores 採点結果登録
 pub async fn register_scores(
@@ -19,7 +19,7 @@ pub async fn register_scores(
     let class_id = &path.class_id;
 
     let mut tx = pool.begin().await?;
-    let class_repo = ClassRepositoryImpl {};
+    let class_repo = ClassRepositoryInfra {};
     let submission_closed = class_repo
         .find_submission_closed_by_id_in_tx(&mut tx, class_id)
         .await?;
@@ -32,7 +32,7 @@ pub async fn register_scores(
         return Err(ClassNotFound);
     }
 
-    let submission_repo = SubmissionRepositoryImpl {};
+    let submission_repo = SubmissionRepositoryInfra {};
 
     for score in req.into_inner() {
         submission_repo

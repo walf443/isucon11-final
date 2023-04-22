@@ -7,10 +7,10 @@ use isucholar_core::repos::error::Result;
 use isucholar_core::MYSQL_ERR_NUM_DUPLICATE_ENTRY;
 
 #[derive(Clone)]
-pub struct AnnouncementRepositoryImpl {}
+pub struct AnnouncementRepositoryInfra {}
 
 #[async_trait]
-impl AnnouncementRepository for AnnouncementRepositoryImpl {
+impl AnnouncementRepository for AnnouncementRepositoryInfra {
     async fn create_in_tx<'c>(&self, tx: &mut TxConn<'c>, req: &Announcement) -> Result<()> {
         let result = sqlx::query(
             "INSERT INTO `announcements` (`id`, `course_id`, `title`, `message`) VALUES (?, ?, ?, ?)",

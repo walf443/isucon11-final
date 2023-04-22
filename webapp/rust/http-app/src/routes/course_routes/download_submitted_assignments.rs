@@ -6,8 +6,8 @@ use isucholar_core::repos::submission_repository::SubmissionRepository;
 use isucholar_core::ASSIGNMENTS_DIRECTORY;
 use isucholar_http_core::responses::error::ResponseError::ClassNotFound;
 use isucholar_http_core::responses::error::ResponseResult;
-use isucholar_infra::repos::class_repository::ClassRepositoryImpl;
-use isucholar_infra::repos::submission_repository::SubmissionRepositoryImpl;
+use isucholar_infra::repos::class_repository::ClassRepositoryInfra;
+use isucholar_infra::repos::submission_repository::SubmissionRepositoryInfra;
 
 // GET /api/courses/{course_id}/classes/{class_id}/assignments/export 提出済みの課題ファイルをzip形式で一括ダウンロード
 pub async fn download_submitted_assignments(
@@ -17,13 +17,13 @@ pub async fn download_submitted_assignments(
     let class_id = &path.class_id;
 
     let mut tx = pool.begin().await?;
-    let class_repo = ClassRepositoryImpl {};
+    let class_repo = ClassRepositoryInfra {};
     let is_exist = class_repo.for_update_by_id_in_tx(&mut tx, class_id).await?;
 
     if !is_exist {
         return Err(ClassNotFound);
     }
-    let submission_repo = SubmissionRepositoryImpl {};
+    let submission_repo = SubmissionRepositoryInfra {};
     let submissions = submission_repo
         .find_all_by_class_id_in_tx(&mut tx, &class_id)
         .await?;

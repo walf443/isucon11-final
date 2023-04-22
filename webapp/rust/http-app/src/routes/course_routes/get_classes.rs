@@ -4,8 +4,8 @@ use isucholar_core::repos::course_repository::CourseRepository;
 use isucholar_http_core::responses::error::ResponseError::CourseNotFound;
 use isucholar_http_core::responses::error::ResponseResult;
 use isucholar_http_core::routes::util::get_user_info;
-use isucholar_infra::repos::class_repository::ClassRepositoryImpl;
-use isucholar_infra::repos::course_repository::CourseRepositoryImpl;
+use isucholar_infra::repos::class_repository::ClassRepositoryInfra;
+use isucholar_infra::repos::course_repository::CourseRepositoryInfra;
 
 #[derive(Debug, serde::Serialize)]
 struct GetClassResponse {
@@ -28,8 +28,8 @@ pub async fn get_classes(
     let course_id = &course_id.0;
 
     let mut tx = pool.begin().await?;
-    let course_repo = CourseRepositoryImpl {};
-    let class_repo = ClassRepositoryImpl {};
+    let course_repo = CourseRepositoryInfra {};
+    let class_repo = ClassRepositoryInfra {};
     let is_exist = course_repo.exist_by_id_in_tx(&mut tx, course_id).await?;
 
     if !is_exist {

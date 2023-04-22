@@ -8,10 +8,10 @@ use isucholar_core::repos::registration_course_repository::RegistrationCourseRep
 use num_traits::ToPrimitive;
 
 #[derive(Clone)]
-pub struct RegistrationCourseRepositoryImpl {}
+pub struct RegistrationCourseRepositoryInfra {}
 
 #[async_trait]
-impl RegistrationCourseRepository for RegistrationCourseRepositoryImpl {
+impl RegistrationCourseRepository for RegistrationCourseRepositoryInfra {
     async fn find_courses_by_user_id(&self, pool: &DBPool, user_id: &str) -> Result<Vec<Course>> {
         let registered_courses: Vec<Course> = sqlx::query_as(concat!(
             "SELECT `courses`.*",
