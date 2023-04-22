@@ -8,7 +8,6 @@ use async_trait::async_trait;
 pub trait UserService: Sync {
     async fn find_by_code(&self, code: &str) -> Result<Option<User>>;
     async fn find_code_by_id(&self, user_id: &str) -> Result<Option<String>>;
-    async fn find_gpas_group_by_user_id(&self) -> Result<Vec<f64>>;
     fn verify_password(&self, user: &User, password: &str) -> Result<bool>;
 }
 
@@ -28,12 +27,6 @@ pub trait UserServiceImpl: Sync + HaveDBPool + HaveUserRepository {
     async fn find_code_by_id(&self, user_id: &str) -> Result<Option<String>> {
         let pool = self.get_db_pool();
         let result = self.user_repo().find_code_by_id(pool, user_id).await?;
-        Ok(result)
-    }
-
-    async fn find_gpas_group_by_user_id(&self) -> Result<Vec<f64>> {
-        let pool = self.get_db_pool();
-        let result = self.user_repo().find_gpas_group_by_user_id(pool).await?;
         Ok(result)
     }
 
@@ -57,10 +50,6 @@ impl<S: UserServiceImpl> UserService for S {
 
     async fn find_code_by_id(&self, user_id: &str) -> Result<Option<String>> {
         UserServiceImpl::find_code_by_id(self, user_id).await
-    }
-
-    async fn find_gpas_group_by_user_id(&self) -> Result<Vec<f64>> {
-        UserServiceImpl::find_gpas_group_by_user_id(self).await
     }
 
     fn verify_password(&self, user: &User, password: &str) -> Result<bool> {
