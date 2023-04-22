@@ -18,6 +18,15 @@ pub enum Error {
     AnnouncementDuplicate,
     #[error("no such course.")]
     CourseNotFound,
+    #[error("validation error")]
+    RegistrationCourseValidationError(RegistrationCourseValidationError),
 }
 
 pub type Result<T> = std::result::Result<T, Error>;
+
+#[derive(Debug, Default)]
+pub struct RegistrationCourseValidationError {
+    pub course_not_found: Vec<String>,
+    pub not_registrable_status: Vec<String>,
+    pub schedule_conflict: Vec<String>,
+}
