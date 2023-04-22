@@ -1,6 +1,7 @@
 use crate::models::class_score::ClassScore;
 use crate::models::course::Course;
 use crate::models::course_result::CourseResult;
+use crate::models::course_status::CourseStatus;
 use crate::repos::class_repository::{ClassRepository, HaveClassRepository};
 use crate::repos::registration_course_repository::{
     HaveRegistrationCourseRepository, RegistrationCourseRepository,
@@ -24,6 +25,11 @@ pub trait ClassService {
         user_id: &str,
         course: &Course,
     ) -> Result<CourseResult>;
+    async fn get_user_courses_result_by_courses(
+        &self,
+        user_id: &str,
+        courses: &Vec<Course>,
+    ) -> Result<(Vec<CourseResult>, f64, i64)>;
 }
 
 pub trait HaveClassService {
@@ -117,6 +123,36 @@ pub trait ClassServiceImpl:
             class_scores,
         })
     }
+
+    async fn get_user_courses_result_by_courses(
+        &self,
+        user_id: &str,
+        courses: &Vec<Course>,
+    ) -> Result<(Vec<CourseResult>, f64, i64)> {
+        // 科目毎の成績計算処理
+        let mut course_results = Vec::with_capacity(courses.len());
+        let mut my_gpa = 0f64;
+        let mut my_credits = 0;
+
+        for course in courses {
+            let course_result = self
+                .get_user_course_result_by_course(&user_id, &course)
+                .await?;
+            let my_total_score = course_result.total_score;
+            course_results.push(course_result);
+
+            // 自分のGPA計算
+            if course.status == CourseStatus::Closed {
+                my_gpa += (my_total_score * course.credit as i64) as f64;
+                my_credits += course.credit as i64;
+            }
+        }
+        if my_credits > 0 {
+            my_gpa = my_gpa / 100.0 / my_credits as f64;
+        }
+
+        Ok((course_results, my_gpa, my_credits))
+    }
 }
 
 #[async_trait]
@@ -135,5 +171,13 @@ impl<S: ClassServiceImpl> ClassService for S {
         course: &Course,
     ) -> Result<CourseResult> {
         ClassServiceImpl::get_user_course_result_by_course(self, user_id, course).await
+    }
+
+    async fn get_user_courses_result_by_courses(
+        &self,
+        user_id: &str,
+        courses: &Vec<Course>,
+    ) -> Result<(Vec<CourseResult>, f64, i64)> {
+        ClassServiceImpl::get_user_courses_result_by_courses(self, user_id, courses).await
     }
 }

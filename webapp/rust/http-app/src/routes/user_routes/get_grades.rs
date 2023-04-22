@@ -1,5 +1,4 @@
 use actix_web::{web, HttpResponse};
-use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::services::class_service::{ClassService, HaveClassService};
 use isucholar_core::services::grade_summary_service::{
     GradeSummaryService, HaveGradeSummaryService,
@@ -25,29 +24,10 @@ pub async fn get_grades<
         .find_courses_by_user_id(&user_id)
         .await?;
 
-    // 科目毎の成績計算処理
-    let mut course_results = Vec::with_capacity(registered_courses.len());
-    let mut my_gpa = 0f64;
-    let mut my_credits = 0;
-
-    let class_service = service.class_service();
-
-    for course in registered_courses {
-        let course_result = class_service
-            .get_user_course_result_by_course(&user_id, &course)
-            .await?;
-        let my_total_score = course_result.total_score;
-        course_results.push(course_result);
-
-        // 自分のGPA計算
-        if course.status == CourseStatus::Closed {
-            my_gpa += (my_total_score * course.credit as i64) as f64;
-            my_credits += course.credit as i64;
-        }
-    }
-    if my_credits > 0 {
-        my_gpa = my_gpa / 100.0 / my_credits as f64;
-    }
+    let (course_results, my_gpa, my_credits) = service
+        .class_service()
+        .get_user_courses_result_by_courses(&user_id, &registered_courses)
+        .await?;
 
     let summary = service
         .grade_summary_service()
