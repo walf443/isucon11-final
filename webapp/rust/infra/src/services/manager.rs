@@ -1,5 +1,6 @@
 use crate::services::announcement_service::AnnouncementServiceInfra;
 use crate::services::class_service::ClassServiceInfra;
+use crate::services::grade_summary_service::GradeSummaryServiceInfra;
 use crate::services::registration_course_service::RegistrationCourseServiceInfra;
 use crate::services::unread_announcement_service::UnreadAnnouncementServiceInfra;
 use crate::services::user_service::UserServiceInfra;
@@ -8,6 +9,7 @@ use isucholar_core::db::DBPool;
 use isucholar_core::services::announcement_service::HaveAnnouncementService;
 use isucholar_core::services::class_service::HaveClassService;
 use isucholar_core::services::course_service::HaveCourseService;
+use isucholar_core::services::grade_summary_service::HaveGradeSummaryService;
 use isucholar_core::services::manager::ServiceManager;
 use isucholar_core::services::registration_course_service::HaveRegistrationCourseService;
 use isucholar_core::services::unread_announcement_service::HaveUnreadAnnouncementService;
@@ -22,6 +24,7 @@ pub struct ServiceManagerImpl {
     course_service: CourseServiceInfra,
     class_service: ClassServiceInfra,
     registration_course_service: RegistrationCourseServiceInfra,
+    grade_summary_service: GradeSummaryServiceInfra,
 }
 
 impl ServiceManager for ServiceManagerImpl {}
@@ -36,6 +39,7 @@ impl ServiceManagerImpl {
             course_service: CourseServiceInfra::new(pool.clone()),
             class_service: ClassServiceInfra::new(pool.clone()),
             registration_course_service: RegistrationCourseServiceInfra::new(pool.clone()),
+            grade_summary_service: GradeSummaryServiceInfra::new(pool.clone()),
         }
     }
 }
@@ -83,5 +87,13 @@ impl HaveRegistrationCourseService for ServiceManagerImpl {
 
     fn registration_course_service(&self) -> &Self::Service {
         &self.registration_course_service
+    }
+}
+
+impl HaveGradeSummaryService for ServiceManagerImpl {
+    type Service = GradeSummaryServiceInfra;
+
+    fn grade_summary_service(&self) -> &Self::Service {
+        &self.grade_summary_service
     }
 }
