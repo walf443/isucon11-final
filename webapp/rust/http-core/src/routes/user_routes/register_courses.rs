@@ -1,11 +1,11 @@
+use crate::requests::register_course_request::RegisterCourseRequestContent;
+use crate::responses::error::ResponseResult;
+use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
 use isucholar_core::services::error::Error;
 use isucholar_core::services::registration_course_service::{
     HaveRegistrationCourseService, RegistrationCourseService,
 };
-use crate::requests::register_course_request::RegisterCourseRequestContent;
-use crate::responses::error::ResponseResult;
-use crate::routes::util::get_user_info;
 
 // PUT /api/users/me/courses 履修登録
 pub async fn register_courses<Service: HaveRegistrationCourseService>(

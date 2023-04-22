@@ -1,3 +1,6 @@
+use crate::responses::error::ResponseResult;
+use crate::responses::get_grade_response::GetGradeResponse;
+use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
 use isucholar_core::services::class_service::{ClassService, HaveClassService};
 use isucholar_core::services::grade_summary_service::{
@@ -6,9 +9,6 @@ use isucholar_core::services::grade_summary_service::{
 use isucholar_core::services::registration_course_service::{
     HaveRegistrationCourseService, RegistrationCourseService,
 };
-use crate::responses::error::ResponseResult;
-use crate::responses::get_grade_response::GetGradeResponse;
-use crate::routes::util::get_user_info;
 
 // GET /api/users/me/grades 成績取得
 pub async fn get_grades<
