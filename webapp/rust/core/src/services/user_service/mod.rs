@@ -4,6 +4,7 @@ use crate::services::error::Result;
 use crate::services::HaveDBPool;
 use async_trait::async_trait;
 
+#[cfg_attr(any(test, feature = "test"), mockall::automock)]
 #[async_trait]
 pub trait UserService: Sync {
     async fn find_by_code(&self, code: &str) -> Result<Option<User>>;
