@@ -13,6 +13,7 @@ use async_trait::async_trait;
 #[async_trait]
 pub trait RegistrationCourseService {
     async fn find_courses_by_user_id(&self, user_id: &str) -> Result<Vec<Course>>;
+    async fn create(&self, user_id: &str, course_ids: &Vec<String>) -> Result<()>;
 }
 
 pub trait HaveRegistrationCourseService {
@@ -115,5 +116,9 @@ pub trait RegistrationCourseServiceImpl:
 impl<S: RegistrationCourseServiceImpl> RegistrationCourseService for S {
     async fn find_courses_by_user_id(&self, user_id: &str) -> Result<Vec<Course>> {
         RegistrationCourseServiceImpl::find_courses_by_user_id(self, user_id).await
+    }
+
+    async fn create(&self, user_id: &str, course_ids: &Vec<String>) -> Result<()> {
+        RegistrationCourseServiceImpl::create(self, user_id, course_ids).await
     }
 }

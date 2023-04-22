@@ -1,5 +1,6 @@
 use crate::repos::error::ReposError;
 use bcrypt::BcryptError;
+use serde::Serialize;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -24,7 +25,7 @@ pub enum Error {
 
 pub type Result<T> = std::result::Result<T, Error>;
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Serialize)]
 pub struct RegistrationCourseValidationError {
     pub course_not_found: Vec<String>,
     pub not_registrable_status: Vec<String>,
