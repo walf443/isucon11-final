@@ -133,5 +133,3 @@ impl<S: UnreadAnnouncementServiceImpl> UnreadAnnouncementService for S {
             .await
     }
 }
-
-pub struct UnreadAnnouncementManager {}
