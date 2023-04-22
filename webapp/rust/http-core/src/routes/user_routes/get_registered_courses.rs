@@ -30,3 +30,82 @@ pub async fn get_registered_courses<Service: HaveCourseService>(
 
     Ok(HttpResponse::Ok().json(res))
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::routes::user_routes::get_registered_courses::get_registered_courses;
+    use actix_session::UserSession;
+    use actix_web::body::to_bytes;
+    use actix_web::http::StatusCode;
+    use actix_web::test::TestRequest;
+    use actix_web::web;
+    use isucholar_core::services::course_service::{HaveCourseService, MockCourseService};
+    use isucholar_core::services::error::Error::TestError;
+    use std::str::from_utf8;
+
+    struct S {
+        course_service: MockCourseService,
+    }
+
+    impl S {
+        fn new() -> Self {
+            Self {
+                course_service: MockCourseService::new(),
+            }
+        }
+    }
+
+    impl HaveCourseService for S {
+        type Service = MockCourseService;
+
+        fn course_service(&self) -> &Self::Service {
+            &self.course_service
+        }
+    }
+
+    #[actix_web::test]
+    #[should_panic(expected = "TestError")]
+    async fn test_error_case() {
+        let mut service = S::new();
+
+        service
+            .course_service
+            .expect_find_open_courses_by_user_id()
+            .withf(|uid| uid == "1")
+            .returning(|_| Err(TestError));
+
+        let req = TestRequest::with_uri("/users/me/courses").to_http_request();
+        let session = req.get_session();
+        let _ = session.insert("userID", "1");
+        let _ = session.insert("userName", "1");
+        let _ = session.insert("isAdmin", false);
+
+        get_registered_courses(web::Data::new(service), session)
+            .await
+            .unwrap();
+    }
+
+    #[actix_web::test]
+    async fn test_empty_case() {
+        let mut service = S::new();
+
+        service
+            .course_service
+            .expect_find_open_courses_by_user_id()
+            .withf(|uid| uid == "1")
+            .returning(|_| Ok(Vec::new()));
+
+        let req = TestRequest::with_uri("/users/me/courses").to_http_request();
+        let session = req.get_session();
+        let _ = session.insert("userID", "1");
+        let _ = session.insert("userName", "1");
+        let _ = session.insert("isAdmin", false);
+
+        let result = get_registered_courses(web::Data::new(service), session)
+            .await
+            .unwrap();
+        assert_eq!(result.status(), StatusCode::OK);
+        let body = to_bytes(result.into_body()).await.unwrap();
+        assert_eq!(from_utf8(&body).unwrap(), "[]");
+    }
+}
