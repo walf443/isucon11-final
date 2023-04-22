@@ -10,6 +10,7 @@ use crate::services::error::{Error, RegistrationCourseValidationError, Result};
 use crate::services::HaveDBPool;
 use async_trait::async_trait;
 
+#[cfg_attr(any(test, feature = "test"), mockall::automock)]
 #[async_trait]
 pub trait RegistrationCourseService {
     async fn find_courses_by_user_id(&self, user_id: &str) -> Result<Vec<Course>>;

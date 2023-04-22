@@ -12,6 +12,7 @@ use crate::services::HaveDBPool;
 use crate::util;
 use async_trait::async_trait;
 
+#[cfg_attr(any(test, feature = "test"), mockall::automock)]
 #[async_trait]
 pub trait ClassService {
     async fn get_user_scores_by_course_id(

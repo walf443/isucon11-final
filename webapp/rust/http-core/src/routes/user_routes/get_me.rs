@@ -39,33 +39,13 @@ mod tests {
     use actix_web::test::TestRequest;
     use actix_web::web;
     use isucholar_core::services::error::Error::TestError;
-    use isucholar_core::services::user_service::{HaveUserService, MockUserService};
     use std::str::from_utf8;
-
-    struct S {
-        user_service: MockUserService,
-    }
-
-    impl S {
-        fn new() -> Self {
-            Self {
-                user_service: MockUserService::new(),
-            }
-        }
-    }
-
-    impl HaveUserService for S {
-        type Service = MockUserService;
-
-        fn user_service(&self) -> &Self::Service {
-            &self.user_service
-        }
-    }
+    use isucholar_core::services::manager::tests::MockServiceManager;
 
     #[actix_web::test]
     #[should_panic(expected = "UserNotFound")]
     async fn test_none_case() {
-        let mut service = S::new();
+        let mut service = MockServiceManager::new();
 
         service
             .user_service
@@ -85,7 +65,7 @@ mod tests {
     #[actix_web::test]
     #[should_panic(expected = "TestError")]
     async fn test_error_case() {
-        let mut service = S::new();
+        let mut service = MockServiceManager::new();
 
         service
             .user_service
@@ -104,7 +84,7 @@ mod tests {
 
     #[actix_web::test]
     async fn test_success_case() {
-        let mut service = S::new();
+        let mut service = MockServiceManager::new();
 
         service
             .user_service

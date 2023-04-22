@@ -5,6 +5,7 @@ use crate::services::HaveDBPool;
 use crate::util;
 use async_trait::async_trait;
 
+#[cfg_attr(any(test, feature = "test"), mockall::automock)]
 #[async_trait]
 pub trait GradeSummaryService {
     async fn get_summary_by_user_gpa(&self, user_gpa: f64, user_credit: i64) -> Result<Summary>;
