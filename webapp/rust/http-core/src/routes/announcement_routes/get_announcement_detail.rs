@@ -45,29 +45,16 @@ mod tests {
     use actix_web::FromRequest;
     use isucholar_core::models::announcement_detail::AnnouncementDetail;
     use isucholar_core::services::error::Error::{AnnouncementNotFound, TestError};
-    use isucholar_core::services::unread_announcement_service::{
-        MockHaveUnreadAnnouncementService, MockUnreadAnnouncementService,
-    };
     use std::str::from_utf8;
-
-    fn wrap_manager(service: MockUnreadAnnouncementService) -> MockHaveUnreadAnnouncementService {
-        let mut manager = MockHaveUnreadAnnouncementService::new();
-        manager
-            .expect_unread_announcement_service()
-            .return_const(service);
-
-        manager
-    }
+    use isucholar_core::services::manager::tests::MockServiceManager;
 
     #[actix_web::test]
     #[should_panic(expected = "AnnouncementNotFound")]
     async fn test_not_found_case() {
-        let mut service = MockUnreadAnnouncementService::new();
-        service
+        let mut service = MockServiceManager::new();
+        service.unread_announcement_service
             .expect_find_detail_and_mark_read()
             .returning(|_, _| Err(AnnouncementNotFound));
-
-        let manager = wrap_manager(service);
 
         let req = TestRequest::with_uri("/announcements/1")
             .param("announcement_id", "1".to_owned())
@@ -78,7 +65,7 @@ mod tests {
         let _ = session.insert("userName", "1");
         let _ = session.insert("isAdmin", false);
 
-        get_announcement_detail(Data::new(manager), session, announcement_id)
+        get_announcement_detail(Data::new(service), session, announcement_id)
             .await
             .unwrap();
     }
@@ -86,12 +73,10 @@ mod tests {
     #[actix_web::test]
     #[should_panic(expected = "ServiceError(TestError)")]
     async fn test_err_but_not_not_found_error() {
-        let mut service = MockUnreadAnnouncementService::new();
-        service
+        let mut service = MockServiceManager::new();
+        service.unread_announcement_service
             .expect_find_detail_and_mark_read()
             .returning(|_, _| Err(TestError));
-
-        let manager = wrap_manager(service);
 
         let req = TestRequest::with_uri("/announcements/1")
             .param("announcement_id", "1".to_owned())
@@ -102,7 +87,7 @@ mod tests {
         let _ = session.insert("userName", "1");
         let _ = session.insert("isAdmin", false);
 
-        get_announcement_detail(Data::new(manager), session, announcement_id)
+        get_announcement_detail(Data::new(service), session, announcement_id)
             .await
             .unwrap();
     }
@@ -119,8 +104,8 @@ mod tests {
 
     #[actix_web::test]
     async fn success() {
-        let mut service = MockUnreadAnnouncementService::new();
-        service
+        let mut service = MockServiceManager::new();
+        service.unread_announcement_service
             .expect_find_detail_and_mark_read()
             .returning(|_, _| {
                 Ok(AnnouncementDetail {
@@ -133,8 +118,6 @@ mod tests {
                 })
             });
 
-        let manager = wrap_manager(service);
-
         let req = TestRequest::with_uri("/announcements/1")
             .param("announcement_id", "1".to_owned())
             .to_http_request();
@@ -144,7 +127,7 @@ mod tests {
         let _ = session.insert("userName", "1");
         let _ = session.insert("isAdmin", false);
 
-        let result = get_announcement_detail(Data::new(manager), session, announcement_id)
+        let result = get_announcement_detail(Data::new(service), session, announcement_id)
             .await
             .unwrap();
 
