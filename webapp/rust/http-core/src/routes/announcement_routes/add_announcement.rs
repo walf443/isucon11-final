@@ -56,7 +56,10 @@ mod tests {
     #[should_panic(expected = "CourseNotFound")]
     async fn test_course_not_found_case() {
         let mut service = MockServiceManager::new();
-        service.announcement_service.expect_create().returning(|_| Err(CourseNotFound));
+        service
+            .announcement_service
+            .expect_create()
+            .returning(|_| Err(CourseNotFound));
 
         let _req = TestRequest::with_uri("/announcements").to_http_request();
 
@@ -77,7 +80,8 @@ mod tests {
     #[should_panic(expected = "AnnouncementConflict")]
     async fn test_conflict_case() {
         let mut service = MockServiceManager::new();
-        service.announcement_service
+        service
+            .announcement_service
             .expect_create()
             .returning(|_| Err(AnnouncementDuplicate));
 
@@ -100,7 +104,10 @@ mod tests {
     #[should_panic(expected = "ServiceError(TestError)")]
     async fn test_error() {
         let mut service = MockServiceManager::new();
-        service.announcement_service.expect_create().returning(|_| Err(TestError));
+        service
+            .announcement_service
+            .expect_create()
+            .returning(|_| Err(TestError));
 
         let _req = TestRequest::with_uri("/announcements").to_http_request();
 
@@ -120,7 +127,10 @@ mod tests {
     #[actix_web::test]
     async fn success_case() {
         let mut service = MockServiceManager::new();
-        service.announcement_service.expect_create().returning(|_| Ok(()));
+        service
+            .announcement_service
+            .expect_create()
+            .returning(|_| Ok(()));
 
         let _req = TestRequest::with_uri("/announcements").to_http_request();
 

@@ -40,8 +40,8 @@ mod tests {
     use actix_web::test::TestRequest;
     use actix_web::web;
     use isucholar_core::services::error::Error::TestError;
-    use std::str::from_utf8;
     use isucholar_core::services::manager::tests::MockServiceManager;
+    use std::str::from_utf8;
 
     #[actix_web::test]
     #[should_panic(expected = "TestError")]
