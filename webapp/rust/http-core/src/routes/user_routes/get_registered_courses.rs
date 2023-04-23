@@ -39,34 +39,14 @@ mod tests {
     use actix_web::http::StatusCode;
     use actix_web::test::TestRequest;
     use actix_web::web;
-    use isucholar_core::services::course_service::{HaveCourseService, MockCourseService};
     use isucholar_core::services::error::Error::TestError;
     use std::str::from_utf8;
-
-    struct S {
-        course_service: MockCourseService,
-    }
-
-    impl S {
-        fn new() -> Self {
-            Self {
-                course_service: MockCourseService::new(),
-            }
-        }
-    }
-
-    impl HaveCourseService for S {
-        type Service = MockCourseService;
-
-        fn course_service(&self) -> &Self::Service {
-            &self.course_service
-        }
-    }
+    use isucholar_core::services::manager::tests::MockServiceManager;
 
     #[actix_web::test]
     #[should_panic(expected = "TestError")]
     async fn test_error_case() {
-        let mut service = S::new();
+        let mut service = MockServiceManager::new();
 
         service
             .course_service
@@ -87,7 +67,7 @@ mod tests {
 
     #[actix_web::test]
     async fn test_empty_case() {
-        let mut service = S::new();
+        let mut service = MockServiceManager::new();
 
         service
             .course_service
