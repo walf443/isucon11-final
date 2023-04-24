@@ -17,13 +17,13 @@ pub struct AnnouncementRepositoryInfra {}
 #[async_trait]
 impl AnnouncementRepository for AnnouncementRepositoryInfra {
     async fn create(&self, tx: &mut DBConn, req: &Announcement) -> Result<()> {
-        let result = sqlx::query(
+        let result = sqlx::query!(
             "INSERT INTO `announcements` (`id`, `course_id`, `title`, `message`) VALUES (?, ?, ?, ?)",
+            &req.id,
+            &req.course_id,
+            &req.title,
+            &req.message,
         )
-            .bind(&req.id)
-            .bind(&req.course_id)
-            .bind(&req.title)
-            .bind(&req.message)
             .execute(tx)
             .await;
 
@@ -44,11 +44,13 @@ impl AnnouncementRepository for AnnouncementRepositoryInfra {
     }
 
     async fn find_by_id(&self, conn: &mut DBConn, id: &str) -> Result<Announcement> {
-        let announcement: Announcement =
-            sqlx::query_as("SELECT * FROM `announcements` WHERE `id` = ?")
-                .bind(id)
-                .fetch_one(conn)
-                .await?;
+        let announcement = sqlx::query_as!(
+            Announcement,
+            "SELECT * FROM `announcements` WHERE `id` = ?",
+            id
+        )
+        .fetch_one(conn)
+        .await?;
 
         Ok(announcement)
     }
