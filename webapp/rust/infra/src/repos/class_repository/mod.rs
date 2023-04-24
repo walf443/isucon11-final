@@ -11,6 +11,8 @@ use isucholar_core::MYSQL_ERR_NUM_DUPLICATE_ENTRY;
 mod create;
 #[cfg(test)]
 mod for_update_by_id;
+#[cfg(test)]
+mod update_submission_closed_by_id;
 
 #[derive(Clone)]
 pub struct ClassRepositoryInfra {}
