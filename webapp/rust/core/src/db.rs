@@ -1,6 +1,7 @@
-use sqlx::{Executor, MySql, MySqlPool, Transaction};
+use sqlx::{Executor, MySql, MySqlConnection, MySqlPool, Transaction};
 
 pub type DBPool = MySqlPool;
+pub type DBConn = MySqlConnection;
 pub type TxConn<'c> = Transaction<'c, MySql>;
 
 pub async fn get_db_conn() -> Result<DBPool, sqlx::Error> {

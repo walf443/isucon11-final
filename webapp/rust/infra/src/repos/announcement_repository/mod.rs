@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use isucholar_core::db::{DBPool, TxConn};
+use isucholar_core::db::{DBConn, TxConn};
 use isucholar_core::models::announcement::Announcement;
 use isucholar_core::repos::announcement_repository::AnnouncementRepository;
 use isucholar_core::repos::error::ReposError::AnnouncementDuplicate;
@@ -41,11 +41,11 @@ impl AnnouncementRepository for AnnouncementRepositoryInfra {
         Ok(())
     }
 
-    async fn find_by_id(&self, pool: &DBPool, id: &str) -> Result<Announcement> {
+    async fn find_by_id(&self, conn: &mut DBConn, id: &str) -> Result<Announcement> {
         let announcement: Announcement =
             sqlx::query_as("SELECT * FROM `announcements` WHERE `id` = ?")
                 .bind(id)
-                .fetch_one(pool)
+                .fetch_one(conn)
                 .await?;
 
         Ok(announcement)

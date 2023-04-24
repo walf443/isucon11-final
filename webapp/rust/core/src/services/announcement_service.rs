@@ -36,6 +36,8 @@ pub trait AnnouncementServiceImpl:
 {
     async fn create(&self, announcement: &Announcement) -> Result<()> {
         let pool = self.get_db_pool();
+        let mut conn = pool.acquire().await?;
+
         let mut tx = self.transaction_repo().begin(&pool).await?;
 
         let is_exist = self
@@ -59,7 +61,7 @@ pub trait AnnouncementServiceImpl:
                     ReposError::AnnouncementDuplicate => {
                         let an = self
                             .announcement_repo()
-                            .find_by_id(&pool, &announcement.id)
+                            .find_by_id(&mut conn, &announcement.id)
                             .await?;
                         if announcement.course_id != an.course_id
                             || announcement.title != an.title
