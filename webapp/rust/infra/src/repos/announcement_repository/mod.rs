@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use isucholar_core::db::{DBConn, TxConn};
+use isucholar_core::db::DBConn;
 use isucholar_core::models::announcement::Announcement;
 use isucholar_core::repos::announcement_repository::AnnouncementRepository;
 use isucholar_core::repos::error::ReposError::AnnouncementDuplicate;
@@ -14,7 +14,7 @@ pub struct AnnouncementRepositoryInfra {}
 
 #[async_trait]
 impl AnnouncementRepository for AnnouncementRepositoryInfra {
-    async fn create_in_tx<'c>(&self, tx: &mut TxConn<'c>, req: &Announcement) -> Result<()> {
+    async fn create(&self, tx: &mut DBConn, req: &Announcement) -> Result<()> {
         let result = sqlx::query(
             "INSERT INTO `announcements` (`id`, `course_id`, `title`, `message`) VALUES (?, ?, ?, ?)",
         )

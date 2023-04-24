@@ -50,7 +50,7 @@ pub trait AnnouncementServiceImpl:
 
         let result = self
             .announcement_repo()
-            .create_in_tx(&mut tx, &announcement)
+            .create(&mut tx, &announcement)
             .await;
 
         match result {

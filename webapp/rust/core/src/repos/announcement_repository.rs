@@ -1,15 +1,11 @@
-use crate::db::{DBConn, TxConn};
+use crate::db::DBConn;
 use crate::models::announcement::Announcement;
 use crate::repos::error::Result;
 use async_trait::async_trait;
 
 #[async_trait]
 pub trait AnnouncementRepository {
-    async fn create_in_tx<'c>(
-        &self,
-        tx: &mut TxConn<'c>,
-        announcement: &Announcement,
-    ) -> Result<()>;
+    async fn create(&self, conn: &mut DBConn, announcement: &Announcement) -> Result<()>;
     async fn find_by_id(&self, conn: &mut DBConn, id: &str) -> Result<Announcement>;
 }
 
