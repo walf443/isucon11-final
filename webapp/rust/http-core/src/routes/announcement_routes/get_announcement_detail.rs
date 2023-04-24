@@ -45,14 +45,15 @@ mod tests {
     use actix_web::FromRequest;
     use isucholar_core::models::announcement_detail::AnnouncementDetail;
     use isucholar_core::services::error::Error::{AnnouncementNotFound, TestError};
-    use std::str::from_utf8;
     use isucholar_core::services::manager::tests::MockServiceManager;
+    use std::str::from_utf8;
 
     #[actix_web::test]
     #[should_panic(expected = "AnnouncementNotFound")]
     async fn test_not_found_case() {
         let mut service = MockServiceManager::new();
-        service.unread_announcement_service
+        service
+            .unread_announcement_service
             .expect_find_detail_and_mark_read()
             .returning(|_, _| Err(AnnouncementNotFound));
 
@@ -74,7 +75,8 @@ mod tests {
     #[should_panic(expected = "ServiceError(TestError)")]
     async fn test_err_but_not_not_found_error() {
         let mut service = MockServiceManager::new();
-        service.unread_announcement_service
+        service
+            .unread_announcement_service
             .expect_find_detail_and_mark_read()
             .returning(|_, _| Err(TestError));
 
@@ -105,7 +107,8 @@ mod tests {
     #[actix_web::test]
     async fn success() {
         let mut service = MockServiceManager::new();
-        service.unread_announcement_service
+        service
+            .unread_announcement_service
             .expect_find_detail_and_mark_read()
             .returning(|_, _| {
                 Ok(AnnouncementDetail {

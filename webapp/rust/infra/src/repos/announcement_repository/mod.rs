@@ -6,6 +6,9 @@ use isucholar_core::repos::error::ReposError::AnnouncementDuplicate;
 use isucholar_core::repos::error::Result;
 use isucholar_core::MYSQL_ERR_NUM_DUPLICATE_ENTRY;
 
+#[cfg(test)]
+mod find_by_id;
+
 #[derive(Clone)]
 pub struct AnnouncementRepositoryInfra {}
 
