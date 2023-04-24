@@ -18,19 +18,21 @@ async fn success() {
 
     let mut tx = db_pool.begin().await.unwrap();
 
-    sqlx::query("SET foreign_key_checks=0")
+    sqlx::query!("SET foreign_key_checks=0")
         .execute(&mut tx)
         .await
         .unwrap();
 
-    sqlx::query("INSERT INTO announcements (id, course_id, title, message) VALUES (?,?,?,?)")
-        .bind("1")
-        .bind("course_id")
-        .bind("title")
-        .bind("message")
-        .execute(&mut tx)
-        .await
-        .unwrap();
+    sqlx::query!(
+        "INSERT INTO announcements (id, course_id, title, message) VALUES (?,?,?,?)",
+        "1",
+        "course_id",
+        "title",
+        "message",
+    )
+    .execute(&mut tx)
+    .await
+    .unwrap();
 
     let repo = AnnouncementRepositoryInfra {};
     let result = repo.find_by_id(&mut tx, "1").await.unwrap();

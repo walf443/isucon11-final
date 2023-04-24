@@ -8,7 +8,7 @@ async fn success_case() {
     let db_pool = get_test_db_conn().await.unwrap();
     let mut tx = db_pool.begin().await.unwrap();
 
-    sqlx::query("SET foreign_key_checks=0")
+    sqlx::query!("SET foreign_key_checks=0")
         .execute(&mut tx)
         .await
         .unwrap();
@@ -31,7 +31,7 @@ async fn duplicate_case() {
     let db_pool = get_test_db_conn().await.unwrap();
     let mut tx = db_pool.begin().await.unwrap();
 
-    sqlx::query("SET foreign_key_checks=0")
+    sqlx::query!("SET foreign_key_checks=0")
         .execute(&mut tx)
         .await
         .unwrap();
