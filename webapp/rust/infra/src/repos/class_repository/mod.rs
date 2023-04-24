@@ -98,12 +98,24 @@ impl ClassRepository for ClassRepositoryInfra {
         course_id: &str,
         part: &u8,
     ) -> Result<Class> {
-        let class: Class =
-            sqlx::query_as("SELECT * FROM `classes` WHERE `course_id` = ? AND `part` = ?")
-                .bind(course_id)
-                .bind(part)
-                .fetch_one(pool)
-                .await?;
+        let class = sqlx::query_as!(
+            Class,
+            r"
+                SELECT
+                  id,
+                  course_id,
+                  part,
+                  title,
+                  description,
+                  submission_closed AS `submission_closed:bool`
+                FROM `classes`
+                WHERE `course_id` = ? AND `part` = ?
+            ",
+            course_id,
+            part
+        )
+        .fetch_one(pool)
+        .await?;
 
         Ok(class)
     }
