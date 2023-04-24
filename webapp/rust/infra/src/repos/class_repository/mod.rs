@@ -75,7 +75,7 @@ impl ClassRepository for ClassRepositoryInfra {
         Ok(())
     }
 
-    async fn find_submission_closed_by_id<'c>(
+    async fn find_submission_closed_by_id_with_shared_lock<'c>(
         &self,
         tx: &mut TxConn<'c>,
         id: &str,

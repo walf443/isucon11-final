@@ -21,7 +21,7 @@ pub async fn register_scores(
     let mut tx = pool.begin().await?;
     let class_repo = ClassRepositoryInfra {};
     let submission_closed = class_repo
-        .find_submission_closed_by_id(&mut tx, class_id)
+        .find_submission_closed_by_id_with_shared_lock(&mut tx, class_id)
         .await?;
 
     if let Some(submission_closed) = submission_closed {

@@ -9,7 +9,7 @@ pub trait ClassRepository {
     async fn create(&self, conn: &mut DBConn, class: &CreateClass) -> Result<()>;
     async fn update_submission_closed_by_id<'c>(&self, tx: &mut TxConn<'c>, id: &str)
         -> Result<()>;
-    async fn find_submission_closed_by_id<'c>(
+    async fn find_submission_closed_by_id_with_shared_lock<'c>(
         &self,
         tx: &mut TxConn<'c>,
         id: &str,
