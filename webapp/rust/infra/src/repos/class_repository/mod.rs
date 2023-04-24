@@ -17,7 +17,10 @@ pub struct ClassRepositoryInfra {}
 impl ClassRepository for ClassRepositoryInfra {
     async fn for_update_by_id<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<bool> {
         let class_count: i64 = db::fetch_one_scalar(
-            sqlx::query_scalar!("SELECT COUNT(*) FROM `classes` WHERE `id` = ? FOR UPDATE", id),
+            sqlx::query_scalar!(
+                "SELECT COUNT(*) FROM `classes` WHERE `id` = ? FOR UPDATE",
+                id
+            ),
             tx,
         )
         .await?;
