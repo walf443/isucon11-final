@@ -18,7 +18,7 @@ pub async fn download_submitted_assignments(
 
     let mut tx = pool.begin().await?;
     let class_repo = ClassRepositoryInfra {};
-    let is_exist = class_repo.for_update_by_id_in_tx(&mut tx, class_id).await?;
+    let is_exist = class_repo.for_update_by_id(&mut tx, class_id).await?;
 
     if !is_exist {
         return Err(ClassNotFound);
@@ -32,7 +32,7 @@ pub async fn download_submitted_assignments(
     create_submissions_zip(&zip_file_path, class_id, &submissions).await?;
 
     class_repo
-        .update_submission_closed_by_id_in_tx(&mut tx, &class_id)
+        .update_submission_closed_by_id(&mut tx, &class_id)
         .await?;
 
     tx.commit().await?;

@@ -55,7 +55,7 @@ pub async fn add_class(
         title: req.title.clone(),
         description: req.description.clone(),
     };
-    let result = class_repo.create_in_tx(&mut tx, &form).await;
+    let result = class_repo.create(&mut tx, &form).await;
     match result {
         Ok(_) => {
             tx.commit().await?;

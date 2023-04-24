@@ -37,7 +37,7 @@ pub async fn get_classes(
     }
 
     let classes = class_repo
-        .find_all_with_submitteed_by_user_id_and_course_id_in_tx(&mut tx, &user_id, course_id)
+        .find_all_with_submitted_by_user_id_and_course_id(&mut tx, &user_id, course_id)
         .await?;
 
     tx.commit().await?;

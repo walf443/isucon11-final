@@ -56,7 +56,7 @@ pub async fn submit_assignment(
 
     let class_repo = ClassRepositoryInfra {};
     let submission_closed = class_repo
-        .find_submission_closed_by_id_in_tx(&mut tx, course_id)
+        .find_submission_closed_by_id(&mut tx, course_id)
         .await?;
 
     if let Some(submission_closed) = submission_closed {

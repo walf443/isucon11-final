@@ -12,7 +12,7 @@ pub struct ClassRepositoryInfra {}
 
 #[async_trait]
 impl ClassRepository for ClassRepositoryInfra {
-    async fn for_update_by_id_in_tx<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<bool> {
+    async fn for_update_by_id<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<bool> {
         let class_count: i64 = db::fetch_one_scalar(
             sqlx::query_scalar("SELECT COUNT(*) FROM `classes` WHERE `id` = ? FOR UPDATE").bind(id),
             tx,
@@ -22,7 +22,7 @@ impl ClassRepository for ClassRepositoryInfra {
         Ok(class_count == 1)
     }
 
-    async fn create_in_tx<'c>(&self, tx: &mut TxConn<'c>, class: &CreateClass) -> Result<()> {
+    async fn create<'c>(&self, tx: &mut TxConn<'c>, class: &CreateClass) -> Result<()> {
         let result = sqlx::query("INSERT INTO `classes` (`id`, `course_id`, `part`, `title`, `description`) VALUES (?, ?, ?, ?, ?)")
             .bind(&class.id)
             .bind(&class.course_id)
@@ -49,7 +49,7 @@ impl ClassRepository for ClassRepositoryInfra {
         Ok(())
     }
 
-    async fn update_submission_closed_by_id_in_tx<'c>(
+    async fn update_submission_closed_by_id<'c>(
         &self,
         tx: &mut TxConn<'c>,
         id: &str,
@@ -62,7 +62,7 @@ impl ClassRepository for ClassRepositoryInfra {
         Ok(())
     }
 
-    async fn find_submission_closed_by_id_in_tx<'c>(
+    async fn find_submission_closed_by_id<'c>(
         &self,
         tx: &mut TxConn<'c>,
         id: &str,
@@ -109,7 +109,7 @@ impl ClassRepository for ClassRepositoryInfra {
         Ok(classes)
     }
 
-    async fn find_all_with_submitteed_by_user_id_and_course_id_in_tx<'c>(
+    async fn find_all_with_submitted_by_user_id_and_course_id<'c>(
         &self,
         tx: &mut TxConn<'c>,
         user_id: &str,
