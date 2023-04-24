@@ -7,6 +7,9 @@ use isucholar_core::repos::error::ReposError::ClassDuplicate;
 use isucholar_core::repos::error::Result;
 use isucholar_core::MYSQL_ERR_NUM_DUPLICATE_ENTRY;
 
+#[cfg(test)]
+mod for_update_by_id;
+
 #[derive(Clone)]
 pub struct ClassRepositoryInfra {}
 
