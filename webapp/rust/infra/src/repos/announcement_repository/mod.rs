@@ -7,6 +7,8 @@ use isucholar_core::repos::error::Result;
 use isucholar_core::MYSQL_ERR_NUM_DUPLICATE_ENTRY;
 
 #[cfg(test)]
+mod create;
+#[cfg(test)]
 mod find_by_id;
 
 #[derive(Clone)]
