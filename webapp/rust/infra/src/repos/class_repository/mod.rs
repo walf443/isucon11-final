@@ -121,13 +121,22 @@ impl ClassRepository for ClassRepositoryInfra {
     }
 
     async fn find_all_by_course_id(&self, pool: &DBPool, course_id: &str) -> Result<Vec<Class>> {
-        let classes: Vec<Class> = sqlx::query_as(concat!(
-            "SELECT *",
-            " FROM `classes`",
-            " WHERE `course_id` = ?",
-            " ORDER BY `part` DESC",
-        ))
-        .bind(course_id)
+        let classes: Vec<Class> = sqlx::query_as!(
+            Class,
+            r"
+            SELECT
+              id,
+              course_id,
+              part,
+              title,
+              description,
+              submission_closed AS `submission_closed:bool`
+            FROM `classes`
+            WHERE `course_id` = ?
+            ORDER BY `part` DESC
+        ",
+            course_id
+        )
         .fetch_all(pool)
         .await?;
 
