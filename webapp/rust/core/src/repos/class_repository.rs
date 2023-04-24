@@ -1,4 +1,4 @@
-use crate::db::{DBPool, TxConn};
+use crate::db::{DBConn, DBPool, TxConn};
 use crate::models::class::{Class, ClassWithSubmitted, CreateClass};
 use crate::repos::error::Result;
 use async_trait::async_trait;
@@ -6,7 +6,7 @@ use async_trait::async_trait;
 #[async_trait]
 pub trait ClassRepository {
     async fn for_update_by_id<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<bool>;
-    async fn create<'c>(&self, tx: &mut TxConn<'c>, class: &CreateClass) -> Result<()>;
+    async fn create(&self, conn: &mut DBConn, class: &CreateClass) -> Result<()>;
     async fn update_submission_closed_by_id<'c>(&self, tx: &mut TxConn<'c>, id: &str)
         -> Result<()>;
     async fn find_submission_closed_by_id<'c>(

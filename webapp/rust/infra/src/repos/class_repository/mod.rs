@@ -1,6 +1,6 @@
 use crate::db;
 use async_trait::async_trait;
-use isucholar_core::db::{DBPool, TxConn};
+use isucholar_core::db::{DBConn, DBPool, TxConn};
 use isucholar_core::models::class::{Class, ClassWithSubmitted, CreateClass};
 use isucholar_core::repos::class_repository::ClassRepository;
 use isucholar_core::repos::error::ReposError::ClassDuplicate;
@@ -30,7 +30,7 @@ impl ClassRepository for ClassRepositoryInfra {
         Ok(class_count == 1)
     }
 
-    async fn create<'c>(&self, tx: &mut TxConn<'c>, class: &CreateClass) -> Result<()> {
+    async fn create(&self, conn: &mut DBConn, class: &CreateClass) -> Result<()> {
         let result = sqlx::query!("INSERT INTO `classes` (`id`, `course_id`, `part`, `title`, `description`) VALUES (?, ?, ?, ?, ?)",
             &class.id,
             &class.course_id,
@@ -38,7 +38,7 @@ impl ClassRepository for ClassRepositoryInfra {
             &class.title,
             &class.description
         )
-            .execute(tx)
+            .execute(conn)
             .await;
 
         if let Err(e) = result {
