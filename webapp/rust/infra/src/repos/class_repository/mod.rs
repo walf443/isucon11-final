@@ -81,10 +81,10 @@ impl ClassRepository for ClassRepositoryInfra {
         id: &str,
     ) -> Result<Option<bool>> {
         let submission_closed: Option<bool> = db::fetch_optional_scalar(
-            sqlx::query_scalar(
-                "SELECT `submission_closed` FROM `classes` WHERE `id` = ? FOR SHARE",
-            )
-            .bind(id),
+            sqlx::query_scalar!(
+                "SELECT `submission_closed` AS `s:bool` FROM `classes` WHERE `id` = ? FOR SHARE",
+                id
+            ),
             tx,
         )
         .await?;
