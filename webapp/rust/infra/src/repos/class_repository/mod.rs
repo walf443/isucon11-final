@@ -8,6 +8,8 @@ use isucholar_core::repos::error::Result;
 use isucholar_core::MYSQL_ERR_NUM_DUPLICATE_ENTRY;
 
 #[cfg(test)]
+mod create;
+#[cfg(test)]
 mod for_update_by_id;
 
 #[derive(Clone)]
@@ -29,12 +31,13 @@ impl ClassRepository for ClassRepositoryInfra {
     }
 
     async fn create<'c>(&self, tx: &mut TxConn<'c>, class: &CreateClass) -> Result<()> {
-        let result = sqlx::query("INSERT INTO `classes` (`id`, `course_id`, `part`, `title`, `description`) VALUES (?, ?, ?, ?, ?)")
-            .bind(&class.id)
-            .bind(&class.course_id)
-            .bind(&class.part)
-            .bind(&class.title)
-            .bind(&class.description)
+        let result = sqlx::query!("INSERT INTO `classes` (`id`, `course_id`, `part`, `title`, `description`) VALUES (?, ?, ?, ?, ?)",
+            &class.id,
+            &class.course_id,
+            &class.part,
+            &class.title,
+            &class.description
+        )
             .execute(tx)
             .await;
 
