@@ -65,10 +65,12 @@ impl ClassRepository for ClassRepositoryInfra {
         tx: &mut TxConn<'c>,
         id: &str,
     ) -> Result<()> {
-        sqlx::query("UPDATE `classes` SET `submission_closed` = true WHERE `id` = ?")
-            .bind(id)
-            .execute(tx)
-            .await?;
+        sqlx::query!(
+            "UPDATE `classes` SET `submission_closed` = true WHERE `id` = ?",
+            id
+        )
+        .execute(tx)
+        .await?;
 
         Ok(())
     }
