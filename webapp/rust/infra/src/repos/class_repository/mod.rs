@@ -149,15 +149,24 @@ impl ClassRepository for ClassRepositoryInfra {
         user_id: &str,
         course_id: &str,
     ) -> Result<Vec<ClassWithSubmitted>> {
-        let classes: Vec<ClassWithSubmitted> = sqlx::query_as(concat!(
-        "SELECT `classes`.*, `submissions`.`user_id` IS NOT NULL AS `submitted`",
-        " FROM `classes`",
-        " LEFT JOIN `submissions` ON `classes`.`id` = `submissions`.`class_id` AND `submissions`.`user_id` = ?",
-        " WHERE `classes`.`course_id` = ?",
-        " ORDER BY `classes`.`part`",
-        ))
-            .bind(user_id)
-            .bind(course_id)
+        let classes: Vec<ClassWithSubmitted> = sqlx::query_as!(ClassWithSubmitted,
+            r"
+                SELECT
+                  `classes`.id,
+                  `classes`.course_id,
+                  `classes`.part,
+                  `classes`.title,
+                  `classes`.description,
+                  `classes`.submission_closed AS `submission_closed:bool`,
+                  `submissions`.`user_id` IS NOT NULL AS `submitted:bool`
+                FROM `classes`
+                LEFT JOIN `submissions` ON `classes`.`id` = `submissions`.`class_id` AND `submissions`.`user_id` = ?
+                WHERE `classes`.`course_id` = ?
+                ORDER BY `classes`.`part`
+            ",
+            user_id,
+            course_id,
+        )
             .fetch_all(tx)
             .await?;
 
