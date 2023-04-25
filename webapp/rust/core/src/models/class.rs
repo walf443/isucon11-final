@@ -1,4 +1,4 @@
-#[derive(Debug, sqlx::FromRow)]
+#[derive(Debug, sqlx::FromRow, PartialEq, Eq)]
 pub struct Class {
     pub id: String,
     pub course_id: String,
