@@ -12,6 +12,8 @@ mod create;
 #[cfg(test)]
 mod find_all_by_course_id;
 #[cfg(test)]
+mod find_all_with_submitted_by_user_id_and_course_id;
+#[cfg(test)]
 mod find_by_course_id_and_part;
 #[cfg(test)]
 mod find_submission_closed_by_id_with_shared_lock;
