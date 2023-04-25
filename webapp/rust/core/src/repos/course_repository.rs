@@ -1,4 +1,4 @@
-use crate::db::{DBPool, TxConn};
+use crate::db::{DBConn, DBPool, TxConn};
 use crate::models::course::{Course, CourseWithTeacher, CreateCourse};
 use crate::models::course_status::CourseStatus;
 use crate::models::day_of_week::DayOfWeek;
@@ -46,7 +46,7 @@ pub trait CourseRepository {
         id: &str,
         status: &CourseStatus,
     ) -> Result<()>;
-    async fn find_by_code(&self, pool: &DBPool, code: &str) -> Result<Course>;
+    async fn find_by_code(&self, conn: &mut DBConn, code: &str) -> Result<Course>;
     async fn find_with_teacher_by_id(
         &self,
         pool: &DBPool,

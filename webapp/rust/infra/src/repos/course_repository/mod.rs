@@ -1,6 +1,6 @@
 use crate::db;
 use async_trait::async_trait;
-use isucholar_core::db::{DBPool, TxConn};
+use isucholar_core::db::{DBConn, DBPool, TxConn};
 use isucholar_core::models::course::{Course, CourseWithTeacher, CreateCourse};
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::repos::course_repository::{CourseRepository, SearchCoursesQuery};
@@ -35,7 +35,8 @@ impl CourseRepository for CourseRepositoryInfra {
                 db_error.try_downcast_ref::<sqlx::mysql::MySqlDatabaseError>()
             {
                 if mysql_error.number() == MYSQL_ERR_NUM_DUPLICATE_ENTRY {
-                    let course = self.find_by_code(&pool, &req.code).await?;
+                    let mut conn = pool.acquire().await?;
+                    let course = self.find_by_code(&mut conn, &req.code).await?;
 
                     if req.type_ != course.type_
                         || req.name != course.name
@@ -206,10 +207,10 @@ impl CourseRepository for CourseRepositoryInfra {
         Ok(())
     }
 
-    async fn find_by_code(&self, pool: &DBPool, code: &str) -> Result<Course> {
+    async fn find_by_code(&self, conn: &mut DBConn, code: &str) -> Result<Course> {
         let course: Course = sqlx::query_as("SELECT * FROM `courses` WHERE `code` = ?")
             .bind(code)
-            .fetch_one(pool)
+            .fetch_one(conn)
             .await?;
 
         Ok(course)
