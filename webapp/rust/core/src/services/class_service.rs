@@ -53,10 +53,11 @@ pub trait ClassServiceImpl:
         course_id: &str,
     ) -> Result<Vec<ClassScore>> {
         let pool = self.get_db_pool();
+        let mut conn = pool.acquire().await?;
 
         let classes = self
             .class_repo()
-            .find_all_by_course_id(&pool, &course_id)
+            .find_all_by_course_id(&mut conn, &course_id)
             .await?;
         let mut class_scores = Vec::with_capacity(classes.len());
 

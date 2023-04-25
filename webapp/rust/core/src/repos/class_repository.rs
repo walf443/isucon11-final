@@ -1,4 +1,4 @@
-use crate::db::{DBConn, DBPool, TxConn};
+use crate::db::{DBConn, TxConn};
 use crate::models::class::{Class, ClassWithSubmitted, CreateClass};
 use crate::repos::error::Result;
 use async_trait::async_trait;
@@ -20,7 +20,8 @@ pub trait ClassRepository {
         course_id: &str,
         part: &u8,
     ) -> Result<Class>;
-    async fn find_all_by_course_id(&self, pool: &DBPool, course_id: &str) -> Result<Vec<Class>>;
+    async fn find_all_by_course_id(&self, conn: &mut DBConn, course_id: &str)
+        -> Result<Vec<Class>>;
     async fn find_all_with_submitted_by_user_id_and_course_id<'c>(
         &self,
         tx: &mut TxConn<'c>,

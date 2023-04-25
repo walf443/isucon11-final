@@ -1,6 +1,6 @@
 use crate::db;
 use async_trait::async_trait;
-use isucholar_core::db::{DBConn, DBPool, TxConn};
+use isucholar_core::db::{DBConn, TxConn};
 use isucholar_core::models::class::{Class, ClassWithSubmitted, CreateClass};
 use isucholar_core::repos::class_repository::ClassRepository;
 use isucholar_core::repos::error::ReposError::ClassDuplicate;
@@ -124,7 +124,11 @@ impl ClassRepository for ClassRepositoryInfra {
         Ok(class)
     }
 
-    async fn find_all_by_course_id(&self, pool: &DBPool, course_id: &str) -> Result<Vec<Class>> {
+    async fn find_all_by_course_id(
+        &self,
+        conn: &mut DBConn,
+        course_id: &str,
+    ) -> Result<Vec<Class>> {
         let classes: Vec<Class> = sqlx::query_as!(
             Class,
             r"
@@ -141,7 +145,7 @@ impl ClassRepository for ClassRepositoryInfra {
         ",
             course_id
         )
-        .fetch_all(pool)
+        .fetch_all(conn)
         .await?;
 
         Ok(classes)
