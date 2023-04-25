@@ -96,7 +96,7 @@ impl ClassRepository for ClassRepositoryInfra {
 
     async fn find_by_course_id_and_part(
         &self,
-        pool: &DBPool,
+        conn: &mut DBConn,
         course_id: &str,
         part: &u8,
     ) -> Result<Class> {
@@ -116,7 +116,7 @@ impl ClassRepository for ClassRepositoryInfra {
             course_id,
             part
         )
-        .fetch_one(pool)
+        .fetch_one(conn)
         .await?;
 
         Ok(class)

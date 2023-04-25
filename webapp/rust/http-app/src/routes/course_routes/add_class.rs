@@ -64,8 +64,9 @@ pub async fn add_class(
             let _ = tx.rollback().await;
             match e {
                 ReposError::CourseDuplicate => {
+                    let mut conn = pool.acquire().await?;
                     let class = class_repo
-                        .find_by_course_id_and_part(&pool, course_id, &req.part)
+                        .find_by_course_id_and_part(&mut conn, course_id, &req.part)
                         .await?;
                     if req.title != class.title || req.description != class.description {
                         return Err(CourseConflict);
