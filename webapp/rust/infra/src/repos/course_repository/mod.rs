@@ -14,17 +14,19 @@ pub struct CourseRepositoryInfra {}
 #[async_trait]
 impl CourseRepository for CourseRepositoryInfra {
     async fn create(&self, pool: &DBPool, req: &CreateCourse) -> Result<String> {
-        let result = sqlx::query("INSERT INTO `courses` (`id`, `code`, `type`, `name`, `description`, `credit`, `period`, `day_of_week`, `teacher_id`, `keywords`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
-            .bind(&req.id)
-            .bind(&req.code)
-            .bind(&req.type_)
-            .bind(&req.name)
-            .bind(&req.description)
-            .bind(&req.credit)
-            .bind(&req.period)
-            .bind(&req.day_of_week)
-            .bind(&req.user_id)
-            .bind(&req.keywords)
+        let result = sqlx::query!(
+            "INSERT INTO `courses` (`id`, `code`, `type`, `name`, `description`, `credit`, `period`, `day_of_week`, `teacher_id`, `keywords`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            &req.id,
+            &req.code,
+            &req.type_,
+            &req.name,
+            &req.description,
+            &req.credit,
+            &req.period,
+            &req.day_of_week,
+            &req.user_id,
+            &req.keywords,
+        )
             .execute(pool)
             .await;
 
