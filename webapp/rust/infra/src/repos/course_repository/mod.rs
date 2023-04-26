@@ -3,6 +3,8 @@ use async_trait::async_trait;
 use isucholar_core::db::{DBConn, DBPool, TxConn};
 use isucholar_core::models::course::{Course, CourseWithTeacher, CreateCourse};
 use isucholar_core::models::course_status::CourseStatus;
+use isucholar_core::models::course_type::CourseType;
+use isucholar_core::models::day_of_week::DayOfWeek;
 use isucholar_core::repos::course_repository::{CourseRepository, SearchCoursesQuery};
 use isucholar_core::repos::error::{ReposError, Result};
 use isucholar_core::MYSQL_ERR_NUM_DUPLICATE_ENTRY;
@@ -208,10 +210,27 @@ impl CourseRepository for CourseRepositoryInfra {
     }
 
     async fn find_by_code(&self, conn: &mut DBConn, code: &str) -> Result<Course> {
-        let course: Course = sqlx::query_as("SELECT * FROM `courses` WHERE `code` = ?")
-            .bind(code)
-            .fetch_one(conn)
-            .await?;
+        let course = sqlx::query_as!(
+            Course,
+            r"
+                SELECT
+                   id,
+                   code,
+                   type as `type_:CourseType`,
+                   name,
+                   description,
+                   credit,
+                   period,
+                   day_of_week as `day_of_week:DayOfWeek`,
+                   teacher_id,
+                   keywords,
+                   status as `status:CourseStatus`
+                FROM `courses`
+                WHERE `code` = ?",
+            code
+        )
+        .fetch_one(conn)
+        .await?;
 
         Ok(course)
     }
