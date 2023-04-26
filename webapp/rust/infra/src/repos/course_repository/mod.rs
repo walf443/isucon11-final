@@ -240,13 +240,28 @@ impl CourseRepository for CourseRepositoryInfra {
         conn: &mut DBConn,
         id: &str,
     ) -> Result<Option<CourseWithTeacher>> {
-        let res: Option<CourseWithTeacher> = sqlx::query_as(concat!(
-            "SELECT `courses`.*, `users`.`name` AS `teacher`",
-            " FROM `courses`",
-            " JOIN `users` ON `courses`.`teacher_id` = `users`.`id`",
-            " WHERE `courses`.`id` = ?",
-        ))
-        .bind(id)
+        let res: Option<CourseWithTeacher> = sqlx::query_as!(
+            CourseWithTeacher,
+            r"
+                SELECT
+                   courses.id,
+                   courses.code,
+                   courses.type as `type_`,
+                   courses.name,
+                   description,
+                   credit,
+                   period,
+                   day_of_week as `day_of_week:DayOfWeek`,
+                   teacher_id,
+                   keywords,
+                   status as `status:CourseStatus`,
+                    `users`.`name` AS `teacher`
+                FROM `courses`
+                JOIN `users` ON `courses`.`teacher_id` = `users`.`id`
+                WHERE `courses`.`id` = ?
+            ",
+            id
+        )
         .fetch_optional(conn)
         .await?;
 
