@@ -28,19 +28,19 @@ pub trait CourseRepository {
         offset: i64,
         query: &SearchCoursesQuery,
     ) -> Result<Vec<CourseWithTeacher>>;
-    async fn find_status_for_share_lock_by_id_in_tx<'c>(
+    async fn find_status_for_share_lock_by_id<'c>(
         &self,
         tx: &mut TxConn<'c>,
         id: &str,
     ) -> Result<Option<CourseStatus>>;
-    async fn find_for_share_lock_by_id_in_tx<'c>(
+    async fn find_for_share_lock_by_id<'c>(
         &self,
         tx: &mut TxConn<'c>,
         id: &str,
     ) -> Result<Option<Course>>;
-    async fn exist_by_id_in_tx<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<bool>;
-    async fn for_update_by_id_in_tx<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<bool>;
-    async fn update_status_by_id_in_tx<'c>(
+    async fn exist_by_id<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<bool>;
+    async fn for_update_by_id<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<bool>;
+    async fn update_status_by_id<'c>(
         &self,
         tx: &mut TxConn<'c>,
         id: &str,

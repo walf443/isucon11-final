@@ -42,7 +42,7 @@ pub trait AnnouncementServiceImpl:
 
         let is_exist = self
             .course_repo()
-            .exist_by_id_in_tx(&mut tx, &announcement.course_id)
+            .exist_by_id(&mut tx, &announcement.course_id)
             .await?;
         if !is_exist {
             return Err(CourseNotFound);

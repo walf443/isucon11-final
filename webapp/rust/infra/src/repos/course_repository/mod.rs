@@ -149,7 +149,7 @@ impl CourseRepository for CourseRepositoryInfra {
         Ok(courses)
     }
 
-    async fn find_status_for_share_lock_by_id_in_tx<'c>(
+    async fn find_status_for_share_lock_by_id<'c>(
         &self,
         tx: &mut TxConn<'c>,
         id: &str,
@@ -163,7 +163,7 @@ impl CourseRepository for CourseRepositoryInfra {
         Ok(status)
     }
 
-    async fn find_for_share_lock_by_id_in_tx<'c>(
+    async fn find_for_share_lock_by_id<'c>(
         &self,
         tx: &mut TxConn<'c>,
         id: &str,
@@ -177,7 +177,7 @@ impl CourseRepository for CourseRepositoryInfra {
         Ok(course)
     }
 
-    async fn exist_by_id_in_tx<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<bool> {
+    async fn exist_by_id<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<bool> {
         let count: i64 = db::fetch_one_scalar(
             sqlx::query_scalar("SELECT COUNT(*) FROM `courses` WHERE `id` = ?").bind(id),
             tx,
@@ -187,7 +187,7 @@ impl CourseRepository for CourseRepositoryInfra {
         Ok(count == 1)
     }
 
-    async fn for_update_by_id_in_tx<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<bool> {
+    async fn for_update_by_id<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<bool> {
         let count: i64 = db::fetch_one_scalar(
             sqlx::query_scalar("SELECT COUNT(*) FROM `courses` WHERE `id` = ? FOR UPDATE").bind(id),
             tx,
@@ -197,7 +197,7 @@ impl CourseRepository for CourseRepositoryInfra {
         Ok(count == 1)
     }
 
-    async fn update_status_by_id_in_tx<'c>(
+    async fn update_status_by_id<'c>(
         &self,
         tx: &mut TxConn<'c>,
         id: &str,

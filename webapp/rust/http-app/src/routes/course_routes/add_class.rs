@@ -36,7 +36,7 @@ pub async fn add_class(
 
     let course_repo = CourseRepositoryInfra {};
     let course = course_repo
-        .find_for_share_lock_by_id_in_tx(&mut tx, course_id)
+        .find_for_share_lock_by_id(&mut tx, course_id)
         .await?;
     if course.is_none() {
         return Err(CourseNotFound);

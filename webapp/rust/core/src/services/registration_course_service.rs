@@ -54,7 +54,7 @@ pub trait RegistrationCourseServiceImpl:
         let mut newly_added = Vec::new();
         for course_id in course_ids {
             let course = course_repo
-                .find_for_share_lock_by_id_in_tx(&mut tx, &course_id)
+                .find_for_share_lock_by_id(&mut tx, &course_id)
                 .await?;
             if course.is_none() {
                 errors.course_not_found.push(course_id.clone());

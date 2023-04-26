@@ -30,7 +30,7 @@ pub async fn get_classes(
     let mut tx = pool.begin().await?;
     let course_repo = CourseRepositoryInfra {};
     let class_repo = ClassRepositoryInfra {};
-    let is_exist = course_repo.exist_by_id_in_tx(&mut tx, course_id).await?;
+    let is_exist = course_repo.exist_by_id(&mut tx, course_id).await?;
 
     if !is_exist {
         return Err(CourseNotFound);

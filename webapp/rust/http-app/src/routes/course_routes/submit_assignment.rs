@@ -35,7 +35,7 @@ pub async fn submit_assignment(
     let mut tx = pool.begin().await?;
     let course_repo = CourseRepositoryInfra {};
     let status = course_repo
-        .find_status_for_share_lock_by_id_in_tx(&mut tx, course_id)
+        .find_status_for_share_lock_by_id(&mut tx, course_id)
         .await?;
     if let Some(status) = status {
         if status != CourseStatus::InProgress {
