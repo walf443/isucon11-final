@@ -237,7 +237,7 @@ impl CourseRepository for CourseRepositoryInfra {
 
     async fn find_with_teacher_by_id(
         &self,
-        pool: &DBPool,
+        conn: &mut DBConn,
         id: &str,
     ) -> Result<Option<CourseWithTeacher>> {
         let res: Option<CourseWithTeacher> = sqlx::query_as(concat!(
@@ -247,7 +247,7 @@ impl CourseRepository for CourseRepositoryInfra {
             " WHERE `courses`.`id` = ?",
         ))
         .bind(id)
-        .fetch_optional(pool)
+        .fetch_optional(conn)
         .await?;
 
         Ok(res)

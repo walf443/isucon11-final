@@ -12,8 +12,9 @@ pub async fn get_course_detail(
     let course_id = &course_id.0;
 
     let course_repo = CourseRepositoryInfra {};
+    let mut conn = pool.acquire().await?;
     let course_with_teacher = course_repo
-        .find_with_teacher_by_id(&pool, course_id)
+        .find_with_teacher_by_id(&mut conn, course_id)
         .await?;
 
     if let Some(c) = course_with_teacher {

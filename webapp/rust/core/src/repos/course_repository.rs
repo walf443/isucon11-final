@@ -49,7 +49,7 @@ pub trait CourseRepository {
     async fn find_by_code(&self, conn: &mut DBConn, code: &str) -> Result<Course>;
     async fn find_with_teacher_by_id(
         &self,
-        pool: &DBPool,
+        conn: &mut DBConn,
         id: &str,
     ) -> Result<Option<CourseWithTeacher>>;
 }
