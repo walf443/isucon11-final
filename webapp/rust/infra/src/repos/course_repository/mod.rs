@@ -203,9 +203,7 @@ impl CourseRepository for CourseRepositoryInfra {
         id: &str,
         status: &CourseStatus,
     ) -> Result<()> {
-        sqlx::query("UPDATE `courses` SET `status` = ? WHERE `id` = ?")
-            .bind(status)
-            .bind(id)
+        sqlx::query!("UPDATE `courses` SET `status` = ? WHERE `id` = ?", status, id)
             .execute(tx)
             .await?;
 
