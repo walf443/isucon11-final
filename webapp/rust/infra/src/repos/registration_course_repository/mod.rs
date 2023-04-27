@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 use futures::StreamExt;
-use isucholar_core::db::{DBPool, TxConn};
+use isucholar_core::db::{DBConn, DBPool, TxConn};
 use isucholar_core::models::course::Course;
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::repos::error::Result;
@@ -12,7 +12,11 @@ pub struct RegistrationCourseRepositoryInfra {}
 
 #[async_trait]
 impl RegistrationCourseRepository for RegistrationCourseRepositoryInfra {
-    async fn find_courses_by_user_id(&self, pool: &DBPool, user_id: &str) -> Result<Vec<Course>> {
+    async fn find_courses_by_user_id(
+        &self,
+        conn: &mut DBConn,
+        user_id: &str,
+    ) -> Result<Vec<Course>> {
         let registered_courses: Vec<Course> = sqlx::query_as(concat!(
             "SELECT `courses`.*",
             " FROM `registrations`",
@@ -20,7 +24,7 @@ impl RegistrationCourseRepository for RegistrationCourseRepositoryInfra {
             " WHERE `user_id` = ?",
         ))
         .bind(&user_id)
-        .fetch_all(pool)
+        .fetch_all(conn)
         .await?;
 
         Ok(registered_courses)
