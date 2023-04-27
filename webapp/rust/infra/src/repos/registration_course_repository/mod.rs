@@ -7,6 +7,9 @@ use isucholar_core::repos::error::Result;
 use isucholar_core::repos::registration_course_repository::RegistrationCourseRepository;
 use num_traits::ToPrimitive;
 
+#[cfg(test)]
+mod find_courses_by_user_id;
+
 #[derive(Clone)]
 pub struct RegistrationCourseRepositoryInfra {}
 
