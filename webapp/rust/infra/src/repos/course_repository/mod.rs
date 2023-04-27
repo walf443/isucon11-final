@@ -163,7 +163,10 @@ impl CourseRepository for CourseRepositoryInfra {
         id: &str,
     ) -> Result<Option<CourseStatus>> {
         let status: Option<CourseStatus> = db::fetch_optional_scalar(
-            sqlx::query_scalar!("SELECT `status` AS `status:CourseStatus` FROM `courses` WHERE `id` = ? FOR SHARE", id),
+            sqlx::query_scalar!(
+                "SELECT `status` AS `status:CourseStatus` FROM `courses` WHERE `id` = ? FOR SHARE",
+                id
+            ),
             tx,
         )
         .await?;
