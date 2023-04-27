@@ -20,9 +20,7 @@ pub async fn set_course_status(
 
     let mut tx = pool.begin().await?;
     let course_repo = CourseRepositoryInfra {};
-    let is_exist = course_repo
-        .for_update_by_id(&mut tx, course_id)
-        .await?;
+    let is_exist = course_repo.for_update_by_id(&mut tx, course_id).await?;
     if !is_exist {
         return Err(CourseNotFound);
     }

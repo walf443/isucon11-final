@@ -179,7 +179,7 @@ impl CourseRepository for CourseRepositoryInfra {
 
     async fn exist_by_id<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<bool> {
         let count: i64 = db::fetch_one_scalar(
-            sqlx::query_scalar("SELECT COUNT(*) FROM `courses` WHERE `id` = ?").bind(id),
+            sqlx::query_scalar!("SELECT COUNT(*) FROM `courses` WHERE `id` = ?", id),
             tx,
         )
         .await?;
@@ -189,7 +189,10 @@ impl CourseRepository for CourseRepositoryInfra {
 
     async fn for_update_by_id<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<bool> {
         let count: i64 = db::fetch_one_scalar(
-            sqlx::query_scalar("SELECT COUNT(*) FROM `courses` WHERE `id` = ? FOR UPDATE").bind(id),
+            sqlx::query_scalar!(
+                "SELECT COUNT(*) FROM `courses` WHERE `id` = ? FOR UPDATE",
+                id
+            ),
             tx,
         )
         .await?;
@@ -203,9 +206,13 @@ impl CourseRepository for CourseRepositoryInfra {
         id: &str,
         status: &CourseStatus,
     ) -> Result<()> {
-        sqlx::query!("UPDATE `courses` SET `status` = ? WHERE `id` = ?", status, id)
-            .execute(tx)
-            .await?;
+        sqlx::query!(
+            "UPDATE `courses` SET `status` = ? WHERE `id` = ?",
+            status,
+            id
+        )
+        .execute(tx)
+        .await?;
 
         Ok(())
     }
