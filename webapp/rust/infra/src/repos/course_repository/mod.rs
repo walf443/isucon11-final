@@ -14,6 +14,8 @@ use sqlx::Arguments;
 mod exist_by_id;
 #[cfg(test)]
 mod find_by_code;
+#[cfg(test)]
+mod for_update_by_id;
 
 #[derive(Clone)]
 pub struct CourseRepositoryInfra {}
