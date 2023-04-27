@@ -1,10 +1,10 @@
+use crate::repos::course_repository::CourseRepositoryInfra;
 use isucholar_core::db::get_test_db_conn;
 use isucholar_core::models::course::Course;
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::models::course_type::CourseType;
 use isucholar_core::models::day_of_week::DayOfWeek;
 use isucholar_core::repos::course_repository::CourseRepository;
-use crate::repos::course_repository::CourseRepositoryInfra;
 
 #[tokio::test]
 async fn success_case() {
@@ -44,8 +44,16 @@ async fn success_case() {
     ).execute(&mut tx).await.unwrap();
 
     let repo = CourseRepositoryInfra {};
-    repo.update_status_by_id(&mut tx, &course.id, &CourseStatus::Closed).await.unwrap();
-    let status = sqlx::query_scalar!("SELECT status AS `status:CourseStatus` FROM courses WHERE id = ?", &course.id).fetch_one(&mut tx).await.unwrap();
+    repo.update_status_by_id(&mut tx, &course.id, &CourseStatus::Closed)
+        .await
+        .unwrap();
+    let status = sqlx::query_scalar!(
+        "SELECT status AS `status:CourseStatus` FROM courses WHERE id = ?",
+        &course.id
+    )
+    .fetch_one(&mut tx)
+    .await
+    .unwrap();
     assert_eq!(status, CourseStatus::Closed)
 }
 
@@ -55,6 +63,8 @@ async fn empty_case() {
     let mut tx = db_pool.begin().await.unwrap();
 
     let repo = CourseRepositoryInfra {};
-    let result = repo.update_status_by_id(&mut tx, "none_exist_course_id", &CourseStatus::Closed).await;
+    let result = repo
+        .update_status_by_id(&mut tx, "none_exist_course_id", &CourseStatus::Closed)
+        .await;
     assert_eq!(result.is_ok(), true);
 }

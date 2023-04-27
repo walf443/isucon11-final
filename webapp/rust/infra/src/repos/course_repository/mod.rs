@@ -15,6 +15,8 @@ mod exist_by_id;
 #[cfg(test)]
 mod find_by_code;
 #[cfg(test)]
+mod find_with_teacher_by_id;
+#[cfg(test)]
 mod for_update_by_id;
 #[cfg(test)]
 mod update_status_by_id;
