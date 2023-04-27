@@ -16,6 +16,8 @@ mod exist_by_id;
 mod find_by_code;
 #[cfg(test)]
 mod for_update_by_id;
+#[cfg(test)]
+mod update_status_by_id;
 
 #[derive(Clone)]
 pub struct CourseRepositoryInfra {}
