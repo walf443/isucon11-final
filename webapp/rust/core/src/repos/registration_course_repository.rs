@@ -10,7 +10,7 @@ pub trait RegistrationCourseRepository {
         conn: &mut DBConn,
         user_id: &str,
     ) -> Result<Vec<Course>>;
-    async fn find_open_courses_by_user_id_in_tx(
+    async fn find_open_courses_by_user_id(
         &self,
         tx: &mut TxConn,
         user_id: &str,

@@ -33,7 +33,7 @@ impl RegistrationCourseRepository for RegistrationCourseRepositoryInfra {
         Ok(registered_courses)
     }
 
-    async fn find_open_courses_by_user_id_in_tx(
+    async fn find_open_courses_by_user_id(
         &self,
         tx: &mut TxConn,
         user_id: &str,

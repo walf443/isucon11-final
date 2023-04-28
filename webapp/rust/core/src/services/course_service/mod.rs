@@ -34,7 +34,7 @@ pub trait CourseServiceImpl:
 
         let courses = self
             .registration_course_repo()
-            .find_open_courses_by_user_id_in_tx(&mut tx, &user_id)
+            .find_open_courses_by_user_id(&mut tx, &user_id)
             .await?;
 
         let mut results: Vec<(Course, User)> = Vec::with_capacity(courses.len());

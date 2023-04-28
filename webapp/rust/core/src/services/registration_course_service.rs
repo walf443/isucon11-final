@@ -80,7 +80,7 @@ pub trait RegistrationCourseServiceImpl:
         }
 
         let already_registered = registration_course_repo
-            .find_open_courses_by_user_id_in_tx(&mut tx, &user_id)
+            .find_open_courses_by_user_id(&mut tx, &user_id)
             .await?;
 
         for course1 in &newly_added {
