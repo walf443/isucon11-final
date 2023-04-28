@@ -3,6 +3,8 @@ use futures::StreamExt;
 use isucholar_core::db::{DBConn, DBPool, TxConn};
 use isucholar_core::models::course::Course;
 use isucholar_core::models::course_status::CourseStatus;
+use isucholar_core::models::course_type::CourseType;
+use isucholar_core::models::day_of_week::DayOfWeek;
 use isucholar_core::repos::error::Result;
 use isucholar_core::repos::registration_course_repository::RegistrationCourseRepository;
 use num_traits::ToPrimitive;
@@ -20,13 +22,27 @@ impl RegistrationCourseRepository for RegistrationCourseRepositoryInfra {
         conn: &mut DBConn,
         user_id: &str,
     ) -> Result<Vec<Course>> {
-        let registered_courses: Vec<Course> = sqlx::query_as(concat!(
-            "SELECT `courses`.*",
-            " FROM `registrations`",
-            " JOIN `courses` ON `registrations`.`course_id` = `courses`.`id`",
-            " WHERE `user_id` = ?",
-        ))
-        .bind(&user_id)
+        let registered_courses: Vec<Course> = sqlx::query_as!(
+            Course,
+            r"
+                SELECT
+                    courses.id,
+                    courses.code,
+                    courses.type as `type_:CourseType`,
+                    courses.name,
+                    courses.description,
+                    courses.credit,
+                    courses.period,
+                    courses.day_of_week as `day_of_week:DayOfWeek`,
+                    courses.teacher_id,
+                    courses.keywords,
+                    courses.status as `status:CourseStatus`
+                FROM `registrations`
+                JOIN `courses` ON `registrations`.`course_id` = `courses`.`id`
+                WHERE `user_id` = ?
+            ",
+            &user_id
+        )
         .fetch_all(conn)
         .await?;
 
