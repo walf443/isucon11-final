@@ -11,6 +11,8 @@ use num_traits::ToPrimitive;
 
 #[cfg(test)]
 mod find_courses_by_user_id;
+#[cfg(test)]
+mod find_open_courses_by_user_id;
 
 #[derive(Clone)]
 pub struct RegistrationCourseRepositoryInfra {}
