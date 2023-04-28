@@ -54,14 +54,28 @@ impl RegistrationCourseRepository for RegistrationCourseRepositoryInfra {
         tx: &mut TxConn,
         user_id: &str,
     ) -> Result<Vec<Course>> {
-        let courses: Vec<Course> = sqlx::query_as(concat!(
-            "SELECT `courses`.*",
-            " FROM `courses`",
-            " JOIN `registrations` ON `courses`.`id` = `registrations`.`course_id`",
-            " WHERE `courses`.`status` != ? AND `registrations`.`user_id` = ?",
-        ))
-        .bind(CourseStatus::Closed)
-        .bind(user_id)
+        let courses: Vec<Course> = sqlx::query_as!(
+            Course,
+            r"
+                SELECT
+                    courses.id,
+                    courses.code,
+                    courses.type as `type_:CourseType`,
+                    courses.name,
+                    courses.description,
+                    courses.credit,
+                    courses.period,
+                    courses.day_of_week as `day_of_week:DayOfWeek`,
+                    courses.teacher_id,
+                    courses.keywords,
+                    courses.status as `status:CourseStatus`
+                FROM `courses`
+                JOIN `registrations` ON `courses`.`id` = `registrations`.`course_id`
+                WHERE `courses`.`status` != ? AND `registrations`.`user_id` = ?
+            ",
+            CourseStatus::Closed,
+            user_id
+        )
         .fetch_all(tx)
         .await?;
 
