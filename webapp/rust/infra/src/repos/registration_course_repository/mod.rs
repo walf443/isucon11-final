@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 use futures::StreamExt;
-use isucholar_core::db::{DBConn, DBPool, TxConn};
+use isucholar_core::db::{DBConn, TxConn};
 use isucholar_core::models::course::Course;
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::models::course_type::CourseType;
@@ -86,7 +86,7 @@ impl RegistrationCourseRepository for RegistrationCourseRepositoryInfra {
 
     async fn find_total_scores_by_course_id_group_by_user_id(
         &self,
-        pool: &DBPool,
+        conn: &mut DBConn,
         course_id: &str,
     ) -> Result<Vec<i64>> {
         let mut rows = sqlx::query_scalar(concat!(
@@ -100,7 +100,7 @@ impl RegistrationCourseRepository for RegistrationCourseRepositoryInfra {
         " GROUP BY `users`.`id`",
         ))
             .bind(course_id)
-            .fetch(pool);
+            .fetch(conn);
         let mut totals = Vec::new();
         while let Some(row) = rows.next().await {
             let total_score: sqlx::types::Decimal = row?;

@@ -1,4 +1,4 @@
-use crate::db::{DBConn, DBPool, TxConn};
+use crate::db::{DBConn, TxConn};
 use crate::models::course::Course;
 use crate::repos::error::Result;
 use async_trait::async_trait;
@@ -17,7 +17,7 @@ pub trait RegistrationCourseRepository {
     ) -> Result<Vec<Course>>;
     async fn find_total_scores_by_course_id_group_by_user_id(
         &self,
-        pool: &DBPool,
+        conn: &mut DBConn,
         course_id: &str,
     ) -> Result<Vec<i64>>;
 }

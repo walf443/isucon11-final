@@ -97,6 +97,7 @@ pub trait ClassServiceImpl:
         course: &Course,
     ) -> Result<CourseResult> {
         let pool = self.get_db_pool();
+        let mut conn = pool.acquire().await?;
 
         let class_scores = self
             .get_user_scores_by_course_id(&user_id, &course.id)
@@ -111,7 +112,7 @@ pub trait ClassServiceImpl:
 
         let totals = self
             .registration_course_repo()
-            .find_total_scores_by_course_id_group_by_user_id(&pool, &course.id)
+            .find_total_scores_by_course_id_group_by_user_id(&mut conn, &course.id)
             .await?;
 
         Ok(CourseResult {
