@@ -18,3 +18,4 @@ serde_json.workspace = true
 
 [dev-dependencies]
 isucholar-core = { path = "../core/", features = ["test"] }
+fake    = { version = "2.5" }
