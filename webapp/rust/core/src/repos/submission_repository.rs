@@ -5,11 +5,7 @@ use async_trait::async_trait;
 
 #[async_trait]
 pub trait SubmissionRepository {
-    async fn create_in_tx<'c>(
-        &self,
-        tx: &mut TxConn<'c>,
-        submission: &CreateSubmission,
-    ) -> Result<()>;
+    async fn create<'c>(&self, tx: &mut TxConn<'c>, submission: &CreateSubmission) -> Result<()>;
     async fn count_by_class_id(&self, pool: &DBPool, class_id: &str) -> Result<i64>;
     async fn update_score_by_user_code_and_class_id<'c>(
         &self,

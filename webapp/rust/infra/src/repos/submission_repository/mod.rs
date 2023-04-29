@@ -9,7 +9,7 @@ pub struct SubmissionRepositoryInfra {}
 
 #[async_trait]
 impl SubmissionRepository for SubmissionRepositoryInfra {
-    async fn create_in_tx<'c>(&self, tx: &mut TxConn, submission: &CreateSubmission) -> Result<()> {
+    async fn create<'c>(&self, tx: &mut TxConn, submission: &CreateSubmission) -> Result<()> {
         sqlx::query(
             "INSERT INTO `submissions` (`user_id`, `class_id`, `file_name`) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE `file_name` = VALUES(`file_name`)",
         )
