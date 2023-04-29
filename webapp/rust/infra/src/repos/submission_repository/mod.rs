@@ -90,7 +90,7 @@ impl SubmissionRepository for SubmissionRepositoryInfra {
         }
     }
 
-    async fn find_all_by_class_id_in_tx<'c>(
+    async fn find_all_by_class_id<'c>(
         &self,
         tx: &mut TxConn,
         class_id: &str,

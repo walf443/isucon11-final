@@ -24,7 +24,7 @@ pub trait SubmissionRepository {
         class_id: &str,
         user_id: &str,
     ) -> Result<Option<u8>>;
-    async fn find_all_by_class_id_in_tx<'c>(
+    async fn find_all_by_class_id<'c>(
         &self,
         tx: &mut TxConn,
         class_id: &str,
