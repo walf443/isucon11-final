@@ -39,5 +39,5 @@ async fn success() {
 
     let repo = AnnouncementRepositoryInfra {};
     let result = repo.find_by_id(&mut tx, &announcement.id).await.unwrap();
-    assert_eq!(result.id, announcement.id);
+    assert_eq!(result, announcement);
 }
