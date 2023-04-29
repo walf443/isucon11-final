@@ -18,7 +18,7 @@ pub trait RegistrationRepository {
         user_id: &str,
         course_id: &str,
     ) -> Result<bool>;
-    async fn find_users_by_course_id_in_tx<'c>(
+    async fn find_users_by_course_id<'c>(
         &self,
         tx: &mut TxConn<'c>,
         course_id: &str,

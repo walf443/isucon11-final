@@ -79,7 +79,7 @@ pub trait AnnouncementServiceImpl:
 
         let targets = self
             .registration_repo()
-            .find_users_by_course_id_in_tx(&mut tx, &announcement.course_id)
+            .find_users_by_course_id(&mut tx, &announcement.course_id)
             .await?;
 
         let repo = self.unread_announcement_repo();
