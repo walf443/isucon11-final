@@ -1,4 +1,6 @@
-#[derive(Debug, PartialEq, Eq)]
+use fake::Dummy;
+
+#[derive(Debug, PartialEq, Eq, Dummy)]
 pub enum UserType {
     Student,
     Teacher,

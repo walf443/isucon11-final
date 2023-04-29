@@ -1,8 +1,9 @@
 use crate::models::course_status::CourseStatus;
 use crate::models::course_type::CourseType;
 use crate::models::day_of_week::DayOfWeek;
+use fake::{Dummy, Fake};
 
-#[derive(Debug, sqlx::FromRow, PartialEq, Eq)]
+#[derive(Debug, sqlx::FromRow, PartialEq, Eq, Dummy)]
 pub struct Course {
     pub id: String,
     pub code: String,

@@ -1,4 +1,6 @@
-#[derive(Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+use fake::Dummy;
+
+#[derive(Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize, Dummy)]
 #[serde(rename_all = "kebab-case")]
 pub enum CourseStatus {
     Registration,

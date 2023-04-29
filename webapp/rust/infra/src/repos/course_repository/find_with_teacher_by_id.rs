@@ -1,11 +1,9 @@
 use crate::repos::course_repository::CourseRepositoryInfra;
+use fake::{Fake, Faker};
 use isucholar_core::db::get_test_db_conn;
 use isucholar_core::models::course::Course;
-use isucholar_core::models::course_status::CourseStatus;
-use isucholar_core::models::course_type::CourseType;
-use isucholar_core::models::day_of_week::DayOfWeek;
 use isucholar_core::models::user::User;
-use isucholar_core::models::user_type::UserType;
+use isucholar_core::models::user_type::UserType::Teacher;
 use isucholar_core::repos::course_repository::CourseRepository;
 
 #[tokio::test]
@@ -25,13 +23,9 @@ async fn empty_case() {
 async fn success_case() {
     let db_pool = get_test_db_conn().await.unwrap();
     let mut tx = db_pool.begin().await.unwrap();
-    let teacher = User {
-        id: "100".to_string(),
-        code: "code".to_string(),
-        name: "teacher".to_string(),
-        hashed_password: vec![],
-        type_: UserType::Teacher,
-    };
+    let mut teacher: User = Faker.fake();
+    teacher.type_ = Teacher;
+
     sqlx::query!(
         "INSERT INTO users (id, code, name, hashed_password, type) VALUES (?,?,?,?,?)",
         &teacher.id,
@@ -44,19 +38,8 @@ async fn success_case() {
     .await
     .unwrap();
 
-    let course = Course {
-        id: "100".to_string(),
-        code: "code".to_string(),
-        type_: CourseType::LiberalArts,
-        name: "name".to_string(),
-        description: "description".to_string(),
-        credit: 1,
-        period: 2,
-        day_of_week: DayOfWeek::Monday,
-        teacher_id: teacher.id,
-        keywords: "keywords".to_string(),
-        status: CourseStatus::Registration,
-    };
+    let mut course: Course = Faker.fake();
+    course.teacher_id = teacher.id.clone();
 
     sqlx::query!("INSERT INTO courses (id, code, type, name, description, credit, period, day_of_week, teacher_id, keywords, status) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
         &course.id,

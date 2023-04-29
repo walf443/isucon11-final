@@ -1,4 +1,6 @@
-#[derive(Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize, Clone)]
+use fake::Dummy;
+
+#[derive(Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize, Clone, Dummy)]
 #[serde(rename_all = "lowercase")]
 pub enum DayOfWeek {
     Monday,
