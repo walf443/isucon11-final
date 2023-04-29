@@ -70,7 +70,7 @@ pub trait RegistrationCourseServiceImpl:
 
             // すでに履修登録済みの科目は無視する
             let is_exist = registration_repo
-                .exist_by_user_id_and_course_id_in_tx(&mut tx, &user_id, &course.id)
+                .exist_by_user_id_and_course_id(&mut tx, &user_id, &course.id)
                 .await?;
             if is_exist {
                 continue;

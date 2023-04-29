@@ -48,7 +48,7 @@ async fn exist_by_user_id_and_course_id_in_tx_err() -> () {
 
     service
         .registration_repo
-        .expect_exist_by_user_id_and_course_id_in_tx()
+        .expect_exist_by_user_id_and_course_id()
         .returning(|_, _, _| Err(TestError));
 
     service.find_detail_and_mark_read("", "").await.unwrap();
@@ -74,7 +74,7 @@ async fn exist_by_user_id_and_course_id_in_tx_false() -> () {
 
     service
         .registration_repo
-        .expect_exist_by_user_id_and_course_id_in_tx()
+        .expect_exist_by_user_id_and_course_id()
         .returning(|_, _, _| Ok(false));
 
     service.find_detail_and_mark_read("", "").await.unwrap();
@@ -100,7 +100,7 @@ async fn mark_read_failed() -> () {
 
     service
         .registration_repo
-        .expect_exist_by_user_id_and_course_id_in_tx()
+        .expect_exist_by_user_id_and_course_id()
         .returning(|_, _, _| Ok(true));
 
     service
@@ -132,7 +132,7 @@ async fn success_case() -> Result<()> {
 
     service
         .registration_repo
-        .expect_exist_by_user_id_and_course_id_in_tx()
+        .expect_exist_by_user_id_and_course_id()
         .withf(|_, user_id, course_id| user_id == "user_id" && course_id == "course_id")
         .returning(|_, _, _| Ok(true));
 

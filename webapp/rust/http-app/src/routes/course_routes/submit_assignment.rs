@@ -48,7 +48,7 @@ pub async fn submit_assignment(
     let registration_repo = RegistrationRepositoryInfra {};
 
     let is_registered = registration_repo
-        .exist_by_user_id_and_course_id_in_tx(&mut tx, &user_id, &course_id)
+        .exist_by_user_id_and_course_id(&mut tx, &user_id, &course_id)
         .await?;
     if is_registered {
         return Err(RegistrationAlready);

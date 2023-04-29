@@ -25,7 +25,7 @@ impl RegistrationRepository for RegistrationRepositoryInfra {
         Ok(())
     }
 
-    async fn exist_by_user_id_and_course_id_in_tx<'c>(
+    async fn exist_by_user_id_and_course_id<'c>(
         &self,
         tx: &mut TxConn<'c>,
         user_id: &str,

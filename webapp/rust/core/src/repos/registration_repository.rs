@@ -12,7 +12,7 @@ pub trait RegistrationRepository {
         user_id: &str,
         course_id: &str,
     ) -> Result<()>;
-    async fn exist_by_user_id_and_course_id_in_tx<'c>(
+    async fn exist_by_user_id_and_course_id<'c>(
         &self,
         tx: &mut TxConn<'c>,
         user_id: &str,
