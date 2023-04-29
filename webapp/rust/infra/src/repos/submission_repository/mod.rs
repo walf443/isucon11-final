@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use isucholar_core::db::{DBConn, DBPool, TxConn};
+use isucholar_core::db::{DBConn, TxConn};
 use isucholar_core::models::submission::{CreateSubmission, Submission};
 use isucholar_core::repos::error::Result;
 use isucholar_core::repos::submission_repository::SubmissionRepository;
@@ -8,6 +8,8 @@ use isucholar_core::repos::submission_repository::SubmissionRepository;
 mod count_by_class_id;
 #[cfg(test)]
 mod create_or_update;
+#[cfg(test)]
+mod find_score_by_class_id_and_user_id;
 #[cfg(test)]
 mod update_score_by_user_code_and_class_id;
 
@@ -64,7 +66,7 @@ impl SubmissionRepository for SubmissionRepositoryInfra {
 
     async fn find_score_by_class_id_and_user_id(
         &self,
-        pool: &DBPool,
+        conn: &mut DBConn,
         class_id: &str,
         user_id: &str,
     ) -> Result<Option<Option<u8>>> {
@@ -74,7 +76,7 @@ impl SubmissionRepository for SubmissionRepositoryInfra {
         ))
         .bind(user_id)
         .bind(class_id)
-        .fetch_optional(pool)
+        .fetch_optional(conn)
         .await?;
 
         Ok(score)
