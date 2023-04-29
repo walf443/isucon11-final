@@ -13,6 +13,8 @@ use num_traits::ToPrimitive;
 mod find_courses_by_user_id;
 #[cfg(test)]
 mod find_open_courses_by_user_id;
+#[cfg(test)]
+mod find_total_scores_by_course_id_group_by_user_id;
 
 #[derive(Clone)]
 pub struct RegistrationCourseRepositoryInfra {}
