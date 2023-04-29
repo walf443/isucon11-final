@@ -1,11 +1,7 @@
 use actix_web::{web, HttpResponse};
-use isucholar_core::repos::class_repository::ClassRepository;
-use isucholar_core::repos::course_repository::CourseRepository;
-use isucholar_http_core::responses::error::ResponseError::CourseNotFound;
+use isucholar_core::services::class_service::{ClassService, HaveClassService};
 use isucholar_http_core::responses::error::ResponseResult;
 use isucholar_http_core::routes::util::get_user_info;
-use isucholar_infra::repos::class_repository::ClassRepositoryInfra;
-use isucholar_infra::repos::course_repository::CourseRepositoryInfra;
 
 #[derive(Debug, serde::Serialize)]
 struct GetClassResponse {
@@ -18,8 +14,8 @@ struct GetClassResponse {
 }
 
 // GET /api/courses/{course_id}/classes 科目に紐づく講義一覧の取得
-pub async fn get_classes(
-    pool: web::Data<sqlx::MySqlPool>,
+pub async fn get_classes<Service: HaveClassService>(
+    service: web::Data<Service>,
     session: actix_session::Session,
     course_id: web::Path<(String,)>,
 ) -> ResponseResult<HttpResponse> {
@@ -27,20 +23,10 @@ pub async fn get_classes(
 
     let course_id = &course_id.0;
 
-    let mut tx = pool.begin().await?;
-    let course_repo = CourseRepositoryInfra {};
-    let class_repo = ClassRepositoryInfra {};
-    let is_exist = course_repo.exist_by_id(&mut tx, course_id).await?;
-
-    if !is_exist {
-        return Err(CourseNotFound);
-    }
-
-    let classes = class_repo
-        .find_all_with_submitted_by_user_id_and_course_id(&mut tx, &user_id, course_id)
+    let classes = service
+        .class_service()
+        .find_all_with_submitted_by_user_id_and_course_id(&user_id, course_id)
         .await?;
-
-    tx.commit().await?;
 
     // 結果が0件の時は空配列を返却
     let res = classes

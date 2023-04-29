@@ -1,12 +1,15 @@
+use crate::models::class::ClassWithSubmitted;
 use crate::models::class_score::ClassScore;
 use crate::models::course::Course;
 use crate::models::course_result::CourseResult;
 use crate::models::course_status::CourseStatus;
 use crate::repos::class_repository::{ClassRepository, HaveClassRepository};
+use crate::repos::course_repository::{CourseRepository, HaveCourseRepository};
 use crate::repos::registration_course_repository::{
     HaveRegistrationCourseRepository, RegistrationCourseRepository,
 };
 use crate::repos::submission_repository::{HaveSubmissionRepository, SubmissionRepository};
+use crate::services::error::Error::CourseNotFound;
 use crate::services::error::Result;
 use crate::services::HaveDBPool;
 use crate::util;
@@ -31,6 +34,11 @@ pub trait ClassService {
         user_id: &str,
         courses: &Vec<Course>,
     ) -> Result<(Vec<CourseResult>, f64, i64)>;
+    async fn find_all_with_submitted_by_user_id_and_course_id<'c>(
+        &self,
+        user_id: &str,
+        course_id: &str,
+    ) -> Result<Vec<ClassWithSubmitted>>;
 }
 
 pub trait HaveClassService {
@@ -46,6 +54,7 @@ pub trait ClassServiceImpl:
     + HaveClassRepository
     + HaveSubmissionRepository
     + HaveRegistrationCourseRepository
+    + HaveCourseRepository
 {
     async fn get_user_scores_by_course_id(
         &self,
@@ -156,6 +165,30 @@ pub trait ClassServiceImpl:
 
         Ok((course_results, my_gpa, my_credits))
     }
+
+    async fn find_all_with_submitted_by_user_id_and_course_id<'c>(
+        &self,
+        user_id: &str,
+        course_id: &str,
+    ) -> Result<Vec<ClassWithSubmitted>> {
+        let pool = self.get_db_pool();
+
+        let mut tx = pool.begin().await?;
+        let is_exist = self.course_repo().exist_by_id(&mut tx, course_id).await?;
+
+        if !is_exist {
+            return Err(CourseNotFound);
+        }
+
+        let classes = self
+            .class_repo()
+            .find_all_with_submitted_by_user_id_and_course_id(&mut tx, &user_id, course_id)
+            .await?;
+
+        tx.commit().await?;
+
+        Ok(classes)
+    }
 }
 
 #[async_trait]
@@ -182,5 +215,14 @@ impl<S: ClassServiceImpl> ClassService for S {
         courses: &Vec<Course>,
     ) -> Result<(Vec<CourseResult>, f64, i64)> {
         ClassServiceImpl::get_user_courses_result_by_courses(self, user_id, courses).await
+    }
+
+    async fn find_all_with_submitted_by_user_id_and_course_id<'c>(
+        &self,
+        user_id: &str,
+        course_id: &str,
+    ) -> Result<Vec<ClassWithSubmitted>> {
+        ClassServiceImpl::find_all_with_submitted_by_user_id_and_course_id(self, user_id, course_id)
+            .await
     }
 }

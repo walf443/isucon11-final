@@ -1,8 +1,10 @@
 use crate::repos::class_repository::ClassRepositoryInfra;
+use crate::repos::course_repository::CourseRepositoryInfra;
 use crate::repos::registration_course_repository::RegistrationCourseRepositoryInfra;
 use crate::repos::submission_repository::SubmissionRepositoryInfra;
 use isucholar_core::db::DBPool;
 use isucholar_core::repos::class_repository::HaveClassRepository;
+use isucholar_core::repos::course_repository::HaveCourseRepository;
 use isucholar_core::repos::registration_course_repository::HaveRegistrationCourseRepository;
 use isucholar_core::repos::submission_repository::HaveSubmissionRepository;
 use isucholar_core::services::class_service::ClassServiceImpl;
@@ -13,6 +15,7 @@ use std::sync::Arc;
 pub struct ClassServiceInfra {
     db_pool: Arc<DBPool>,
     class_repo: ClassRepositoryInfra,
+    course_repo: CourseRepositoryInfra,
     submission_repo: SubmissionRepositoryInfra,
     registration_course_repo: RegistrationCourseRepositoryInfra,
 }
@@ -22,6 +25,7 @@ impl ClassServiceInfra {
         Self {
             db_pool,
             class_repo: ClassRepositoryInfra {},
+            course_repo: CourseRepositoryInfra {},
             submission_repo: SubmissionRepositoryInfra {},
             registration_course_repo: RegistrationCourseRepositoryInfra {},
         }
@@ -56,5 +60,13 @@ impl HaveRegistrationCourseRepository for ClassServiceInfra {
 
     fn registration_course_repo(&self) -> &Self::Repo {
         &self.registration_course_repo
+    }
+}
+
+impl HaveCourseRepository for ClassServiceInfra {
+    type Repo = CourseRepositoryInfra;
+
+    fn course_repo(&self) -> &Self::Repo {
+        &self.course_repo
     }
 }
