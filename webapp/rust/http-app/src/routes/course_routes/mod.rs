@@ -30,7 +30,7 @@ pub fn get_course_routes<Service: ServiceManager + 'static>() -> Scope {
                 .wrap(IsAdmin)
                 .to(add_course::<Service>),
         )
-        .route("/{course_id}", web::get().to(get_course_detail))
+        .route("/{course_id}", web::get().to(get_course_detail::<Service>))
         .service(
             web::resource("/{course_id}/status")
                 .guard(actix_web::guard::Put())

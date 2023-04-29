@@ -20,6 +20,7 @@ pub trait CourseService: Sync {
         offset: i64,
         query: &SearchCoursesQuery,
     ) -> Result<Vec<CourseWithTeacher>>;
+    async fn find_with_teacher_by_id(&self, course_id: &str) -> Result<Option<CourseWithTeacher>>;
     async fn find_open_courses_by_user_id(&self, user_id: &str) -> Result<Vec<(Course, User)>>;
 }
 
@@ -84,6 +85,17 @@ pub trait CourseServiceImpl:
 
         Ok(results)
     }
+
+    async fn find_with_teacher_by_id(&self, course_id: &str) -> Result<Option<CourseWithTeacher>> {
+        let pool = self.get_db_pool();
+        let mut conn = pool.acquire().await?;
+        let course = self
+            .course_repo()
+            .find_with_teacher_by_id(&mut conn, course_id)
+            .await?;
+
+        Ok(course)
+    }
 }
 
 #[async_trait]
@@ -99,6 +111,10 @@ impl<S: CourseServiceImpl> CourseService for S {
         query: &SearchCoursesQuery,
     ) -> Result<Vec<CourseWithTeacher>> {
         CourseServiceImpl::find_all_with_teacher(self, limit, offset, query).await
+    }
+
+    async fn find_with_teacher_by_id(&self, course_id: &str) -> Result<Option<CourseWithTeacher>> {
+        CourseServiceImpl::find_with_teacher_by_id(self, course_id).await
     }
 
     async fn find_open_courses_by_user_id(&self, user_id: &str) -> Result<Vec<(Course, User)>> {
