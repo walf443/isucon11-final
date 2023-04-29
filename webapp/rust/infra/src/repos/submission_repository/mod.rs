@@ -17,12 +17,12 @@ impl SubmissionRepository for SubmissionRepositoryInfra {
         tx: &mut TxConn,
         submission: &CreateSubmission,
     ) -> Result<()> {
-        sqlx::query(
+        sqlx::query!(
             "INSERT INTO `submissions` (`user_id`, `class_id`, `file_name`) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE `file_name` = VALUES(`file_name`)",
+            &submission.user_id,
+            &submission.class_id,
+            &submission.file_name,
         )
-            .bind(&submission.user_id)
-            .bind(&submission.class_id)
-            .bind(&submission.file_name)
             .execute(tx)
             .await?;
 
