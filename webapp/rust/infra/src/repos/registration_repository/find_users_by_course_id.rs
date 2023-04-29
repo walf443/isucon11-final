@@ -23,7 +23,6 @@ async fn success_case() {
     let mut tx = db_pool.begin().await.unwrap();
 
     let course_id = "course_id";
-    let user_id = "user_id";
 
     sqlx::query!("SET foreign_key_checks=0")
         .execute(&mut tx)
