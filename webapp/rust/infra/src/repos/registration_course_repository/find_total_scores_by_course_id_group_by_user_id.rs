@@ -1,12 +1,9 @@
 use crate::repos::registration_course_repository::RegistrationCourseRepositoryInfra;
+use fake::{Fake, Faker};
 use isucholar_core::db::get_test_db_conn;
 use isucholar_core::models::class::Class;
 use isucholar_core::models::course::Course;
-use isucholar_core::models::course_status::CourseStatus;
-use isucholar_core::models::course_type::CourseType;
-use isucholar_core::models::day_of_week::DayOfWeek;
 use isucholar_core::models::user::User;
-use isucholar_core::models::user_type::UserType;
 use isucholar_core::repos::registration_course_repository::RegistrationCourseRepository;
 
 #[tokio::test]
@@ -32,19 +29,7 @@ async fn success_case() {
         .await
         .unwrap();
 
-    let course = Course {
-        id: "2".to_string(),
-        code: "2".to_string(),
-        type_: CourseType::LiberalArts,
-        name: "".to_string(),
-        description: "".to_string(),
-        credit: 0,
-        period: 0,
-        day_of_week: DayOfWeek::Monday,
-        teacher_id: "".to_string(),
-        keywords: "".to_string(),
-        status: CourseStatus::Registration,
-    };
+    let course: Course = Faker.fake();
 
     sqlx::query!("INSERT INTO courses (id, code, type, name, description, credit, period, day_of_week, teacher_id, keywords, status) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
         &course.id,
@@ -60,13 +45,7 @@ async fn success_case() {
         &course.status,
     ).execute(&mut tx).await.unwrap();
 
-    let user = User {
-        id: "user_id".to_string(),
-        code: "code".to_string(),
-        name: "name".to_string(),
-        hashed_password: vec![],
-        type_: UserType::Student,
-    };
+    let user: User = Faker.fake();
     sqlx::query!(
         "INSERT INTO users (id, code, name, hashed_password, type) VALUES (?, ?, ?, ?, ?)",
         &user.id,
@@ -88,14 +67,8 @@ async fn success_case() {
     .await
     .unwrap();
 
-    let class = Class {
-        id: "1".to_string(),
-        course_id: course.id.clone(),
-        part: 1,
-        title: "title".to_string(),
-        description: "description".to_string(),
-        submission_closed: false,
-    };
+    let mut class: Class = Faker.fake();
+    class.course_id = course.id.clone();
     sqlx::query!(
         "INSERT INTO classes (id, course_id, part, title, description, submission_closed) VALUES (?, ?, ?, ?, ?, ?)",
         &class.id,

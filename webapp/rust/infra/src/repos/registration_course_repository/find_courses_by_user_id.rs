@@ -1,9 +1,7 @@
 use crate::repos::registration_course_repository::RegistrationCourseRepositoryInfra;
+use fake::{Fake, Faker};
 use isucholar_core::db::get_test_db_conn;
 use isucholar_core::models::course::Course;
-use isucholar_core::models::course_status::CourseStatus;
-use isucholar_core::models::course_type::CourseType;
-use isucholar_core::models::day_of_week::DayOfWeek;
 use isucholar_core::repos::registration_course_repository::RegistrationCourseRepository;
 
 #[tokio::test]
@@ -28,19 +26,7 @@ async fn success_case() {
         .execute(&mut tx)
         .await
         .unwrap();
-    let course = Course {
-        id: "".to_string(),
-        code: "".to_string(),
-        type_: CourseType::LiberalArts,
-        name: "".to_string(),
-        description: "".to_string(),
-        credit: 0,
-        period: 0,
-        day_of_week: DayOfWeek::Monday,
-        teacher_id: "".to_string(),
-        keywords: "".to_string(),
-        status: CourseStatus::Registration,
-    };
+    let course: Course = Faker.fake();
 
     sqlx::query!("INSERT INTO courses (id, code, type, name, description, credit, period, day_of_week, teacher_id, keywords, status) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
         &course.id,
