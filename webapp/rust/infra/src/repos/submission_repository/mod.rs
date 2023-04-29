@@ -70,12 +70,14 @@ impl SubmissionRepository for SubmissionRepositoryInfra {
         class_id: &str,
         user_id: &str,
     ) -> Result<Option<u8>> {
-        let score: Option<Option<u8>> = sqlx::query_scalar(concat!(
-            "SELECT `submissions`.`score` FROM `submissions`",
-            " WHERE `user_id` = ? AND `class_id` = ?"
-        ))
-        .bind(user_id)
-        .bind(class_id)
+        let score: Option<Option<u8>> = sqlx::query_scalar!(
+            r"
+                SELECT `submissions`.`score` FROM `submissions`
+                WHERE `user_id` = ? AND `class_id` = ?
+            ",
+            user_id,
+            class_id,
+        )
         .fetch_optional(conn)
         .await?;
 
