@@ -1,4 +1,5 @@
 use crate::repos::registration_repository::RegistrationRepositoryInfra;
+use fake::{Fake, Faker};
 use isucholar_core::db::get_test_db_conn;
 use isucholar_core::repos::registration_repository::RegistrationRepository;
 
@@ -20,8 +21,8 @@ async fn true_case() {
     let db_pool = get_test_db_conn().await.unwrap();
     let mut tx = db_pool.begin().await.unwrap();
 
-    let course_id = "course_id";
-    let user_id = "user_id";
+    let user_id = Faker.fake::<String>();
+    let course_id = Faker.fake::<String>();
 
     sqlx::query!("SET foreign_key_checks=0")
         .execute(&mut tx)
@@ -38,7 +39,7 @@ async fn true_case() {
 
     let repo = RegistrationRepositoryInfra {};
     let got = repo
-        .exist_by_user_id_and_course_id(&mut tx, user_id, course_id)
+        .exist_by_user_id_and_course_id(&mut tx, &user_id, &course_id)
         .await
         .unwrap();
     assert_eq!(got, true);
