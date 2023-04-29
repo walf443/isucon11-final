@@ -7,6 +7,8 @@ use isucholar_core::repos::error::Result;
 use isucholar_core::repos::registration_repository::RegistrationRepository;
 
 #[cfg(test)]
+mod create_or_update;
+#[cfg(test)]
 mod exist_by_user_id_and_course_id;
 
 #[derive(Clone)]
