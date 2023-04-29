@@ -1,3 +1,5 @@
+use fake::{Dummy, Fake};
+
 #[derive(Debug, sqlx::FromRow)]
 pub struct Submission {
     pub user_id: String,
@@ -5,7 +7,7 @@ pub struct Submission {
     pub file_name: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Dummy)]
 pub struct CreateSubmission {
     pub user_id: String,
     pub class_id: String,

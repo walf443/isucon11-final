@@ -4,12 +4,19 @@ use isucholar_core::models::submission::{CreateSubmission, Submission};
 use isucholar_core::repos::error::Result;
 use isucholar_core::repos::submission_repository::SubmissionRepository;
 
+#[cfg(test)]
+mod create_or_update;
+
 #[derive(Clone)]
 pub struct SubmissionRepositoryInfra {}
 
 #[async_trait]
 impl SubmissionRepository for SubmissionRepositoryInfra {
-    async fn create<'c>(&self, tx: &mut TxConn, submission: &CreateSubmission) -> Result<()> {
+    async fn create_or_update<'c>(
+        &self,
+        tx: &mut TxConn,
+        submission: &CreateSubmission,
+    ) -> Result<()> {
         sqlx::query(
             "INSERT INTO `submissions` (`user_id`, `class_id`, `file_name`) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE `file_name` = VALUES(`file_name`)",
         )

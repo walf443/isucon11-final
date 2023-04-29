@@ -85,7 +85,7 @@ pub async fn submit_assignment(
 
     let submission_repo = SubmissionRepositoryInfra {};
     submission_repo
-        .create(
+        .create_or_update(
             &mut tx,
             &CreateSubmission {
                 user_id: user_id.clone(),
