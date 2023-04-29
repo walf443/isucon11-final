@@ -1,4 +1,5 @@
 use crate::repos::announcement_repository::AnnouncementRepositoryInfra;
+use fake::{Fake, Faker};
 use isucholar_core::db::get_test_db_conn;
 use isucholar_core::models::announcement::Announcement;
 use isucholar_core::repos::announcement_repository::AnnouncementRepository;
@@ -14,14 +15,9 @@ async fn success_case() {
         .unwrap();
 
     let repo = AnnouncementRepositoryInfra {};
-    let input = Announcement {
-        id: "1".to_string(),
-        course_id: "course_id".to_string(),
-        title: "title".to_string(),
-        message: "message".to_string(),
-    };
+    let input: Announcement = Faker.fake();
     repo.create(&mut tx, &input).await.unwrap();
-    let got = repo.find_by_id(&mut tx, "1").await.unwrap();
+    let got = repo.find_by_id(&mut tx, &input.id).await.unwrap();
     assert_eq!(got, input);
 }
 
@@ -37,12 +33,7 @@ async fn duplicate_case() {
         .unwrap();
 
     let repo = AnnouncementRepositoryInfra {};
-    let input = Announcement {
-        id: "2".to_string(),
-        course_id: "course_id".to_string(),
-        title: "title".to_string(),
-        message: "message".to_string(),
-    };
+    let input: Announcement = Faker.fake();
     repo.create(&mut tx, &input).await.unwrap();
     repo.create(&mut tx, &input).await.unwrap();
 }
@@ -54,11 +45,6 @@ async fn other_error_case() {
     let mut tx = db_pool.begin().await.unwrap();
 
     let repo = AnnouncementRepositoryInfra {};
-    let input = Announcement {
-        id: "3".to_string(),
-        course_id: "course_id".to_string(),
-        title: "title".to_string(),
-        message: "message".to_string(),
-    };
+    let input: Announcement = Faker.fake();
     repo.create(&mut tx, &input).await.unwrap();
 }

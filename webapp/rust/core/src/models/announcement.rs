@@ -1,4 +1,6 @@
-#[derive(Debug, sqlx::FromRow, PartialEq, Eq)]
+use fake::{Dummy, Fake};
+
+#[derive(Debug, sqlx::FromRow, PartialEq, Eq, Dummy)]
 pub struct Announcement {
     pub id: String,
     pub course_id: String,

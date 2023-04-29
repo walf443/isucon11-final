@@ -1,5 +1,5 @@
-use fake::{Fake, Faker};
 use crate::repos::class_repository::ClassRepositoryInfra;
+use fake::{Fake, Faker};
 use isucholar_core::db::get_test_db_conn;
 use isucholar_core::models::class::Class;
 use isucholar_core::repos::class_repository::ClassRepository;

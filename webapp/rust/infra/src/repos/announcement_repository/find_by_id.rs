@@ -1,5 +1,7 @@
+use fake::{Fake, Faker};
 use crate::repos::announcement_repository::AnnouncementRepositoryInfra;
 use isucholar_core::db::get_test_db_conn;
+use isucholar_core::models::announcement::Announcement;
 use isucholar_core::repos::announcement_repository::AnnouncementRepository;
 
 #[tokio::test]
@@ -23,18 +25,19 @@ async fn success() {
         .await
         .unwrap();
 
+    let announcement: Announcement = Faker.fake();
     sqlx::query!(
         "INSERT INTO announcements (id, course_id, title, message) VALUES (?,?,?,?)",
-        "1",
-        "course_id",
-        "title",
-        "message",
+        &announcement.id,
+        &announcement.course_id,
+        &announcement.title,
+        &announcement.message,
     )
     .execute(&mut tx)
     .await
     .unwrap();
 
     let repo = AnnouncementRepositoryInfra {};
-    let result = repo.find_by_id(&mut tx, "1").await.unwrap();
-    assert_eq!(result.id, "1");
+    let result = repo.find_by_id(&mut tx, &announcement.id).await.unwrap();
+    assert_eq!(result.id, announcement.id);
 }
