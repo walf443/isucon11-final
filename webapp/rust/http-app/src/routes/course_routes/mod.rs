@@ -8,6 +8,7 @@ use crate::routes::course_routes::search_courses::search_courses;
 use crate::routes::course_routes::set_course_status::set_course_status;
 use crate::routes::course_routes::submit_assignment::submit_assignment;
 use actix_web::{web, Scope};
+use isucholar_core::services::manager::ServiceManager;
 use isucholar_http_core::middleware::IsAdmin;
 
 mod add_class;
@@ -20,14 +21,14 @@ mod search_courses;
 mod set_course_status;
 mod submit_assignment;
 
-pub fn get_course_routes() -> Scope {
+pub fn get_course_routes<Service: ServiceManager + 'static>() -> Scope {
     web::scope("/courses")
         .route("", web::get().to(search_courses))
         .service(
             web::resource("")
                 .guard(actix_web::guard::Post())
                 .wrap(IsAdmin)
-                .to(add_course),
+                .to(add_course::<Service>),
         )
         .route("/{course_id}", web::get().to(get_course_detail))
         .service(

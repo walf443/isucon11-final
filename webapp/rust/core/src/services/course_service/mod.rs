@@ -1,5 +1,6 @@
-use crate::models::course::Course;
+use crate::models::course::{Course, CreateCourse};
 use crate::models::user::User;
+use crate::repos::course_repository::{CourseRepository, HaveCourseRepository};
 use crate::repos::registration_course_repository::{
     HaveRegistrationCourseRepository, RegistrationCourseRepository,
 };
@@ -12,6 +13,7 @@ use async_trait::async_trait;
 #[cfg_attr(any(test, feature = "test"), mockall::automock)]
 #[async_trait]
 pub trait CourseService: Sync {
+    async fn create(&self, course: &CreateCourse) -> Result<String>;
     async fn find_open_courses_by_user_id(&self, user_id: &str) -> Result<Vec<(Course, User)>>;
 }
 
@@ -26,8 +28,17 @@ pub trait CourseServiceImpl:
     + HaveDBPool
     + HaveTransactionRepository
     + HaveUserRepository
+    + HaveCourseRepository
     + HaveRegistrationCourseRepository
 {
+    async fn create(&self, course: &CreateCourse) -> Result<String> {
+        let db_pool = self.get_db_pool();
+
+        let course_id = self.course_repo().create(&db_pool, course).await?;
+
+        Ok(course_id)
+    }
+
     async fn find_open_courses_by_user_id(&self, user_id: &str) -> Result<Vec<(Course, User)>> {
         let db_pool = self.get_db_pool();
         let mut tx = self.transaction_repo().begin(db_pool).await?;
@@ -56,6 +67,10 @@ pub trait CourseServiceImpl:
 
 #[async_trait]
 impl<S: CourseServiceImpl> CourseService for S {
+    async fn create(&self, course: &CreateCourse) -> Result<String> {
+        CourseServiceImpl::create(self, course).await
+    }
+
     async fn find_open_courses_by_user_id(&self, user_id: &str) -> Result<Vec<(Course, User)>> {
         CourseServiceImpl::find_open_courses_by_user_id(self, user_id).await
     }

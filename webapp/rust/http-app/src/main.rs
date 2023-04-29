@@ -25,7 +25,7 @@ async fn main() -> std::io::Result<()> {
 
     let server = actix_web::HttpServer::new(move || {
         let users_api = get_user_routes::<ServiceManagerImpl>();
-        let courses_api = get_course_routes();
+        let courses_api = get_course_routes::<ServiceManagerImpl>();
         let announcements_api = get_announcement_routes::<ServiceManagerImpl>();
 
         actix_web::App::new()

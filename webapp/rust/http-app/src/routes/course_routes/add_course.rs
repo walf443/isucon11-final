@@ -2,11 +2,10 @@ use actix_web::{web, HttpResponse};
 use isucholar_core::models::course::CreateCourse;
 use isucholar_core::models::course_type::CourseType;
 use isucholar_core::models::day_of_week::DayOfWeek;
-use isucholar_core::repos::course_repository::CourseRepository;
+use isucholar_core::services::course_service::{CourseService, HaveCourseService};
 use isucholar_core::util;
 use isucholar_http_core::responses::error::ResponseResult;
 use isucholar_http_core::routes::util::get_user_info;
-use isucholar_infra::repos::course_repository::CourseRepositoryInfra;
 
 #[derive(Debug, serde::Deserialize)]
 pub struct AddCourseRequest {
@@ -44,17 +43,17 @@ pub struct AddCourseResponse {
 }
 
 // POST /api/courses 新規科目登録
-pub async fn add_course(
-    pool: web::Data<sqlx::MySqlPool>,
+pub async fn add_course<Service: HaveCourseService>(
+    service: web::Data<Service>,
     session: actix_session::Session,
     req: web::Json<AddCourseRequest>,
 ) -> ResponseResult<HttpResponse> {
     let (user_id, _, _) = get_user_info(session)?;
 
     let course_id = util::new_ulid().await;
-    let course_repo = CourseRepositoryInfra {};
     let form = req.convert_create_course(course_id.clone(), user_id.clone());
-    let course_id = course_repo.create(&pool, &form).await?;
+
+    let course_id = service.course_service().create(&form).await?;
 
     Ok(HttpResponse::Created().json(AddCourseResponse { id: course_id }))
 }

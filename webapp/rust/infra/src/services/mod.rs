@@ -1,6 +1,8 @@
+use crate::repos::course_repository::CourseRepositoryInfra;
 use crate::repos::registration_course_repository::RegistrationCourseRepositoryInfra;
 use crate::repos::user_repository::UserRepositoryInfra;
 use isucholar_core::db::DBPool;
+use isucholar_core::repos::course_repository::HaveCourseRepository;
 use isucholar_core::repos::registration_course_repository::HaveRegistrationCourseRepository;
 use isucholar_core::repos::transaction_repository::{
     HaveTransactionRepository, TransactionRepositoryImpl,
@@ -24,6 +26,7 @@ pub struct CourseServiceInfra {
     db_pool: Arc<DBPool>,
     transaction_repo: TransactionRepositoryImpl,
     user_repo: UserRepositoryInfra,
+    course_repo: CourseRepositoryInfra,
     registration_course_repo: RegistrationCourseRepositoryInfra,
 }
 
@@ -33,6 +36,7 @@ impl CourseServiceInfra {
             db_pool,
             transaction_repo: TransactionRepositoryImpl {},
             user_repo: UserRepositoryInfra {},
+            course_repo: CourseRepositoryInfra {},
             registration_course_repo: RegistrationCourseRepositoryInfra {},
         }
     }
@@ -67,5 +71,12 @@ impl HaveRegistrationCourseRepository for CourseServiceInfra {
 
     fn registration_course_repo(&self) -> &Self::Repo {
         &self.registration_course_repo
+    }
+}
+impl HaveCourseRepository for CourseServiceInfra {
+    type Repo = CourseRepositoryInfra;
+
+    fn course_repo(&self) -> &Self::Repo {
+        &self.course_repo
     }
 }
