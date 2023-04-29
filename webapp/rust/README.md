@@ -42,9 +42,9 @@ This crate handles DB code. don't handle HTTP
 ```mermaid
 
 flowchart LR
-  ServiceInfra --> RepositoryImpl
-  RepositoryImpl --> DB[(MySQL)]
-  RepositoryImpl -- models --> ServiceInfra
+  ServiceInfra --> RepositoryInfra
+  RepositoryInfra --> DB[(MySQL)]
+  RepositoryInfra -- models --> ServiceInfra
 ```
 
 ## core
