@@ -1,4 +1,5 @@
 use crate::models::course::{Course, CourseWithTeacher, CreateCourse};
+use crate::models::course_status::CourseStatus;
 use crate::models::user::User;
 use crate::repos::course_repository::{CourseRepository, HaveCourseRepository, SearchCoursesQuery};
 use crate::repos::registration_course_repository::{
@@ -6,6 +7,7 @@ use crate::repos::registration_course_repository::{
 };
 use crate::repos::transaction_repository::{HaveTransactionRepository, TransactionRepository};
 use crate::repos::user_repository::{HaveUserRepository, UserRepository};
+use crate::services::error::Error::CourseNotFound;
 use crate::services::error::Result;
 use crate::services::HaveDBPool;
 use async_trait::async_trait;
@@ -14,6 +16,7 @@ use async_trait::async_trait;
 #[async_trait]
 pub trait CourseService: Sync {
     async fn create(&self, course: &CreateCourse) -> Result<String>;
+    async fn update_status_by_id(&self, course_id: &str, status: &CourseStatus) -> Result<()>;
     async fn find_all_with_teacher(
         &self,
         limit: i64,
@@ -44,6 +47,25 @@ pub trait CourseServiceImpl:
         let course_id = self.course_repo().create(&db_pool, course).await?;
 
         Ok(course_id)
+    }
+
+    async fn update_status_by_id(&self, course_id: &str, status: &CourseStatus) -> Result<()> {
+        let db_pool = self.get_db_pool();
+        let course_repo = self.course_repo();
+        let mut tx = self.transaction_repo().begin(&db_pool).await?;
+
+        let is_exist = course_repo.for_update_by_id(&mut tx, course_id).await?;
+        if !is_exist {
+            return Err(CourseNotFound);
+        }
+
+        course_repo
+            .update_status_by_id(&mut tx, course_id, status)
+            .await?;
+
+        tx.commit().await?;
+
+        Ok(())
     }
 
     async fn find_all_with_teacher(
@@ -102,6 +124,10 @@ pub trait CourseServiceImpl:
 impl<S: CourseServiceImpl> CourseService for S {
     async fn create(&self, course: &CreateCourse) -> Result<String> {
         CourseServiceImpl::create(self, course).await
+    }
+
+    async fn update_status_by_id(&self, course_id: &str, status: &CourseStatus) -> Result<()> {
+        CourseServiceImpl::update_status_by_id(self, course_id, status).await
     }
 
     async fn find_all_with_teacher(
