@@ -89,17 +89,19 @@ impl RegistrationCourseRepository for RegistrationCourseRepositoryInfra {
         conn: &mut DBConn,
         course_id: &str,
     ) -> Result<Vec<i64>> {
-        let mut rows = sqlx::query_scalar(concat!(
-        "SELECT IFNULL(SUM(`submissions`.`score`), 0) AS `total_score`",
-        " FROM `users`",
-        " JOIN `registrations` ON `users`.`id` = `registrations`.`user_id`",
-        " JOIN `courses` ON `registrations`.`course_id` = `courses`.`id`",
-        " LEFT JOIN `classes` ON `courses`.`id` = `classes`.`course_id`",
-        " LEFT JOIN `submissions` ON `users`.`id` = `submissions`.`user_id` AND `submissions`.`class_id` = `classes`.`id`",
-        " WHERE `courses`.`id` = ?",
-        " GROUP BY `users`.`id`",
-        ))
-            .bind(course_id)
+        let mut rows = sqlx::query_scalar!(
+        r"
+                SELECT IFNULL(SUM(`submissions`.`score`), 0) AS `total_score`
+                FROM `users`
+                JOIN `registrations` ON `users`.`id` = `registrations`.`user_id`
+                JOIN `courses` ON `registrations`.`course_id` = `courses`.`id`
+                LEFT JOIN `classes` ON `courses`.`id` = `classes`.`course_id`
+                LEFT JOIN `submissions` ON `users`.`id` = `submissions`.`user_id` AND `submissions`.`class_id` = `classes`.`id`
+                WHERE `courses`.`id` = ?
+                GROUP BY `users`.`id`
+            ",
+            course_id
+        )
             .fetch(conn);
         let mut totals = Vec::new();
         while let Some(row) = rows.next().await {
