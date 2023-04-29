@@ -1,4 +1,5 @@
 use crate::repos::class_repository::ClassRepositoryInfra;
+use fake::{Fake, Faker};
 use isucholar_core::db::get_test_db_conn;
 use isucholar_core::models::class::{Class, CreateClass};
 use isucholar_core::repos::class_repository::ClassRepository;
@@ -13,13 +14,7 @@ async fn success_case() {
         .await
         .unwrap();
 
-    let class = CreateClass {
-        id: "1".to_string(),
-        course_id: "course_id".to_string(),
-        part: 0,
-        title: "".to_string(),
-        description: "".to_string(),
-    };
+    let class: CreateClass = Faker.fake();
 
     let repo = ClassRepositoryInfra {};
     repo.create(&mut tx, &class).await.unwrap();
@@ -48,13 +43,7 @@ async fn duplicate_case() {
         .await
         .unwrap();
 
-    let class = CreateClass {
-        id: "2".to_string(),
-        course_id: "".to_string(),
-        part: 0,
-        title: "".to_string(),
-        description: "".to_string(),
-    };
+    let class: CreateClass = Faker.fake();
 
     let repo = ClassRepositoryInfra {};
     repo.create(&mut tx, &class).await.unwrap();
@@ -67,13 +56,7 @@ async fn error_case() {
     let db_pool = get_test_db_conn().await.unwrap();
     let mut tx = db_pool.begin().await.unwrap();
 
-    let class = CreateClass {
-        id: "3".to_string(),
-        course_id: "".to_string(),
-        part: 0,
-        title: "".to_string(),
-        description: "".to_string(),
-    };
+    let class: CreateClass = Faker.fake();
 
     let repo = ClassRepositoryInfra {};
     repo.create(&mut tx, &class).await.unwrap();

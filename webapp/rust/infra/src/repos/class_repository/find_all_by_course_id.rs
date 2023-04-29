@@ -1,4 +1,5 @@
 use crate::repos::class_repository::ClassRepositoryInfra;
+use fake::{Fake, Faker};
 use isucholar_core::db::get_test_db_conn;
 use isucholar_core::models::class::Class;
 use isucholar_core::repos::class_repository::ClassRepository;
@@ -24,15 +25,7 @@ async fn success_case() {
         .execute(&mut tx)
         .await
         .unwrap();
-    let course_id = "course_id";
-    let class = Class {
-        id: "1".to_string(),
-        course_id: course_id.to_string().clone(),
-        part: 2,
-        title: "title".to_string(),
-        description: "description".to_string(),
-        submission_closed: true,
-    };
+    let class: Class = Faker.fake();
     sqlx::query!("INSERT INTO classes (id, course_id, part, title, description, submission_closed) VALUES (?,?,?,?,?,?)",
         &class.id,
         &class.course_id,
@@ -44,7 +37,7 @@ async fn success_case() {
 
     let repo = ClassRepositoryInfra {};
     let got = repo
-        .find_all_by_course_id(&mut tx, course_id)
+        .find_all_by_course_id(&mut tx, &class.course_id)
         .await
         .unwrap();
     assert_eq!(got.len(), 1);

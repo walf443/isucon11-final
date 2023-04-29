@@ -10,6 +10,7 @@ pub struct Class {
     pub submission_closed: bool,
 }
 
+#[derive(Dummy)]
 pub struct CreateClass {
     pub id: String,
     pub course_id: String,
