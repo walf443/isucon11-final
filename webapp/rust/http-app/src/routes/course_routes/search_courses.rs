@@ -1,12 +1,12 @@
 use actix_web::{web, HttpResponse};
-use isucholar_core::repos::course_repository::{CourseRepository, SearchCoursesQuery};
+use isucholar_core::repos::course_repository::SearchCoursesQuery;
+use isucholar_core::services::course_service::{CourseService, HaveCourseService};
 use isucholar_http_core::responses::error::ResponseError::InvalidPage;
 use isucholar_http_core::responses::error::ResponseResult;
-use isucholar_infra::repos::course_repository::CourseRepositoryInfra;
 
 // GET /api/courses 科目検索
-pub async fn search_courses(
-    pool: web::Data<sqlx::MySqlPool>,
+pub async fn search_courses<Service: HaveCourseService>(
+    service: web::Data<Service>,
     params: web::Query<SearchCoursesQuery>,
     request: actix_web::HttpRequest,
 ) -> ResponseResult<HttpResponse> {
@@ -21,9 +21,9 @@ pub async fn search_courses(
     let limit = 20;
     let offset = limit * (page - 1);
 
-    let course_repo = CourseRepositoryInfra {};
-    let mut res = course_repo
-        .find_all_with_teacher(&pool, limit, offset, &params)
+    let mut res = service
+        .course_service()
+        .find_all_with_teacher(limit, offset, &params)
         .await?;
 
     let uri = request.uri();

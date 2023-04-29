@@ -23,7 +23,7 @@ mod submit_assignment;
 
 pub fn get_course_routes<Service: ServiceManager + 'static>() -> Scope {
     web::scope("/courses")
-        .route("", web::get().to(search_courses))
+        .route("", web::get().to(search_courses::<Service>))
         .service(
             web::resource("")
                 .guard(actix_web::guard::Post())

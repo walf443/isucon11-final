@@ -1,6 +1,6 @@
-use crate::models::course::{Course, CreateCourse};
+use crate::models::course::{Course, CourseWithTeacher, CreateCourse};
 use crate::models::user::User;
-use crate::repos::course_repository::{CourseRepository, HaveCourseRepository};
+use crate::repos::course_repository::{CourseRepository, HaveCourseRepository, SearchCoursesQuery};
 use crate::repos::registration_course_repository::{
     HaveRegistrationCourseRepository, RegistrationCourseRepository,
 };
@@ -14,6 +14,12 @@ use async_trait::async_trait;
 #[async_trait]
 pub trait CourseService: Sync {
     async fn create(&self, course: &CreateCourse) -> Result<String>;
+    async fn find_all_with_teacher(
+        &self,
+        limit: i64,
+        offset: i64,
+        query: &SearchCoursesQuery,
+    ) -> Result<Vec<CourseWithTeacher>>;
     async fn find_open_courses_by_user_id(&self, user_id: &str) -> Result<Vec<(Course, User)>>;
 }
 
@@ -37,6 +43,21 @@ pub trait CourseServiceImpl:
         let course_id = self.course_repo().create(&db_pool, course).await?;
 
         Ok(course_id)
+    }
+
+    async fn find_all_with_teacher(
+        &self,
+        limit: i64,
+        offset: i64,
+        query: &SearchCoursesQuery,
+    ) -> Result<Vec<CourseWithTeacher>> {
+        let db_pool = self.get_db_pool();
+
+        let courses = self
+            .course_repo()
+            .find_all_with_teacher(&db_pool, limit, offset, query)
+            .await?;
+        Ok(courses)
     }
 
     async fn find_open_courses_by_user_id(&self, user_id: &str) -> Result<Vec<(Course, User)>> {
@@ -69,6 +90,15 @@ pub trait CourseServiceImpl:
 impl<S: CourseServiceImpl> CourseService for S {
     async fn create(&self, course: &CreateCourse) -> Result<String> {
         CourseServiceImpl::create(self, course).await
+    }
+
+    async fn find_all_with_teacher(
+        &self,
+        limit: i64,
+        offset: i64,
+        query: &SearchCoursesQuery,
+    ) -> Result<Vec<CourseWithTeacher>> {
+        CourseServiceImpl::find_all_with_teacher(self, limit, offset, query).await
     }
 
     async fn find_open_courses_by_user_id(&self, user_id: &str) -> Result<Vec<(Course, User)>> {
