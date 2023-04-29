@@ -10,7 +10,7 @@ pub struct RegistrationRepositoryInfra {}
 
 #[async_trait]
 impl RegistrationRepository for RegistrationRepositoryInfra {
-    async fn create_or_update_in_tx<'c>(
+    async fn create_or_update<'c>(
         &self,
         tx: &mut TxConn<'c>,
         user_id: &str,

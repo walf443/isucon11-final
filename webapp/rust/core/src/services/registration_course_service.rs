@@ -104,7 +104,7 @@ pub trait RegistrationCourseServiceImpl:
 
         for course in newly_added {
             registration_repo
-                .create_or_update_in_tx(&mut tx, &user_id, &course.id)
+                .create_or_update(&mut tx, &user_id, &course.id)
                 .await?;
         }
 

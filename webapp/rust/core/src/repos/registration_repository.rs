@@ -6,7 +6,7 @@ use async_trait::async_trait;
 #[cfg_attr(any(test, feature = "test"), mockall::automock)]
 #[async_trait]
 pub trait RegistrationRepository {
-    async fn create_or_update_in_tx<'c>(
+    async fn create_or_update<'c>(
         &self,
         tx: &mut TxConn<'c>,
         user_id: &str,
