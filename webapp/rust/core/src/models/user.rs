@@ -1,6 +1,6 @@
 use crate::models::user_type::UserType;
 
-#[derive(Debug, sqlx::FromRow)]
+#[derive(Debug, sqlx::FromRow, PartialEq, Eq)]
 pub struct User {
     pub id: String,
     pub code: String,

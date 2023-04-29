@@ -10,6 +10,8 @@ use isucholar_core::repos::registration_repository::RegistrationRepository;
 mod create_or_update;
 #[cfg(test)]
 mod exist_by_user_id_and_course_id;
+#[cfg(test)]
+mod find_users_by_course_id;
 
 #[derive(Clone)]
 pub struct RegistrationRepositoryInfra {}
