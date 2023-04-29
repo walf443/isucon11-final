@@ -76,10 +76,10 @@ pub trait ClassServiceImpl:
                 .count_by_class_id(&mut conn, &class.id)
                 .await?;
             let my_score = submission_repo
-                .find_score_by_class_id_and_user_id(&pool, &class.id, user_id)
+                .find_score_by_class_id_and_user_id(&mut conn, &class.id, user_id)
                 .await?;
 
-            if let Some(Some(my_score)) = my_score {
+            if let Some(my_score) = my_score {
                 let my_score = my_score as i64;
                 class_scores.push(ClassScore {
                     class_id: class.id,

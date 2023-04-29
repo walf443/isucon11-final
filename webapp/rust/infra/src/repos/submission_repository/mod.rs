@@ -69,7 +69,7 @@ impl SubmissionRepository for SubmissionRepositoryInfra {
         conn: &mut DBConn,
         class_id: &str,
         user_id: &str,
-    ) -> Result<Option<Option<u8>>> {
+    ) -> Result<Option<u8>> {
         let score: Option<Option<u8>> = sqlx::query_scalar(concat!(
             "SELECT `submissions`.`score` FROM `submissions`",
             " WHERE `user_id` = ? AND `class_id` = ?"
@@ -79,7 +79,13 @@ impl SubmissionRepository for SubmissionRepositoryInfra {
         .fetch_optional(conn)
         .await?;
 
-        Ok(score)
+        match score {
+            None => Ok(None),
+            Some(score) => match score {
+                None => Ok(None),
+                Some(score) => Ok(Some(score)),
+            },
+        }
     }
 
     async fn find_all_by_class_id_in_tx<'c>(

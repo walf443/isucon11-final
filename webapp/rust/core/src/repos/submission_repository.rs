@@ -1,4 +1,4 @@
-use crate::db::{DBConn, DBPool, TxConn};
+use crate::db::{DBConn, TxConn};
 use crate::models::submission::{CreateSubmission, Submission};
 use crate::repos::error::Result;
 use async_trait::async_trait;
@@ -20,10 +20,10 @@ pub trait SubmissionRepository {
     ) -> Result<()>;
     async fn find_score_by_class_id_and_user_id(
         &self,
-        pool: &DBPool,
+        conn: &mut DBConn,
         class_id: &str,
         user_id: &str,
-    ) -> Result<Option<Option<u8>>>;
+    ) -> Result<Option<u8>>;
     async fn find_all_by_class_id_in_tx<'c>(
         &self,
         tx: &mut TxConn,

@@ -32,7 +32,7 @@ async fn exist_case() {
         .find_score_by_class_id_and_user_id(&mut tx, &submission.class_id, &submission.user_id)
         .await
         .unwrap();
-    assert_eq!(score.unwrap().unwrap(), 100);
+    assert_eq!(score.unwrap(), 100);
 }
 
 #[tokio::test]
@@ -62,7 +62,7 @@ async fn exist_but_null_case() {
         .find_score_by_class_id_and_user_id(&mut tx, &submission.class_id, &submission.user_id)
         .await
         .unwrap();
-    assert_eq!(score.unwrap().is_none(), true);
+    assert_eq!(score.is_none(), true);
 }
 
 #[tokio::test]
