@@ -72,7 +72,9 @@ pub trait ClassServiceImpl:
 
         let submission_repo = self.submission_repo();
         for class in classes {
-            let submissions_count = submission_repo.count_by_class_id(&pool, &class.id).await?;
+            let submissions_count = submission_repo
+                .count_by_class_id(&mut conn, &class.id)
+                .await?;
             let my_score = submission_repo
                 .find_score_by_class_id_and_user_id(&pool, &class.id, user_id)
                 .await?;

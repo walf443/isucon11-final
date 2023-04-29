@@ -1,4 +1,4 @@
-use crate::db::{DBPool, TxConn};
+use crate::db::{DBConn, DBPool, TxConn};
 use crate::models::submission::{CreateSubmission, Submission};
 use crate::repos::error::Result;
 use async_trait::async_trait;
@@ -10,7 +10,7 @@ pub trait SubmissionRepository {
         tx: &mut TxConn<'c>,
         submission: &CreateSubmission,
     ) -> Result<()>;
-    async fn count_by_class_id(&self, pool: &DBPool, class_id: &str) -> Result<i64>;
+    async fn count_by_class_id(&self, conn: &mut DBConn, class_id: &str) -> Result<i64>;
     async fn update_score_by_user_code_and_class_id<'c>(
         &self,
         tx: &mut TxConn,

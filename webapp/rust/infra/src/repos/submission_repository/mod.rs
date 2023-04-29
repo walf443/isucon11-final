@@ -1,9 +1,11 @@
 use async_trait::async_trait;
-use isucholar_core::db::{DBPool, TxConn};
+use isucholar_core::db::{DBConn, DBPool, TxConn};
 use isucholar_core::models::submission::{CreateSubmission, Submission};
 use isucholar_core::repos::error::Result;
 use isucholar_core::repos::submission_repository::SubmissionRepository;
 
+#[cfg(test)]
+mod count_by_class_id;
 #[cfg(test)]
 mod create_or_update;
 
@@ -29,11 +31,11 @@ impl SubmissionRepository for SubmissionRepositoryInfra {
         Ok(())
     }
 
-    async fn count_by_class_id(&self, pool: &DBPool, class_id: &str) -> Result<i64> {
+    async fn count_by_class_id(&self, conn: &mut DBConn, class_id: &str) -> Result<i64> {
         let submissions_count: i64 =
             sqlx::query_scalar("SELECT COUNT(*) FROM `submissions` WHERE `class_id` = ?")
                 .bind(class_id)
-                .fetch_one(pool)
+                .fetch_one(conn)
                 .await?;
         Ok(submissions_count)
     }
