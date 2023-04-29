@@ -8,6 +8,8 @@ use isucholar_core::repos::submission_repository::SubmissionRepository;
 mod count_by_class_id;
 #[cfg(test)]
 mod create_or_update;
+#[cfg(test)]
+mod update_score_by_user_code_and_class_id;
 
 #[derive(Clone)]
 pub struct SubmissionRepositoryInfra {}
@@ -32,10 +34,12 @@ impl SubmissionRepository for SubmissionRepositoryInfra {
     }
 
     async fn count_by_class_id(&self, conn: &mut DBConn, class_id: &str) -> Result<i64> {
-        let submissions_count: i64 =
-            sqlx::query_scalar!("SELECT COUNT(*) FROM `submissions` WHERE `class_id` = ?", class_id)
-                .fetch_one(conn)
-                .await?;
+        let submissions_count: i64 = sqlx::query_scalar!(
+            "SELECT COUNT(*) FROM `submissions` WHERE `class_id` = ?",
+            class_id
+        )
+        .fetch_one(conn)
+        .await?;
         Ok(submissions_count)
     }
 
@@ -46,10 +50,12 @@ impl SubmissionRepository for SubmissionRepositoryInfra {
         class_id: &str,
         score: i64,
     ) -> Result<()> {
-        sqlx::query("UPDATE `submissions` JOIN `users` ON `users`.`id` = `submissions`.`user_id` SET `score` = ? WHERE `users`.`code` = ? AND `class_id` = ?")
-            .bind(score)
-            .bind(user_code)
-            .bind(class_id)
+        sqlx::query!(
+            "UPDATE `submissions` JOIN `users` ON `users`.`id` = `submissions`.`user_id` SET `score` = ? WHERE `users`.`code` = ? AND `class_id` = ?",
+            score,
+            user_code,
+            class_id,
+        )
             .execute(tx)
             .await?;
 
