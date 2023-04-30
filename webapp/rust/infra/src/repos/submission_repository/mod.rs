@@ -9,6 +9,8 @@ mod count_by_class_id;
 #[cfg(test)]
 mod create_or_update;
 #[cfg(test)]
+mod find_all_with_user_code_by_class_id;
+#[cfg(test)]
 mod find_score_by_class_id_and_user_id;
 #[cfg(test)]
 mod update_score_by_user_code_and_class_id;
