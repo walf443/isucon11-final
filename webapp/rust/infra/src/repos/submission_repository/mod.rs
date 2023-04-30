@@ -97,13 +97,16 @@ impl SubmissionRepository for SubmissionRepositoryInfra {
         tx: &mut TxConn,
         class_id: &str,
     ) -> Result<Vec<SubmissionWithUserCode>> {
-        let submissions: Vec<SubmissionWithUserCode> = sqlx::query_as(concat!(
-        "SELECT `submissions`.`user_id`, `submissions`.`file_name`, `users`.`code` AS `user_code`",
-        " FROM `submissions`",
-        " JOIN `users` ON `users`.`id` = `submissions`.`user_id`",
-        " WHERE `class_id` = ?",
-        ))
-        .bind(class_id)
+        let submissions: Vec<SubmissionWithUserCode> = sqlx::query_as!(
+            SubmissionWithUserCode,
+            r"
+                SELECT `submissions`.`user_id`, `submissions`.`file_name`, `users`.`code` AS `user_code`
+                FROM `submissions`
+                JOIN `users` ON `users`.`id` = `submissions`.`user_id`
+                WHERE `class_id` = ?
+            ",
+            class_id
+        )
         .fetch_all(tx)
         .await?;
 
