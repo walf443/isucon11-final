@@ -11,11 +11,8 @@ async fn main() -> std::io::Result<()> {
     let pool = get_db_conn().await.expect("failed to connect db");
     let service = ServiceManagerImpl::new(pool.clone());
 
-    let mut session_key = b"trapnomura".to_vec();
-    session_key.resize(32, 0);
-
     let server = actix_web::HttpServer::new(move || {
-        let app = create_app(pool.clone(), service.clone(), &session_key);
+        let app = create_app(pool.clone(), service.clone());
         app.wrap(actix_web::middleware::Logger::default())
     });
     if let Some(l) = listenfd::ListenFd::from_env().take_tcp_listener(0)? {

@@ -18,7 +18,6 @@ const SESSION_NAME: &str = "isucholar_rust";
 pub fn create_app(
     pool: DBPool,
     service: ServiceManagerImpl,
-    session_key: &Vec<u8>
 ) -> actix_web::App<
     impl ServiceFactory<
         ServiceRequest, Config = (),
@@ -29,6 +28,9 @@ pub fn create_app(
     let users_api = get_user_routes::<ServiceManagerImpl>();
     let courses_api = get_course_routes::<ServiceManagerImpl>();
     let announcements_api = get_announcement_routes::<ServiceManagerImpl>();
+
+    let mut session_key = b"trapnomura".to_vec();
+    session_key.resize(32, 0);
 
     actix_web::App::new()
         .app_data(web::Data::new(pool))
@@ -51,3 +53,4 @@ pub fn create_app(
                 .service(announcements_api),
         )
 }
+
