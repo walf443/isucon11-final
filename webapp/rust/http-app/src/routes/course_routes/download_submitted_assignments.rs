@@ -1,6 +1,6 @@
 use actix_web::web;
 use isucholar_core::models::assignment_path::AssignmentPath;
-use isucholar_core::models::submission::Submission;
+use isucholar_core::models::submission::SubmissionWithUserCode;
 use isucholar_core::repos::class_repository::ClassRepository;
 use isucholar_core::repos::submission_repository::SubmissionRepository;
 use isucholar_core::ASSIGNMENTS_DIRECTORY;
@@ -25,7 +25,7 @@ pub async fn download_submitted_assignments(
     }
     let submission_repo = SubmissionRepositoryInfra {};
     let submissions = submission_repo
-        .find_all_by_class_id(&mut tx, &class_id)
+        .find_all_with_user_code_by_class_id(&mut tx, &class_id)
         .await?;
 
     let zip_file_path = format!("{}{}.zip", ASSIGNMENTS_DIRECTORY, class_id);
@@ -43,7 +43,7 @@ pub async fn download_submitted_assignments(
 async fn create_submissions_zip(
     zip_file_path: &str,
     class_id: &str,
-    submissions: &[Submission],
+    submissions: &[SubmissionWithUserCode],
 ) -> std::io::Result<()> {
     let tmp_dir = format!("{}{}/", ASSIGNMENTS_DIRECTORY, class_id);
     tokio::process::Command::new("rm")

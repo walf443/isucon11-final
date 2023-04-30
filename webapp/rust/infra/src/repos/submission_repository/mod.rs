@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 use isucholar_core::db::{DBConn, TxConn};
-use isucholar_core::models::submission::{CreateSubmission, Submission};
+use isucholar_core::models::submission::{CreateSubmission, SubmissionWithUserCode};
 use isucholar_core::repos::error::Result;
 use isucholar_core::repos::submission_repository::SubmissionRepository;
 
@@ -90,12 +90,12 @@ impl SubmissionRepository for SubmissionRepositoryInfra {
         }
     }
 
-    async fn find_all_by_class_id<'c>(
+    async fn find_all_with_user_code_by_class_id<'c>(
         &self,
         tx: &mut TxConn,
         class_id: &str,
-    ) -> Result<Vec<Submission>> {
-        let submissions: Vec<Submission> = sqlx::query_as(concat!(
+    ) -> Result<Vec<SubmissionWithUserCode>> {
+        let submissions: Vec<SubmissionWithUserCode> = sqlx::query_as(concat!(
         "SELECT `submissions`.`user_id`, `submissions`.`file_name`, `users`.`code` AS `user_code`",
         " FROM `submissions`",
         " JOIN `users` ON `users`.`id` = `submissions`.`user_id`",

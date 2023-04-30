@@ -1,5 +1,5 @@
 use crate::db::{DBConn, TxConn};
-use crate::models::submission::{CreateSubmission, Submission};
+use crate::models::submission::{CreateSubmission, SubmissionWithUserCode};
 use crate::repos::error::Result;
 use async_trait::async_trait;
 
@@ -24,11 +24,11 @@ pub trait SubmissionRepository {
         class_id: &str,
         user_id: &str,
     ) -> Result<Option<u8>>;
-    async fn find_all_by_class_id<'c>(
+    async fn find_all_with_user_code_by_class_id<'c>(
         &self,
         tx: &mut TxConn,
         class_id: &str,
-    ) -> Result<Vec<Submission>>;
+    ) -> Result<Vec<SubmissionWithUserCode>>;
 }
 
 pub trait HaveSubmissionRepository {
