@@ -4,12 +4,12 @@ use crate::services::unread_announcement_service::UnreadAnnouncementServiceImpl;
 
 #[tokio::test]
 #[should_panic(expected = "ReposError(TestError)")]
-async fn find_unread_announcements_by_user_id_in_tx_failed() -> () {
+async fn find_unread_announcements_by_user_id_failed() -> () {
     let mut service = S::new().await;
 
     service
         .unread_announcement_repo
-        .expect_find_unread_announcements_by_user_id_in_tx()
+        .expect_find_unread_announcements_by_user_id()
         .withf(|_, _, limit, offset, _| *limit == 5 && *offset == 5)
         .returning(|_, _, _, _, _| Err(TestError));
 
@@ -20,18 +20,18 @@ async fn find_unread_announcements_by_user_id_in_tx_failed() -> () {
 }
 #[tokio::test]
 #[should_panic(expected = "ReposError(TestError)")]
-async fn count_unread_by_user_id_in_tx_failed() -> () {
+async fn count_unread_by_user_id_failed() -> () {
     let mut service = S::new().await;
     let user_id = "user_id";
 
     service
         .unread_announcement_repo
-        .expect_find_unread_announcements_by_user_id_in_tx()
+        .expect_find_unread_announcements_by_user_id()
         .returning(|_, _, _, _, _| Ok(Vec::new()));
 
     service
         .unread_announcement_repo
-        .expect_count_unread_by_user_id_in_tx()
+        .expect_count_unread_by_user_id()
         .withf(move |_, uid| uid == user_id)
         .returning(|_, _| Err(TestError));
 
@@ -47,12 +47,12 @@ async fn success_case() -> () {
 
     service
         .unread_announcement_repo
-        .expect_find_unread_announcements_by_user_id_in_tx()
+        .expect_find_unread_announcements_by_user_id()
         .returning(|_, _, _, _, _| Ok(Vec::new()));
 
     service
         .unread_announcement_repo
-        .expect_count_unread_by_user_id_in_tx()
+        .expect_count_unread_by_user_id()
         .withf(move |_, uid| uid == user_id)
         .returning(|_, _| Ok(1));
 

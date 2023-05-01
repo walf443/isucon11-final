@@ -6,11 +6,11 @@ use crate::services::unread_announcement_service::UnreadAnnouncementServiceImpl;
 
 #[tokio::test]
 #[should_panic(expected = "ReposError(TestError)")]
-async fn find_announcement_detail_by_announcement_id_and_user_id_in_tx_err() -> () {
+async fn find_announcement_detail_by_announcement_id_and_user_id_err() -> () {
     let mut service = S::new().await;
     service
         .unread_announcement_repo
-        .expect_find_announcement_detail_by_announcement_id_and_user_id_in_tx()
+        .expect_find_announcement_detail_by_announcement_id_and_user_id()
         .returning(|_, _, _| Err(TestError));
 
     service.find_detail_and_mark_read("", "").await.unwrap();
@@ -18,11 +18,11 @@ async fn find_announcement_detail_by_announcement_id_and_user_id_in_tx_err() -> 
 
 #[tokio::test]
 #[should_panic(expected = "AnnouncementNotFound")]
-async fn find_announcement_detail_by_announcement_id_and_user_id_in_tx_none() -> () {
+async fn find_announcement_detail_by_announcement_id_and_user_id_none() -> () {
     let mut service = S::new().await;
     service
         .unread_announcement_repo
-        .expect_find_announcement_detail_by_announcement_id_and_user_id_in_tx()
+        .expect_find_announcement_detail_by_announcement_id_and_user_id()
         .returning(|_, _, _| Ok(None));
 
     service.find_detail_and_mark_read("", "").await.unwrap();
@@ -30,11 +30,11 @@ async fn find_announcement_detail_by_announcement_id_and_user_id_in_tx_none() ->
 
 #[tokio::test]
 #[should_panic(expected = "ReposError(TestError)")]
-async fn exist_by_user_id_and_course_id_in_tx_err() -> () {
+async fn exist_by_user_id_and_course_id_err() -> () {
     let mut service = S::new().await;
     service
         .unread_announcement_repo
-        .expect_find_announcement_detail_by_announcement_id_and_user_id_in_tx()
+        .expect_find_announcement_detail_by_announcement_id_and_user_id()
         .returning(|_, _, _| {
             Ok(Some(AnnouncementDetail {
                 id: "".to_string(),
@@ -56,11 +56,11 @@ async fn exist_by_user_id_and_course_id_in_tx_err() -> () {
 
 #[tokio::test]
 #[should_panic(expected = "AnnouncementNotFound")]
-async fn exist_by_user_id_and_course_id_in_tx_false() -> () {
+async fn exist_by_user_id_and_course_id_false() -> () {
     let mut service = S::new().await;
     service
         .unread_announcement_repo
-        .expect_find_announcement_detail_by_announcement_id_and_user_id_in_tx()
+        .expect_find_announcement_detail_by_announcement_id_and_user_id()
         .returning(|_, _, _| {
             Ok(Some(AnnouncementDetail {
                 id: "".to_string(),
@@ -86,7 +86,7 @@ async fn mark_read_failed() -> () {
     let mut service = S::new().await;
     service
         .unread_announcement_repo
-        .expect_find_announcement_detail_by_announcement_id_and_user_id_in_tx()
+        .expect_find_announcement_detail_by_announcement_id_and_user_id()
         .returning(|_, _, _| {
             Ok(Some(AnnouncementDetail {
                 id: "".to_string(),
@@ -126,7 +126,7 @@ async fn success_case() -> Result<()> {
 
     service
         .unread_announcement_repo
-        .expect_find_announcement_detail_by_announcement_id_and_user_id_in_tx()
+        .expect_find_announcement_detail_by_announcement_id_and_user_id()
         .withf(|_, aid, user_id| aid == "aid" && user_id == "user_id")
         .returning(move |_, _, _| Ok(Some(detail.clone())));
 

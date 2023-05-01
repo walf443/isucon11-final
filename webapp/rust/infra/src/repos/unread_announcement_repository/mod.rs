@@ -45,11 +45,7 @@ impl UnreadAnnouncementRepository for UnreadAnnouncementRepositoryInfra {
         Ok(())
     }
 
-    async fn count_unread_by_user_id_in_tx<'c>(
-        &self,
-        tx: &mut TxConn<'c>,
-        user_id: &str,
-    ) -> Result<i64> {
+    async fn count_unread_by_user_id<'c>(&self, tx: &mut TxConn<'c>, user_id: &str) -> Result<i64> {
         let unread_count: i64 = db::fetch_one_scalar(
             sqlx::query_scalar(
                 "SELECT COUNT(*) FROM `unread_announcements` WHERE `user_id` = ? AND NOT `is_deleted`",
@@ -62,7 +58,7 @@ impl UnreadAnnouncementRepository for UnreadAnnouncementRepositoryInfra {
         Ok(unread_count)
     }
 
-    async fn find_unread_announcements_by_user_id_in_tx<'c>(
+    async fn find_unread_announcements_by_user_id<'c>(
         &self,
         tx: &mut TxConn<'c>,
         user_id: &'c str,
@@ -100,7 +96,7 @@ impl UnreadAnnouncementRepository for UnreadAnnouncementRepositoryInfra {
         Ok(announcements)
     }
 
-    async fn find_announcement_detail_by_announcement_id_and_user_id_in_tx<'c>(
+    async fn find_announcement_detail_by_announcement_id_and_user_id<'c>(
         &self,
         tx: &mut TxConn<'c>,
         announcement_id: &str,

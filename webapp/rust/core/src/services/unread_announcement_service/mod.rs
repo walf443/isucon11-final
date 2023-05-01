@@ -53,12 +53,10 @@ pub trait UnreadAnnouncementServiceImpl:
 
         let repo = self.unread_announcement_repo();
         let announcements = repo
-            .find_unread_announcements_by_user_id_in_tx(&mut tx, &user_id, limit, offset, course_id)
+            .find_unread_announcements_by_user_id(&mut tx, &user_id, limit, offset, course_id)
             .await?;
 
-        let unread_count = repo
-            .count_unread_by_user_id_in_tx(&mut tx, &user_id)
-            .await?;
+        let unread_count = repo.count_unread_by_user_id(&mut tx, &user_id).await?;
 
         tx.commit().await?;
 
@@ -75,7 +73,7 @@ pub trait UnreadAnnouncementServiceImpl:
 
         let announcement = self
             .unread_announcement_repo()
-            .find_announcement_detail_by_announcement_id_and_user_id_in_tx(
+            .find_announcement_detail_by_announcement_id_and_user_id(
                 &mut tx,
                 announcement_id,
                 user_id,

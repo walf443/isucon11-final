@@ -8,13 +8,14 @@ use async_trait::async_trait;
 #[async_trait]
 pub trait UnreadAnnouncementRepository {
     async fn create(&self, conn: &mut DBConn, announcement_id: &str, user_id: &str) -> Result<()>;
-    async fn mark_read(&self, conn: &mut DBConn, announcement_id: &str, user_id: &str) -> Result<()>;
-    async fn count_unread_by_user_id_in_tx<'c>(
+    async fn mark_read(
         &self,
-        tx: &mut TxConn<'c>,
+        conn: &mut DBConn,
+        announcement_id: &str,
         user_id: &str,
-    ) -> Result<i64>;
-    async fn find_unread_announcements_by_user_id_in_tx<'c>(
+    ) -> Result<()>;
+    async fn count_unread_by_user_id<'c>(&self, tx: &mut TxConn<'c>, user_id: &str) -> Result<i64>;
+    async fn find_unread_announcements_by_user_id<'c>(
         &self,
         tx: &mut TxConn<'c>,
         user_id: &'c str,
@@ -22,7 +23,7 @@ pub trait UnreadAnnouncementRepository {
         offset: i64,
         course_id: Option<&'c str>,
     ) -> Result<Vec<AnnouncementWithoutDetail>>;
-    async fn find_announcement_detail_by_announcement_id_and_user_id_in_tx<'c>(
+    async fn find_announcement_detail_by_announcement_id_and_user_id<'c>(
         &self,
         tx: &mut TxConn<'c>,
         announcement_id: &str,
