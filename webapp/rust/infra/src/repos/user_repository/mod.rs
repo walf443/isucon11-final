@@ -1,7 +1,6 @@
-use crate::db;
 use async_trait::async_trait;
 use futures::StreamExt;
-use isucholar_core::db::{DBPool, TxConn};
+use isucholar_core::db::{DBConn, DBPool};
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::models::user::User;
 use isucholar_core::models::user_type::UserType;
@@ -9,16 +8,29 @@ use isucholar_core::repos::error::Result;
 use isucholar_core::repos::user_repository::UserRepository;
 use num_traits::ToPrimitive;
 
+#[cfg(test)]
+mod find;
+
 #[derive(Clone)]
 pub struct UserRepositoryInfra {}
 
 #[async_trait]
 impl UserRepository for UserRepositoryInfra {
-    async fn find_in_tx<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<User> {
-        let user: User = db::fetch_one_as(
-            sqlx::query_as("SELECT * FROM `users` WHERE `id` = ?").bind(id),
-            tx,
+    async fn find(&self, conn: &mut DBConn, id: &str) -> Result<User> {
+        let user: User = sqlx::query_as!(
+            User,
+            r"
+                SELECT
+                    id,
+                    code,
+                    name,
+                    hashed_password,
+                    type AS `type_:UserType`
+                FROM `users` WHERE `id` = ?
+            ",
+            id
         )
+        .fetch_one(conn)
         .await?;
 
         Ok(user)
