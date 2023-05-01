@@ -28,9 +28,9 @@ pub async fn get_announcement_list<S: HaveUnreadAnnouncementService>(
 ) -> ResponseResult<HttpResponse> {
     let (user_id, _, _) = get_user_info(session)?;
 
-    let mut course_id: Option<&str> = None;
+    let mut course_id: Option<String> = None;
     if let Some(ref c_id) = params.course_id {
-        course_id = Some(&c_id);
+        course_id = Some(c_id.clone());
     }
 
     let page = if let Some(ref page_str) = params.page {

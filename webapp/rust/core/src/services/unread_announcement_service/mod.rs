@@ -15,12 +15,12 @@ mod tests;
 #[cfg_attr(any(test, feature = "test"), mockall::automock)]
 #[async_trait]
 pub trait UnreadAnnouncementService: Sync {
-    async fn find_all_with_count<'c>(
+    async fn find_all_with_count(
         &self,
         user_id: &str,
         limit: i64,
         page: i64,
-        course_id: Option<&'c str>,
+        course_id: Option<String>,
     ) -> Result<(Vec<AnnouncementWithoutDetail>, i64)>;
 
     async fn find_detail_and_mark_read(
@@ -40,12 +40,12 @@ pub trait HaveUnreadAnnouncementService {
 pub trait UnreadAnnouncementServiceImpl:
     Sync + HaveDBPool + HaveUnreadAnnouncementRepository + HaveRegistrationRepository
 {
-    async fn find_all_with_count<'c>(
+    async fn find_all_with_count(
         &self,
         user_id: &str,
         limit: i64,
         page: i64,
-        course_id: Option<&'c str>,
+        course_id: Option<String>,
     ) -> Result<(Vec<AnnouncementWithoutDetail>, i64)> {
         let pool = self.get_db_pool();
         let mut tx = pool.begin().await?;
@@ -106,12 +106,12 @@ pub trait UnreadAnnouncementServiceImpl:
 
 #[async_trait]
 impl<S: UnreadAnnouncementServiceImpl> UnreadAnnouncementService for S {
-    async fn find_all_with_count<'c>(
+    async fn find_all_with_count(
         &self,
         user_id: &str,
         limit: i64,
         page: i64,
-        course_id: Option<&'c str>,
+        course_id: Option<String>,
     ) -> Result<(Vec<AnnouncementWithoutDetail>, i64)> {
         UnreadAnnouncementServiceImpl::find_all_with_count(self, user_id, limit, page, course_id)
             .await
