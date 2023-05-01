@@ -8,6 +8,8 @@ use isucholar_core::repos::unread_announcement_repository::UnreadAnnouncementRep
 use sqlx::Arguments;
 
 #[cfg(test)]
+mod count_unread_by_user_id;
+#[cfg(test)]
 mod create;
 #[cfg(test)]
 mod mark_read;
@@ -45,15 +47,13 @@ impl UnreadAnnouncementRepository for UnreadAnnouncementRepositoryInfra {
         Ok(())
     }
 
-    async fn count_unread_by_user_id<'c>(&self, tx: &mut TxConn<'c>, user_id: &str) -> Result<i64> {
-        let unread_count: i64 = db::fetch_one_scalar(
-            sqlx::query_scalar(
-                "SELECT COUNT(*) FROM `unread_announcements` WHERE `user_id` = ? AND NOT `is_deleted`",
-            )
-                .bind(user_id),
-            tx,
+    async fn count_unread_by_user_id(&self, conn: &mut DBConn, user_id: &str) -> Result<i64> {
+        let unread_count: i64 = sqlx::query_scalar!(
+            "SELECT COUNT(*) FROM `unread_announcements` WHERE `user_id` = ? AND NOT `is_deleted`",
+            user_id
         )
-            .await?;
+        .fetch_one(conn)
+        .await?;
 
         Ok(unread_count)
     }
