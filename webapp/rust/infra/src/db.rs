@@ -38,45 +38,12 @@ where
     }
 }
 
-pub(crate) async fn fetch_one_scalar<'q, 'c, O>(
-    query: sqlx::query::QueryScalar<'q, sqlx::MySql, O, sqlx::mysql::MySqlArguments>,
-    tx: &mut sqlx::Transaction<'c, sqlx::MySql>,
-) -> sqlx::Result<O>
-where
-    O: 'q + Send + Unpin,
-    (O,): for<'r> sqlx::FromRow<'r, sqlx::mysql::MySqlRow>,
-{
-    match fetch_optional_scalar(query, tx).await? {
-        Some(row) => Ok(row),
-        None => Err(sqlx::Error::RowNotFound),
-    }
-}
-
 pub(crate) async fn fetch_optional_as<'q, 'c, O>(
     query: sqlx::query::QueryAs<'q, sqlx::MySql, O, sqlx::mysql::MySqlArguments>,
     tx: &mut sqlx::Transaction<'c, sqlx::MySql>,
 ) -> sqlx::Result<Option<O>>
 where
     O: Send + Unpin + for<'r> sqlx::FromRow<'r, sqlx::mysql::MySqlRow>,
-{
-    let mut rows = query.fetch(tx);
-    let mut resp = None;
-    while let Some(row) = rows.next().await {
-        let row = row?;
-        if resp.is_none() {
-            resp = Some(row);
-        }
-    }
-    Ok(resp)
-}
-
-pub(crate) async fn fetch_optional_scalar<'q, 'c, O>(
-    query: sqlx::query::QueryScalar<'q, sqlx::MySql, O, sqlx::mysql::MySqlArguments>,
-    tx: &mut sqlx::Transaction<'c, sqlx::MySql>,
-) -> sqlx::Result<Option<O>>
-where
-    O: 'q + Send + Unpin,
-    (O,): for<'r> sqlx::FromRow<'r, sqlx::mysql::MySqlRow>,
 {
     let mut rows = query.fetch(tx);
     let mut resp = None;
