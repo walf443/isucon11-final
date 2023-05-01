@@ -12,6 +12,8 @@ use num_traits::ToPrimitive;
 mod find;
 #[cfg(test)]
 mod find_by_code;
+#[cfg(test)]
+mod find_code_by_id;
 
 #[derive(Clone)]
 pub struct UserRepositoryInfra {}
@@ -46,11 +48,11 @@ impl UserRepository for UserRepositoryInfra {
         Ok(user)
     }
 
-    async fn find_code_by_id(&self, pool: &DBPool, id: &str) -> Result<Option<String>> {
+    async fn find_code_by_id(&self, conn: &mut DBConn, id: &str) -> Result<Option<String>> {
         let user_code: Option<String> =
             sqlx::query_scalar("SELECT `code` FROM `users` WHERE `id` = ?")
                 .bind(&id)
-                .fetch_optional(pool)
+                .fetch_optional(conn)
                 .await?;
 
         Ok(user_code)
