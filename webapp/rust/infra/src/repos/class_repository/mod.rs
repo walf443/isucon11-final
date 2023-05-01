@@ -1,6 +1,5 @@
-use crate::db;
 use async_trait::async_trait;
-use isucholar_core::db::{DBConn, TxConn};
+use isucholar_core::db::DBConn;
 use isucholar_core::models::class::{Class, ClassWithSubmitted, CreateClass};
 use isucholar_core::repos::class_repository::ClassRepository;
 use isucholar_core::repos::error::ReposError::ClassDuplicate;
@@ -27,14 +26,12 @@ pub struct ClassRepositoryInfra {}
 
 #[async_trait]
 impl ClassRepository for ClassRepositoryInfra {
-    async fn for_update_by_id<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<bool> {
-        let class_count: i64 = db::fetch_one_scalar(
-            sqlx::query_scalar!(
-                "SELECT COUNT(*) FROM `classes` WHERE `id` = ? FOR UPDATE",
-                id
-            ),
-            tx,
+    async fn for_update_by_id(&self, conn: &mut DBConn, id: &str) -> Result<bool> {
+        let class_count = sqlx::query_scalar!(
+            "SELECT COUNT(*) FROM `classes` WHERE `id` = ? FOR UPDATE",
+            id
         )
+        .fetch_one(conn)
         .await?;
 
         Ok(class_count == 1)
@@ -79,18 +76,16 @@ impl ClassRepository for ClassRepositoryInfra {
         Ok(())
     }
 
-    async fn find_submission_closed_by_id_with_shared_lock<'c>(
+    async fn find_submission_closed_by_id_with_shared_lock(
         &self,
-        tx: &mut TxConn<'c>,
+        conn: &mut DBConn,
         id: &str,
     ) -> Result<Option<bool>> {
-        let submission_closed: Option<bool> = db::fetch_optional_scalar(
-            sqlx::query_scalar!(
-                "SELECT `submission_closed` AS `s:bool` FROM `classes` WHERE `id` = ? FOR SHARE",
-                id
-            ),
-            tx,
+        let submission_closed = sqlx::query_scalar!(
+            "SELECT `submission_closed` AS `s:bool` FROM `classes` WHERE `id` = ? FOR SHARE",
+            id
         )
+        .fetch_optional(conn)
         .await?;
 
         Ok(submission_closed)
