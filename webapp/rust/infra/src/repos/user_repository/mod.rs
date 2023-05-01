@@ -41,17 +41,28 @@ impl UserRepository for UserRepositoryInfra {
     }
 
     async fn find_by_code(&self, conn: &mut DBConn, code: &str) -> Result<Option<User>> {
-        let user: Option<User> = sqlx::query_as("SELECT * FROM `users` WHERE `code` = ?")
-            .bind(code)
-            .fetch_optional(conn)
-            .await?;
+        let user: Option<User> = sqlx::query_as!(
+            User,
+            r"
+                SELECT
+                    id,
+                    code,
+                    name,
+                    hashed_password,
+                    type AS `type_:UserType`
+                FROM `users` WHERE `code` = ?
+            ",
+            code,
+        )
+        .fetch_optional(conn)
+        .await?;
+
         Ok(user)
     }
 
     async fn find_code_by_id(&self, conn: &mut DBConn, id: &str) -> Result<Option<String>> {
         let user_code: Option<String> =
-            sqlx::query_scalar("SELECT `code` FROM `users` WHERE `id` = ?")
-                .bind(&id)
+            sqlx::query_scalar!("SELECT `code` FROM `users` WHERE `id` = ?", id)
                 .fetch_optional(conn)
                 .await?;
 
