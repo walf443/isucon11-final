@@ -21,11 +21,11 @@ impl UnreadAnnouncementRepository for UnreadAnnouncementRepositoryInfra {
         announcement_id: &str,
         user_id: &str,
     ) -> Result<()> {
-        sqlx::query(
+        sqlx::query!(
             "INSERT INTO `unread_announcements` (`announcement_id`, `user_id`) VALUES (?, ?)",
+            announcement_id,
+            user_id
         )
-        .bind(announcement_id)
-        .bind(user_id)
         .execute(conn)
         .await?;
         Ok(())
