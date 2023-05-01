@@ -23,9 +23,9 @@ pub trait UnreadAnnouncementRepository {
         offset: i64,
         course_id: Option<&'c str>,
     ) -> Result<Vec<AnnouncementWithoutDetail>>;
-    async fn find_announcement_detail_by_announcement_id_and_user_id<'c>(
+    async fn find_announcement_detail_by_announcement_id_and_user_id(
         &self,
-        tx: &mut TxConn<'c>,
+        conn: &mut DBConn,
         announcement_id: &str,
         user_id: &str,
     ) -> Result<Option<AnnouncementDetail>>;

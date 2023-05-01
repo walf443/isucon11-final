@@ -1,4 +1,3 @@
-use crate::db;
 use async_trait::async_trait;
 use isucholar_core::db::{DBConn, TxConn};
 use isucholar_core::models::announcement::AnnouncementWithoutDetail;
@@ -98,9 +97,9 @@ impl UnreadAnnouncementRepository for UnreadAnnouncementRepositoryInfra {
         Ok(announcements)
     }
 
-    async fn find_announcement_detail_by_announcement_id_and_user_id<'c>(
+    async fn find_announcement_detail_by_announcement_id_and_user_id(
         &self,
-        tx: &mut TxConn<'c>,
+        conn: &mut DBConn,
         announcement_id: &str,
         user_id: &str,
     ) -> Result<Option<AnnouncementDetail>> {
@@ -122,7 +121,7 @@ impl UnreadAnnouncementRepository for UnreadAnnouncementRepositoryInfra {
             ",
             announcement_id,
             user_id,
-        ).fetch_optional(tx).await?;
+        ).fetch_optional(conn).await?;
 
         Ok(announcement)
     }
