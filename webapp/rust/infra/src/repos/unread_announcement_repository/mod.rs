@@ -1,6 +1,6 @@
 use crate::db;
 use async_trait::async_trait;
-use isucholar_core::db::TxConn;
+use isucholar_core::db::{DBConn, TxConn};
 use isucholar_core::models::announcement::AnnouncementWithoutDetail;
 use isucholar_core::models::announcement_detail::AnnouncementDetail;
 use isucholar_core::repos::error::Result;
@@ -12,9 +12,9 @@ pub struct UnreadAnnouncementRepositoryInfra {}
 
 #[async_trait]
 impl UnreadAnnouncementRepository for UnreadAnnouncementRepositoryInfra {
-    async fn create_in_tx<'c>(
+    async fn create<'c>(
         &self,
-        tx: &mut TxConn<'c>,
+        conn: &mut DBConn,
         announcement_id: &str,
         user_id: &str,
     ) -> Result<()> {
@@ -23,7 +23,7 @@ impl UnreadAnnouncementRepository for UnreadAnnouncementRepositoryInfra {
         )
         .bind(announcement_id)
         .bind(user_id)
-        .execute(tx)
+        .execute(conn)
         .await?;
         Ok(())
     }

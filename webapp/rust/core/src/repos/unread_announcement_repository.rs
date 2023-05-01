@@ -1,4 +1,4 @@
-use crate::db::TxConn;
+use crate::db::{DBConn, TxConn};
 use crate::models::announcement::AnnouncementWithoutDetail;
 use crate::models::announcement_detail::AnnouncementDetail;
 use crate::repos::error::Result;
@@ -7,9 +7,9 @@ use async_trait::async_trait;
 #[cfg_attr(any(test, feature = "test"), mockall::automock)]
 #[async_trait]
 pub trait UnreadAnnouncementRepository {
-    async fn create_in_tx<'c>(
+    async fn create<'c>(
         &self,
-        tx: &mut TxConn<'c>,
+        conn: &mut DBConn,
         announcement_id: &str,
         user_id: &str,
     ) -> Result<()>;
