@@ -1284,8 +1284,6 @@ dependencies = [
  "actix-session",
  "actix-web",
  "anyhow",
- "bcrypt",
- "chrono",
  "env_logger",
  "futures",
  "isucholar-core",
@@ -1293,8 +1291,6 @@ dependencies = [
  "isucholar-infra",
  "lazy_static",
  "listenfd",
- "log",
- "mime",
  "num-traits",
  "serde",
  "serde_json",
@@ -1302,7 +1298,6 @@ dependencies = [
  "sqlx",
  "thiserror",
  "tokio",
- "ulid",
 ]
 
 [[package]]
@@ -1316,11 +1311,9 @@ dependencies = [
  "anyhow",
  "bcrypt",
  "chrono",
- "env_logger",
  "futures",
  "isucholar-core",
  "lazy_static",
- "listenfd",
  "log",
  "mime",
  "num-traits",

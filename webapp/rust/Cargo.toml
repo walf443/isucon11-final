@@ -4,14 +4,21 @@ members = ["core", "infra", "http-core", "http-app"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [workspace.dependencies]
-sqlx = { version = "0.5", default-features = false, features = ["macros", "runtime-actix-rustls", "mysql", "chrono", "decimal"] }
-serde = { version = "1", features = ["derive"] }
-async-trait = { version = "0.1" }
+actix-files = "0.6.0-beta.7"
+actix-multipart = "0.4.0-beta.6"
+actix-session = "0.5.0-beta.2"
+actix-web = { version = "4.0.0-beta.9", default-features = false, features = ["macros"] }
 anyhow = { version = "1" }
-thiserror = { version = "1" }
-num-traits = { version = "0.2" }
-futures = "0.3"
-tokio = { version = "1", features = ["fs", "process", "macros"] }
-serde_json = "1.0.96"
+async-trait = { version = "0" }
+chrono = "0.4"
+env_logger = "0"
+futures = "0"
 lazy_static = { version = "1" }
+log = "0.4"
+num-traits = { version = "0" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sqlx = { version = "0.5", default-features = false, features = ["macros", "runtime-actix-rustls", "mysql", "chrono", "decimal"] }
+thiserror = { version = "1" }
+tokio = { version = "1", features = ["fs", "process", "macros"] }
 ulid = { version = "0.4" }
