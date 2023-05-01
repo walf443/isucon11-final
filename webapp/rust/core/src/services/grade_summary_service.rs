@@ -21,7 +21,11 @@ pub trait HaveGradeSummaryService {
 pub trait GradeSummaryServiceImpl: Sync + HaveDBPool + HaveUserRepository {
     async fn get_summary_by_user_gpa(&self, user_gpa: f64, user_credit: i64) -> Result<Summary> {
         let pool = self.get_db_pool();
-        let gpas = self.user_repo().find_gpas_group_by_user_id(pool).await?;
+        let mut conn = pool.acquire().await.unwrap();
+        let gpas = self
+            .user_repo()
+            .find_gpas_group_by_user_id(&mut conn)
+            .await?;
 
         Ok(Summary {
             credits: user_credit,
