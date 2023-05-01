@@ -5,7 +5,6 @@ use crate::repos::registration_course_repository::{
     HaveRegistrationCourseRepository, RegistrationCourseRepository,
 };
 use crate::repos::registration_repository::{HaveRegistrationRepository, RegistrationRepository};
-use crate::repos::transaction_repository::{HaveTransactionRepository, TransactionRepository};
 use crate::services::error::{Error, RegistrationCourseValidationError, Result};
 use crate::services::HaveDBPool;
 use async_trait::async_trait;
@@ -28,7 +27,6 @@ pub trait RegistrationCourseServiceImpl:
     Sync
     + HaveDBPool
     + HaveRegistrationCourseRepository
-    + HaveTransactionRepository
     + HaveRegistrationRepository
     + HaveCourseRepository
 {
@@ -45,7 +43,7 @@ pub trait RegistrationCourseServiceImpl:
 
     async fn create(&self, user_id: &str, course_ids: &Vec<String>) -> Result<()> {
         let pool = self.get_db_pool();
-        let mut tx = self.transaction_repo().begin(pool).await?;
+        let mut tx = pool.begin().await?;
 
         let course_repo = self.course_repo();
         let registration_course_repo = self.registration_course_repo();

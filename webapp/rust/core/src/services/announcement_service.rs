@@ -3,7 +3,6 @@ use crate::repos::announcement_repository::{AnnouncementRepository, HaveAnnounce
 use crate::repos::course_repository::{CourseRepository, HaveCourseRepository};
 use crate::repos::error::ReposError;
 use crate::repos::registration_repository::{HaveRegistrationRepository, RegistrationRepository};
-use crate::repos::transaction_repository::{HaveTransactionRepository, TransactionRepository};
 use crate::repos::unread_announcement_repository::{
     HaveUnreadAnnouncementRepository, UnreadAnnouncementRepository,
 };
@@ -28,7 +27,6 @@ pub trait HaveAnnouncementService {
 pub trait AnnouncementServiceImpl:
     Sync
     + HaveDBPool
-    + HaveTransactionRepository
     + HaveCourseRepository
     + HaveAnnouncementRepository
     + HaveRegistrationRepository
@@ -36,9 +34,7 @@ pub trait AnnouncementServiceImpl:
 {
     async fn create(&self, announcement: &Announcement) -> Result<()> {
         let pool = self.get_db_pool();
-        let mut conn = pool.acquire().await?;
-
-        let mut tx = self.transaction_repo().begin(&pool).await?;
+        let mut tx = pool.begin().await?;
 
         let is_exist = self
             .course_repo()
@@ -59,6 +55,7 @@ pub trait AnnouncementServiceImpl:
                 let _ = tx.rollback().await;
                 match e {
                     ReposError::AnnouncementDuplicate => {
+                        let mut conn = pool.acquire().await?;
                         let an = self
                             .announcement_repo()
                             .find_by_id(&mut conn, &announcement.id)

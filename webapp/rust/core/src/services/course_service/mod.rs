@@ -5,7 +5,6 @@ use crate::repos::course_repository::{CourseRepository, HaveCourseRepository, Se
 use crate::repos::registration_course_repository::{
     HaveRegistrationCourseRepository, RegistrationCourseRepository,
 };
-use crate::repos::transaction_repository::{HaveTransactionRepository, TransactionRepository};
 use crate::repos::user_repository::{HaveUserRepository, UserRepository};
 use crate::services::error::Error::CourseNotFound;
 use crate::services::error::Result;
@@ -34,12 +33,7 @@ pub trait HaveCourseService {
 
 #[async_trait]
 pub trait CourseServiceImpl:
-    Sync
-    + HaveDBPool
-    + HaveTransactionRepository
-    + HaveUserRepository
-    + HaveCourseRepository
-    + HaveRegistrationCourseRepository
+    Sync + HaveDBPool + HaveUserRepository + HaveCourseRepository + HaveRegistrationCourseRepository
 {
     async fn create(&self, course: &CreateCourse) -> Result<String> {
         let db_pool = self.get_db_pool();
@@ -52,7 +46,7 @@ pub trait CourseServiceImpl:
     async fn update_status_by_id(&self, course_id: &str, status: &CourseStatus) -> Result<()> {
         let db_pool = self.get_db_pool();
         let course_repo = self.course_repo();
-        let mut tx = self.transaction_repo().begin(&db_pool).await?;
+        let mut tx = db_pool.begin().await?;
 
         let is_exist = course_repo.for_update_by_id(&mut tx, course_id).await?;
         if !is_exist {
@@ -85,7 +79,7 @@ pub trait CourseServiceImpl:
 
     async fn find_open_courses_by_user_id(&self, user_id: &str) -> Result<Vec<(Course, User)>> {
         let db_pool = self.get_db_pool();
-        let mut tx = self.transaction_repo().begin(db_pool).await?;
+        let mut tx = db_pool.begin().await?;
 
         let courses = self
             .registration_course_repo()

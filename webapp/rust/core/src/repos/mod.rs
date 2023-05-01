@@ -5,6 +5,5 @@ pub mod error;
 pub mod registration_course_repository;
 pub mod registration_repository;
 pub mod submission_repository;
-pub mod transaction_repository;
 pub mod unread_announcement_repository;
 pub mod user_repository;

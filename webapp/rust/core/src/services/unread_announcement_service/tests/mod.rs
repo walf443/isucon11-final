@@ -2,7 +2,6 @@ use crate::db::{get_test_db_conn, DBPool};
 use crate::repos::registration_repository::{
     HaveRegistrationRepository, MockRegistrationRepository,
 };
-use crate::repos::transaction_repository::{HaveTransactionRepository, TransactionRepositoryImpl};
 use crate::repos::unread_announcement_repository::{
     HaveUnreadAnnouncementRepository, MockUnreadAnnouncementRepository,
 };
@@ -11,7 +10,6 @@ use crate::services::HaveDBPool;
 
 pub(crate) struct S {
     db_pool: DBPool,
-    pub transaction_repo: TransactionRepositoryImpl,
     pub unread_announcement_repo: MockUnreadAnnouncementRepository,
     pub registration_repo: MockRegistrationRepository,
 }
@@ -20,7 +18,6 @@ impl S {
         let pool = get_test_db_conn().await.unwrap();
         Self {
             db_pool: pool,
-            transaction_repo: TransactionRepositoryImpl {},
             unread_announcement_repo: MockUnreadAnnouncementRepository::new(),
             registration_repo: MockRegistrationRepository::new(),
         }
@@ -29,13 +26,6 @@ impl S {
 
 impl UnreadAnnouncementServiceImpl for S {}
 
-impl HaveTransactionRepository for S {
-    type Repo = TransactionRepositoryImpl;
-
-    fn transaction_repo(&self) -> &Self::Repo {
-        &self.transaction_repo
-    }
-}
 impl HaveUnreadAnnouncementRepository for S {
     type Repo = MockUnreadAnnouncementRepository;
 

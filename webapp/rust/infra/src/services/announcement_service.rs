@@ -6,9 +6,6 @@ use isucholar_core::db::DBPool;
 use isucholar_core::repos::announcement_repository::HaveAnnouncementRepository;
 use isucholar_core::repos::course_repository::HaveCourseRepository;
 use isucholar_core::repos::registration_repository::HaveRegistrationRepository;
-use isucholar_core::repos::transaction_repository::{
-    HaveTransactionRepository, TransactionRepositoryImpl,
-};
 use isucholar_core::repos::unread_announcement_repository::HaveUnreadAnnouncementRepository;
 use isucholar_core::services::announcement_service::AnnouncementServiceImpl;
 use isucholar_core::services::HaveDBPool;
@@ -17,7 +14,6 @@ use std::sync::Arc;
 #[derive(Clone)]
 pub struct AnnouncementServiceInfra {
     db_pool: Arc<DBPool>,
-    transaction: TransactionRepositoryImpl,
     announcement: AnnouncementRepositoryInfra,
     course: CourseRepositoryInfra,
     registration: RegistrationRepositoryInfra,
@@ -28,7 +24,6 @@ impl AnnouncementServiceInfra {
     pub fn new(db_pool: Arc<DBPool>) -> Self {
         Self {
             db_pool,
-            transaction: TransactionRepositoryImpl {},
             announcement: AnnouncementRepositoryInfra {},
             course: CourseRepositoryInfra {},
             registration: RegistrationRepositoryInfra {},
@@ -42,14 +37,6 @@ impl AnnouncementServiceImpl for AnnouncementServiceInfra {}
 impl HaveDBPool for AnnouncementServiceInfra {
     fn get_db_pool(&self) -> &DBPool {
         &self.db_pool
-    }
-}
-
-impl HaveTransactionRepository for AnnouncementServiceInfra {
-    type Repo = TransactionRepositoryImpl;
-
-    fn transaction_repo(&self) -> &Self::Repo {
-        &self.transaction
     }
 }
 

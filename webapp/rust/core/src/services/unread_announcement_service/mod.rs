@@ -1,7 +1,6 @@
 use crate::models::announcement::AnnouncementWithoutDetail;
 use crate::models::announcement_detail::AnnouncementDetail;
 use crate::repos::registration_repository::{HaveRegistrationRepository, RegistrationRepository};
-use crate::repos::transaction_repository::{HaveTransactionRepository, TransactionRepository};
 use crate::repos::unread_announcement_repository::{
     HaveUnreadAnnouncementRepository, UnreadAnnouncementRepository,
 };
@@ -39,11 +38,7 @@ pub trait HaveUnreadAnnouncementService {
 
 #[async_trait]
 pub trait UnreadAnnouncementServiceImpl:
-    Sync
-    + HaveDBPool
-    + HaveTransactionRepository
-    + HaveUnreadAnnouncementRepository
-    + HaveRegistrationRepository
+    Sync + HaveDBPool + HaveUnreadAnnouncementRepository + HaveRegistrationRepository
 {
     async fn find_all_with_count<'c>(
         &self,
@@ -53,7 +48,7 @@ pub trait UnreadAnnouncementServiceImpl:
         course_id: Option<&'c str>,
     ) -> Result<(Vec<AnnouncementWithoutDetail>, i64)> {
         let pool = self.get_db_pool();
-        let mut tx = self.transaction_repo().begin(pool).await?;
+        let mut tx = pool.begin().await?;
         let offset = limit * (page - 1);
 
         let repo = self.unread_announcement_repo();
@@ -76,7 +71,7 @@ pub trait UnreadAnnouncementServiceImpl:
         user_id: &str,
     ) -> Result<AnnouncementDetail> {
         let pool = self.get_db_pool();
-        let mut tx = self.transaction_repo().begin(pool).await?;
+        let mut tx = pool.begin().await?;
 
         let announcement = self
             .unread_announcement_repo()
