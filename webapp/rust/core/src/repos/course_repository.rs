@@ -1,4 +1,4 @@
-use crate::db::{DBConn, DBPool, TxConn};
+use crate::db::{DBConn, DBPool};
 use crate::models::course::{Course, CourseWithTeacher, CreateCourse};
 use crate::models::course_status::CourseStatus;
 use crate::models::day_of_week::DayOfWeek;
@@ -28,21 +28,21 @@ pub trait CourseRepository {
         offset: i64,
         query: &SearchCoursesQuery,
     ) -> Result<Vec<CourseWithTeacher>>;
-    async fn find_status_for_share_lock_by_id<'c>(
+    async fn find_status_for_share_lock_by_id(
         &self,
-        tx: &mut TxConn<'c>,
+        conn: &mut DBConn,
         id: &str,
     ) -> Result<Option<CourseStatus>>;
-    async fn find_for_share_lock_by_id<'c>(
+    async fn find_for_share_lock_by_id(
         &self,
-        tx: &mut TxConn<'c>,
+        conn: &mut DBConn,
         id: &str,
     ) -> Result<Option<Course>>;
-    async fn exist_by_id<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<bool>;
-    async fn for_update_by_id<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<bool>;
-    async fn update_status_by_id<'c>(
+    async fn exist_by_id(&self, conn: &mut DBConn, id: &str) -> Result<bool>;
+    async fn for_update_by_id(&self, conn: &mut DBConn, id: &str) -> Result<bool>;
+    async fn update_status_by_id(
         &self,
-        tx: &mut TxConn<'c>,
+        conn: &mut DBConn,
         id: &str,
         status: &CourseStatus,
     ) -> Result<()>;

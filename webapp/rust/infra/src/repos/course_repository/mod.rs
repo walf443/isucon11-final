@@ -1,6 +1,5 @@
-use crate::db;
 use async_trait::async_trait;
-use isucholar_core::db::{DBConn, DBPool, TxConn};
+use isucholar_core::db::{DBConn, DBPool};
 use isucholar_core::models::course::{Course, CourseWithTeacher, CreateCourse};
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::models::course_type::CourseType;
@@ -161,63 +160,57 @@ impl CourseRepository for CourseRepositoryInfra {
         Ok(courses)
     }
 
-    async fn find_status_for_share_lock_by_id<'c>(
+    async fn find_status_for_share_lock_by_id(
         &self,
-        tx: &mut TxConn<'c>,
+        conn: &mut DBConn,
         id: &str,
     ) -> Result<Option<CourseStatus>> {
-        let status: Option<CourseStatus> = db::fetch_optional_scalar(
-            sqlx::query_scalar!(
-                "SELECT `status` AS `status:CourseStatus` FROM `courses` WHERE `id` = ? FOR SHARE",
-                id
-            ),
-            tx,
+        let status = sqlx::query_scalar!(
+            "SELECT `status` AS `status:CourseStatus` FROM `courses` WHERE `id` = ? FOR SHARE",
+            id
         )
+        .fetch_optional(conn)
         .await?;
 
         Ok(status)
     }
 
-    async fn find_for_share_lock_by_id<'c>(
+    async fn find_for_share_lock_by_id(
         &self,
-        tx: &mut TxConn<'c>,
+        conn: &mut DBConn,
         id: &str,
     ) -> Result<Option<Course>> {
-        let course: Option<Course> = db::fetch_optional_as(
-            sqlx::query_as("SELECT * FROM `courses` WHERE `id` = ? FOR SHARE").bind(id),
-            tx,
-        )
-        .await?;
+        let course: Option<Course> =
+            sqlx::query_as("SELECT * FROM `courses` WHERE `id` = ? FOR SHARE")
+                .bind(id)
+                .fetch_optional(conn)
+                .await?;
 
         Ok(course)
     }
 
-    async fn exist_by_id<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<bool> {
-        let count: i64 = db::fetch_one_scalar(
-            sqlx::query_scalar!("SELECT COUNT(*) FROM `courses` WHERE `id` = ?", id),
-            tx,
+    async fn exist_by_id(&self, conn: &mut DBConn, id: &str) -> Result<bool> {
+        let count = sqlx::query_scalar!("SELECT COUNT(*) FROM `courses` WHERE `id` = ?", id)
+            .fetch_one(conn)
+            .await?;
+
+        Ok(count == 1)
+    }
+
+    async fn for_update_by_id(&self, conn: &mut DBConn, id: &str) -> Result<bool> {
+        let count = sqlx::query_scalar!(
+            "SELECT COUNT(*) FROM `courses` WHERE `id` = ? FOR UPDATE",
+            id
         )
+        .fetch_one(conn)
         .await?;
 
         Ok(count == 1)
     }
 
-    async fn for_update_by_id<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<bool> {
-        let count: i64 = db::fetch_one_scalar(
-            sqlx::query_scalar!(
-                "SELECT COUNT(*) FROM `courses` WHERE `id` = ? FOR UPDATE",
-                id
-            ),
-            tx,
-        )
-        .await?;
-
-        Ok(count == 1)
-    }
-
-    async fn update_status_by_id<'c>(
+    async fn update_status_by_id(
         &self,
-        tx: &mut TxConn<'c>,
+        conn: &mut DBConn,
         id: &str,
         status: &CourseStatus,
     ) -> Result<()> {
@@ -226,7 +219,7 @@ impl CourseRepository for CourseRepositoryInfra {
             status,
             id
         )
-        .execute(tx)
+        .execute(conn)
         .await?;
 
         Ok(())
