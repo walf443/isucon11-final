@@ -1,6 +1,6 @@
 use crate::db;
 use async_trait::async_trait;
-use isucholar_core::db::TxConn;
+use isucholar_core::db::{DBConn, TxConn};
 use isucholar_core::models::user::User;
 use isucholar_core::models::user_type::UserType;
 use isucholar_core::repos::error::Result;
@@ -18,9 +18,9 @@ pub struct RegistrationRepositoryInfra {}
 
 #[async_trait]
 impl RegistrationRepository for RegistrationRepositoryInfra {
-    async fn create_or_update<'c>(
+    async fn create_or_update(
         &self,
-        tx: &mut TxConn<'c>,
+        conn: &mut DBConn,
         user_id: &str,
         course_id: &str,
     ) -> Result<()> {
@@ -29,7 +29,7 @@ impl RegistrationRepository for RegistrationRepositoryInfra {
             course_id,
             user_id,
         )
-        .execute(tx)
+        .execute(conn)
         .await?;
 
         Ok(())
@@ -54,9 +54,9 @@ impl RegistrationRepository for RegistrationRepositoryInfra {
         Ok(registration_count != 0)
     }
 
-    async fn find_users_by_course_id<'c>(
+    async fn find_users_by_course_id(
         &self,
-        tx: &mut TxConn<'c>,
+        conn: &mut DBConn,
         course_id: &str,
     ) -> Result<Vec<User>> {
         let users: Vec<User> = sqlx::query_as!(
@@ -74,7 +74,7 @@ impl RegistrationRepository for RegistrationRepositoryInfra {
             ",
             course_id
         )
-        .fetch_all(tx)
+        .fetch_all(conn)
         .await?;
 
         Ok(users)

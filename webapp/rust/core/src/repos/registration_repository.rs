@@ -1,4 +1,4 @@
-use crate::db::TxConn;
+use crate::db::{DBConn, TxConn};
 use crate::models::user::User;
 use crate::repos::error::Result;
 use async_trait::async_trait;
@@ -6,9 +6,9 @@ use async_trait::async_trait;
 #[cfg_attr(any(test, feature = "test"), mockall::automock)]
 #[async_trait]
 pub trait RegistrationRepository {
-    async fn create_or_update<'c>(
+    async fn create_or_update(
         &self,
-        tx: &mut TxConn<'c>,
+        conn: &mut DBConn,
         user_id: &str,
         course_id: &str,
     ) -> Result<()>;
@@ -18,9 +18,9 @@ pub trait RegistrationRepository {
         user_id: &str,
         course_id: &str,
     ) -> Result<bool>;
-    async fn find_users_by_course_id<'c>(
+    async fn find_users_by_course_id(
         &self,
-        tx: &mut TxConn<'c>,
+        conn: &mut DBConn,
         course_id: &str,
     ) -> Result<Vec<User>>;
 }
