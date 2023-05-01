@@ -1,4 +1,8 @@
 use fake::Dummy;
+use sqlx::database::{HasArguments, HasValueRef};
+use sqlx::encode::IsNull;
+use sqlx::error::BoxDynError;
+use sqlx::{Database, Decode};
 
 #[derive(Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize, Clone, Dummy)]
 #[serde(rename_all = "lowercase")]
@@ -9,20 +13,27 @@ pub enum DayOfWeek {
     Thursday,
     Friday,
 }
-impl sqlx::Type<sqlx::MySql> for DayOfWeek {
-    fn type_info() -> sqlx::mysql::MySqlTypeInfo {
-        str::type_info()
+
+impl<DB: Database> sqlx::Type<DB> for DayOfWeek
+where
+    str: sqlx::Type<DB>,
+{
+    fn type_info() -> DB::TypeInfo {
+        <str as sqlx::Type<DB>>::type_info()
     }
 
-    fn compatible(ty: &sqlx::mysql::MySqlTypeInfo) -> bool {
-        <&str>::compatible(ty)
+    fn compatible(ty: &<DB as sqlx::Database>::TypeInfo) -> bool {
+        <&str as sqlx::Type<DB>>::compatible(ty)
     }
 }
-impl<'r> sqlx::Decode<'r, sqlx::MySql> for DayOfWeek {
-    fn decode(
-        value: sqlx::mysql::MySqlValueRef<'r>,
-    ) -> Result<Self, Box<dyn std::error::Error + Sync + Send>> {
-        match <&'r str>::decode(value)? {
+
+impl<'r, DB: Database> sqlx::Decode<'r, DB> for DayOfWeek
+where
+    &'r str: Decode<'r, DB>,
+{
+    fn decode(value: <DB as HasValueRef<'r>>::ValueRef) -> Result<Self, BoxDynError> {
+        let value = <&str as Decode<DB>>::decode(value)?;
+        match value {
             "monday" => Ok(Self::Monday),
             "tuesday" => Ok(Self::Tuesday),
             "wednesday" => Ok(Self::Wednesday),
@@ -32,15 +43,20 @@ impl<'r> sqlx::Decode<'r, sqlx::MySql> for DayOfWeek {
         }
     }
 }
-impl<'q> sqlx::Encode<'q, sqlx::MySql> for DayOfWeek {
-    fn encode_by_ref(&self, buf: &mut Vec<u8>) -> sqlx::encode::IsNull {
-        match *self {
+
+impl<'q, DB: Database> sqlx::Encode<'q, DB> for DayOfWeek
+where
+    &'q str: sqlx::Encode<'q, DB>,
+{
+    fn encode_by_ref(&self, buf: &mut <DB as HasArguments<'q>>::ArgumentBuffer) -> IsNull {
+        let result = match *self {
             Self::Monday => "monday",
             Self::Tuesday => "tuesday",
             Self::Wednesday => "wednesday",
             Self::Thursday => "thursday",
             Self::Friday => "friday",
-        }
-        .encode_by_ref(buf)
+        };
+
+        <&str as sqlx::Encode<'_, DB>>::encode_by_ref(&result, buf)
     }
 }

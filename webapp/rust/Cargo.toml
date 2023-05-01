@@ -18,7 +18,7 @@ log = "0.4"
 num-traits = { version = "0" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-sqlx = { version = "0.5", default-features = false, features = ["macros", "runtime-actix-rustls", "mysql", "chrono", "decimal"] }
+sqlx = { version = "0.6", default-features = false, features = ["macros", "runtime-actix-rustls", "mysql", "chrono", "decimal"] }
 thiserror = { version = "1" }
 tokio = { version = "1", features = ["fs", "process", "macros"] }
 ulid = { version = "0.4" }

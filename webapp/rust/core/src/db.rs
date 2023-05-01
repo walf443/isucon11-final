@@ -51,7 +51,7 @@ async fn _get_db_conn(database: &str) -> Result<DBPool, sqlx::Error> {
         .ssl_mode(sqlx::mysql::MySqlSslMode::Disabled);
     let pool = sqlx::mysql::MySqlPoolOptions::new()
         .max_connections(10)
-        .after_connect(|conn| {
+        .after_connect(|conn, _| {
             Box::pin(async move {
                 conn.execute("set time_zone = '+00:00'").await?;
                 Ok(())

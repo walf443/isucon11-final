@@ -1,4 +1,8 @@
 use fake::Dummy;
+use sqlx::database::{HasArguments, HasValueRef};
+use sqlx::encode::IsNull;
+use sqlx::error::BoxDynError;
+use sqlx::{Database, Decode, Encode};
 
 #[derive(Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize, Dummy)]
 #[serde(rename_all = "kebab-case")]
@@ -7,20 +11,27 @@ pub enum CourseStatus {
     InProgress,
     Closed,
 }
-impl sqlx::Type<sqlx::MySql> for CourseStatus {
-    fn type_info() -> sqlx::mysql::MySqlTypeInfo {
-        str::type_info()
+
+impl<DB: Database> sqlx::Type<DB> for CourseStatus
+where
+    str: sqlx::Type<DB>,
+{
+    fn type_info() -> DB::TypeInfo {
+        <str as sqlx::Type<DB>>::type_info()
     }
 
-    fn compatible(ty: &sqlx::mysql::MySqlTypeInfo) -> bool {
-        <&str>::compatible(ty)
+    fn compatible(ty: &<DB as sqlx::Database>::TypeInfo) -> bool {
+        <&str as sqlx::Type<DB>>::compatible(ty)
     }
 }
-impl<'r> sqlx::Decode<'r, sqlx::MySql> for CourseStatus {
-    fn decode(
-        value: sqlx::mysql::MySqlValueRef<'r>,
-    ) -> Result<Self, Box<dyn std::error::Error + Sync + Send>> {
-        match <&'r str>::decode(value)? {
+
+impl<'r, DB: Database> sqlx::Decode<'r, DB> for CourseStatus
+where
+    &'r str: Decode<'r, DB>,
+{
+    fn decode(value: <DB as HasValueRef<'r>>::ValueRef) -> Result<Self, BoxDynError> {
+        let value = <&str as Decode<DB>>::decode(value)?;
+        match value {
             "registration" => Ok(Self::Registration),
             "in-progress" => Ok(Self::InProgress),
             "closed" => Ok(Self::Closed),
@@ -28,13 +39,18 @@ impl<'r> sqlx::Decode<'r, sqlx::MySql> for CourseStatus {
         }
     }
 }
-impl<'q> sqlx::Encode<'q, sqlx::MySql> for CourseStatus {
-    fn encode_by_ref(&self, buf: &mut Vec<u8>) -> sqlx::encode::IsNull {
-        match *self {
+
+impl<'q, DB: Database> sqlx::Encode<'q, DB> for CourseStatus
+where
+    &'q str: Encode<'q, DB>,
+{
+    fn encode_by_ref(&self, buf: &mut <DB as HasArguments<'q>>::ArgumentBuffer) -> IsNull {
+        let result = match *self {
             Self::Registration => "registration",
             Self::InProgress => "in-progress",
             Self::Closed => "closed",
-        }
-        .encode_by_ref(buf)
+        };
+
+        <&str as Encode<'_, DB>>::encode_by_ref(&result, buf)
     }
 }

@@ -1,4 +1,8 @@
 use fake::Dummy;
+use sqlx::database::{HasArguments, HasValueRef};
+use sqlx::encode::IsNull;
+use sqlx::error::BoxDynError;
+use sqlx::{Database, Decode, Encode};
 
 #[derive(Debug, PartialEq, Eq, serde::Deserialize, Clone, Dummy)]
 #[serde(rename_all = "kebab-case")]
@@ -6,32 +10,44 @@ pub enum CourseType {
     LiberalArts,
     MajorSubjects,
 }
-impl sqlx::Type<sqlx::MySql> for CourseType {
-    fn type_info() -> sqlx::mysql::MySqlTypeInfo {
-        str::type_info()
+
+impl<DB: Database> sqlx::Type<DB> for CourseType
+where
+    str: sqlx::Type<DB>,
+{
+    fn type_info() -> DB::TypeInfo {
+        <str as sqlx::Type<DB>>::type_info()
     }
 
-    fn compatible(ty: &sqlx::mysql::MySqlTypeInfo) -> bool {
-        <&str>::compatible(ty)
+    fn compatible(ty: &<DB as sqlx::Database>::TypeInfo) -> bool {
+        <&str as sqlx::Type<DB>>::compatible(ty)
     }
 }
-impl<'r> sqlx::Decode<'r, sqlx::MySql> for CourseType {
-    fn decode(
-        value: sqlx::mysql::MySqlValueRef<'r>,
-    ) -> Result<Self, Box<dyn std::error::Error + Sync + Send>> {
-        match <&'r str>::decode(value)? {
+
+impl<'r, DB: Database> sqlx::Decode<'r, DB> for CourseType
+where
+    &'r str: Decode<'r, DB>,
+{
+    fn decode(value: <DB as HasValueRef<'r>>::ValueRef) -> Result<Self, BoxDynError> {
+        let value = <&str as Decode<DB>>::decode(value)?;
+        match value {
             "liberal-arts" => Ok(Self::LiberalArts),
             "major-subjects" => Ok(Self::MajorSubjects),
             v => Err(format!("Unknown enum variant: {}", v).into()),
         }
     }
 }
-impl<'q> sqlx::Encode<'q, sqlx::MySql> for CourseType {
-    fn encode_by_ref(&self, buf: &mut Vec<u8>) -> sqlx::encode::IsNull {
-        match *self {
+
+impl<'q, DB: Database> sqlx::Encode<'q, DB> for CourseType
+where
+    &'q str: Encode<'q, DB>,
+{
+    fn encode_by_ref(&self, buf: &mut <DB as HasArguments<'q>>::ArgumentBuffer) -> IsNull {
+        let result = match *self {
             Self::LiberalArts => "liberal-arts",
             Self::MajorSubjects => "major-subjects",
-        }
-        .encode_by_ref(buf)
+        };
+
+        <&str as Encode<'_, DB>>::encode_by_ref(&result, buf)
     }
 }

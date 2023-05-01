@@ -1,36 +1,52 @@
 use fake::Dummy;
+use sqlx::database::{HasArguments, HasValueRef};
+use sqlx::encode::IsNull;
+use sqlx::error::BoxDynError;
+use sqlx::{Database, Decode, Encode};
 
 #[derive(Debug, PartialEq, Eq, Dummy)]
 pub enum UserType {
     Student,
     Teacher,
 }
-impl sqlx::Type<sqlx::MySql> for UserType {
-    fn type_info() -> sqlx::mysql::MySqlTypeInfo {
-        str::type_info()
+
+impl<DB: Database> sqlx::Type<DB> for UserType
+where
+    str: sqlx::Type<DB>,
+{
+    fn type_info() -> DB::TypeInfo {
+        <str as sqlx::Type<DB>>::type_info()
     }
 
-    fn compatible(ty: &sqlx::mysql::MySqlTypeInfo) -> bool {
-        <&str>::compatible(ty)
+    fn compatible(ty: &<DB as sqlx::Database>::TypeInfo) -> bool {
+        <&str as sqlx::Type<DB>>::compatible(ty)
     }
 }
-impl<'r> sqlx::Decode<'r, sqlx::MySql> for UserType {
-    fn decode(
-        value: sqlx::mysql::MySqlValueRef<'r>,
-    ) -> Result<Self, Box<dyn std::error::Error + Sync + Send>> {
-        match <&'r str>::decode(value)? {
+
+impl<'r, DB: Database> sqlx::Decode<'r, DB> for UserType
+where
+    &'r str: Decode<'r, DB>,
+{
+    fn decode(value: <DB as HasValueRef<'r>>::ValueRef) -> Result<Self, BoxDynError> {
+        let value = <&str as Decode<DB>>::decode(value)?;
+        match value {
             "student" => Ok(Self::Student),
             "teacher" => Ok(Self::Teacher),
             v => Err(format!("Unknown enum variant: {}", v).into()),
         }
     }
 }
-impl<'q> sqlx::Encode<'q, sqlx::MySql> for UserType {
-    fn encode_by_ref(&self, buf: &mut Vec<u8>) -> sqlx::encode::IsNull {
-        match *self {
+
+impl<'q, DB: Database> sqlx::Encode<'q, DB> for UserType
+where
+    &'q str: Encode<'q, DB>,
+{
+    fn encode_by_ref(&self, buf: &mut <DB as HasArguments<'q>>::ArgumentBuffer) -> IsNull {
+        let result = match *self {
             Self::Teacher => "teacher",
             Self::Student => "student",
-        }
-        .encode_by_ref(buf)
+        };
+
+        <&str as Encode<'_, DB>>::encode_by_ref(&result, buf)
     }
 }
