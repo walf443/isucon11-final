@@ -7,6 +7,9 @@ use isucholar_core::repos::error::Result;
 use isucholar_core::repos::unread_announcement_repository::UnreadAnnouncementRepository;
 use sqlx::Arguments;
 
+#[cfg(test)]
+mod create;
+
 #[derive(Clone)]
 pub struct UnreadAnnouncementRepositoryInfra {}
 

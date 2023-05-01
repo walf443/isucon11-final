@@ -81,8 +81,7 @@ pub trait AnnouncementServiceImpl:
 
         let repo = self.unread_announcement_repo();
         for user in targets {
-            repo.create(&mut tx, &announcement.id, &user.id)
-                .await?;
+            repo.create(&mut tx, &announcement.id, &user.id).await?;
         }
 
         tx.commit().await?;
