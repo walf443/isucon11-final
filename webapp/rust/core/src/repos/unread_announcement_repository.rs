@@ -7,13 +7,8 @@ use async_trait::async_trait;
 #[cfg_attr(any(test, feature = "test"), mockall::automock)]
 #[async_trait]
 pub trait UnreadAnnouncementRepository {
-    async fn create<'c>(
-        &self,
-        conn: &mut DBConn,
-        announcement_id: &str,
-        user_id: &str,
-    ) -> Result<()>;
-    async fn mark_read<'c>(&self, tx: &mut TxConn<'c>, id: &str, user_id: &str) -> Result<()>;
+    async fn create(&self, conn: &mut DBConn, announcement_id: &str, user_id: &str) -> Result<()>;
+    async fn mark_read(&self, conn: &mut DBConn, announcement_id: &str, user_id: &str) -> Result<()>;
     async fn count_unread_by_user_id_in_tx<'c>(
         &self,
         tx: &mut TxConn<'c>,

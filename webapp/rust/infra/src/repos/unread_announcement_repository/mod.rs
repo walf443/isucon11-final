@@ -9,18 +9,15 @@ use sqlx::Arguments;
 
 #[cfg(test)]
 mod create;
+#[cfg(test)]
+mod mark_read;
 
 #[derive(Clone)]
 pub struct UnreadAnnouncementRepositoryInfra {}
 
 #[async_trait]
 impl UnreadAnnouncementRepository for UnreadAnnouncementRepositoryInfra {
-    async fn create<'c>(
-        &self,
-        conn: &mut DBConn,
-        announcement_id: &str,
-        user_id: &str,
-    ) -> Result<()> {
+    async fn create(&self, conn: &mut DBConn, announcement_id: &str, user_id: &str) -> Result<()> {
         sqlx::query!(
             "INSERT INTO `unread_announcements` (`announcement_id`, `user_id`) VALUES (?, ?)",
             announcement_id,
@@ -30,16 +27,19 @@ impl UnreadAnnouncementRepository for UnreadAnnouncementRepositoryInfra {
         .await?;
         Ok(())
     }
-    async fn mark_read<'c>(
+
+    async fn mark_read(
         &self,
-        tx: &mut TxConn<'c>,
+        conn: &mut DBConn,
         announcement_id: &str,
         user_id: &str,
     ) -> Result<()> {
-        sqlx::query("UPDATE `unread_announcements` SET `is_deleted` = true WHERE `announcement_id` = ? AND `user_id` = ?")
-            .bind(announcement_id)
-            .bind(user_id)
-            .execute(tx)
+        sqlx::query!(
+            "UPDATE `unread_announcements` SET `is_deleted` = true WHERE `announcement_id` = ? AND `user_id` = ?",
+            announcement_id,
+            user_id,
+        )
+            .execute(conn)
             .await?;
 
         Ok(())
