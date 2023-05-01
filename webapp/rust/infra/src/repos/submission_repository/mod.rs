@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use isucholar_core::db::{DBConn, TxConn};
+use isucholar_core::db::DBConn;
 use isucholar_core::models::submission::{CreateSubmission, SubmissionWithUserCode};
 use isucholar_core::repos::error::Result;
 use isucholar_core::repos::submission_repository::SubmissionRepository;
@@ -20,9 +20,9 @@ pub struct SubmissionRepositoryInfra {}
 
 #[async_trait]
 impl SubmissionRepository for SubmissionRepositoryInfra {
-    async fn create_or_update<'c>(
+    async fn create_or_update(
         &self,
-        tx: &mut TxConn,
+        conn: &mut DBConn,
         submission: &CreateSubmission,
     ) -> Result<()> {
         sqlx::query!(
@@ -31,7 +31,7 @@ impl SubmissionRepository for SubmissionRepositoryInfra {
             &submission.class_id,
             &submission.file_name,
         )
-            .execute(tx)
+            .execute(conn)
             .await?;
 
         Ok(())
@@ -47,9 +47,9 @@ impl SubmissionRepository for SubmissionRepositoryInfra {
         Ok(submissions_count)
     }
 
-    async fn update_score_by_user_code_and_class_id<'c>(
+    async fn update_score_by_user_code_and_class_id(
         &self,
-        tx: &mut TxConn,
+        conn: &mut DBConn,
         user_code: &str,
         class_id: &str,
         score: i64,
@@ -60,7 +60,7 @@ impl SubmissionRepository for SubmissionRepositoryInfra {
             user_code,
             class_id,
         )
-            .execute(tx)
+            .execute(conn)
             .await?;
 
         Ok(())
@@ -92,9 +92,9 @@ impl SubmissionRepository for SubmissionRepositoryInfra {
         }
     }
 
-    async fn find_all_with_user_code_by_class_id<'c>(
+    async fn find_all_with_user_code_by_class_id(
         &self,
-        tx: &mut TxConn,
+        conn: &mut DBConn,
         class_id: &str,
     ) -> Result<Vec<SubmissionWithUserCode>> {
         let submissions: Vec<SubmissionWithUserCode> = sqlx::query_as!(
@@ -107,7 +107,7 @@ impl SubmissionRepository for SubmissionRepositoryInfra {
             ",
             class_id
         )
-        .fetch_all(tx)
+        .fetch_all(conn)
         .await?;
 
         Ok(submissions)

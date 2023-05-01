@@ -1,19 +1,19 @@
-use crate::db::{DBConn, TxConn};
+use crate::db::DBConn;
 use crate::models::submission::{CreateSubmission, SubmissionWithUserCode};
 use crate::repos::error::Result;
 use async_trait::async_trait;
 
 #[async_trait]
 pub trait SubmissionRepository {
-    async fn create_or_update<'c>(
+    async fn create_or_update(
         &self,
-        tx: &mut TxConn<'c>,
+        conn: &mut DBConn,
         submission: &CreateSubmission,
     ) -> Result<()>;
     async fn count_by_class_id(&self, conn: &mut DBConn, class_id: &str) -> Result<i64>;
-    async fn update_score_by_user_code_and_class_id<'c>(
+    async fn update_score_by_user_code_and_class_id(
         &self,
-        tx: &mut TxConn,
+        conn: &mut DBConn,
         user_code: &str,
         class_id: &str,
         score: i64,
@@ -24,9 +24,9 @@ pub trait SubmissionRepository {
         class_id: &str,
         user_id: &str,
     ) -> Result<Option<u8>>;
-    async fn find_all_with_user_code_by_class_id<'c>(
+    async fn find_all_with_user_code_by_class_id(
         &self,
-        tx: &mut TxConn,
+        conn: &mut DBConn,
         class_id: &str,
     ) -> Result<Vec<SubmissionWithUserCode>>;
 }
