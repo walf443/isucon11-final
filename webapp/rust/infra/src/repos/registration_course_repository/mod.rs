@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 use futures::StreamExt;
-use isucholar_core::db::{DBConn, TxConn};
+use isucholar_core::db::DBConn;
 use isucholar_core::models::course::Course;
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::models::course_type::CourseType;
@@ -55,7 +55,7 @@ impl RegistrationCourseRepository for RegistrationCourseRepositoryInfra {
 
     async fn find_open_courses_by_user_id(
         &self,
-        tx: &mut TxConn,
+        conn: &mut DBConn,
         user_id: &str,
     ) -> Result<Vec<Course>> {
         let courses: Vec<Course> = sqlx::query_as!(
@@ -80,7 +80,7 @@ impl RegistrationCourseRepository for RegistrationCourseRepositoryInfra {
             CourseStatus::Closed,
             user_id
         )
-        .fetch_all(tx)
+        .fetch_all(conn)
         .await?;
 
         Ok(courses)
