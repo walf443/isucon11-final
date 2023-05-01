@@ -1,6 +1,11 @@
 use crate::routes::course_routes::get_course_routes;
 use crate::routes::initialize::initialize;
-use actix_web::body::{BoxBody, EitherBody};
+use actix_session::config::PersistentSession;
+use actix_session::storage::CookieSessionStore;
+use actix_session::SessionMiddleware;
+use actix_web::body::{BoxBody, MessageBody};
+use actix_web::cookie::time::Duration;
+use actix_web::cookie::Key;
 use actix_web::dev::{ServiceFactory, ServiceRequest, ServiceResponse};
 use actix_web::{web, Error};
 use isucholar_core::db::DBPool;
@@ -13,8 +18,6 @@ use isucholar_infra::services::manager::ServiceManagerImpl;
 
 pub mod routes;
 
-const SESSION_NAME: &str = "isucholar_rust";
-
 pub fn create_app(
     pool: DBPool,
     service: ServiceManagerImpl,
@@ -22,7 +25,7 @@ pub fn create_app(
     impl ServiceFactory<
         ServiceRequest,
         Config = (),
-        Response = ServiceResponse<EitherBody<BoxBody>>,
+        Response = ServiceResponse<BoxBody>,
         Error = Error,
         InitError = (),
     >,
@@ -31,18 +34,17 @@ pub fn create_app(
     let courses_api = get_course_routes::<ServiceManagerImpl>();
     let announcements_api = get_announcement_routes::<ServiceManagerImpl>();
 
-    let mut session_key = b"trapnomura".to_vec();
-    session_key.resize(32, 0);
+    let session_key = env!("SESSION_KEY").try_into_bytes().unwrap().to_vec();
 
     actix_web::App::new()
         .app_data(web::Data::new(pool))
         .app_data(web::Data::new(service))
         // .wrap(actix_web::middleware::Logger::default())
         .wrap(
-            actix_session::CookieSession::signed(&session_key)
-                .secure(false)
-                .name(SESSION_NAME)
-                .max_age(3600),
+            SessionMiddleware::builder(CookieSessionStore::default(), Key::from(&session_key))
+                .cookie_secure(false)
+                .session_lifecycle(PersistentSession::default().session_ttl(Duration::hours(1)))
+                .build(),
         )
         .route("/initialize", web::post().to(initialize))
         .route("/login", web::post().to(login::<ServiceManagerImpl>))

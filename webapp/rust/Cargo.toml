@@ -6,7 +6,7 @@ members = ["core", "infra", "http-core", "http-app"]
 [workspace.dependencies]
 actix-files = "0.6"
 actix-multipart = "0.6"
-actix-session = "0.5"
+actix-session = { version = "0.7", features = ["cookie-session"] }
 actix-web = { version = "4.3", default-features = false, features = ["macros"] }
 anyhow = { version = "1" }
 async-trait = { version = "0" }

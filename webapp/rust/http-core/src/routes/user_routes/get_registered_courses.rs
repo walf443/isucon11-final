@@ -34,7 +34,7 @@ pub async fn get_registered_courses<Service: HaveCourseService>(
 #[cfg(test)]
 mod tests {
     use crate::routes::user_routes::get_registered_courses::get_registered_courses;
-    use actix_session::UserSession;
+    use actix_session::SessionExt;
     use actix_web::body::to_bytes;
     use actix_web::http::StatusCode;
     use actix_web::test::TestRequest;

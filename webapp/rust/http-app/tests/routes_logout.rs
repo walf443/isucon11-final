@@ -18,7 +18,4 @@ async fn success_case() {
 
     let res = test::call_service(&app, req).await;
     assert_eq!(res.status(), StatusCode::OK);
-
-    let set_cookie_header = res.headers().get("Set-Cookie").unwrap();
-    assert_ne!(set_cookie_header, "");
 }

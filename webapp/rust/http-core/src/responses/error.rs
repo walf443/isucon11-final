@@ -1,4 +1,5 @@
 use actix_multipart::MultipartError;
+use actix_session::{SessionGetError, SessionInsertError};
 use actix_web::HttpResponse;
 use bcrypt::BcryptError;
 use isucholar_core::repos::error::ReposError;
@@ -25,6 +26,10 @@ pub enum ResponseError {
     MultipartError(#[from] MultipartError),
     #[error("url encode error")]
     UrlEncodeError(#[from] serde_urlencoded::ser::Error),
+    #[error("session get error")]
+    SessionGetError(#[from] SessionGetError),
+    #[error("session insert error")]
+    SessionInsertError(#[from] SessionInsertError),
     #[error("Invalid page.")]
     InvalidPage,
     #[error("Invalid file.")]

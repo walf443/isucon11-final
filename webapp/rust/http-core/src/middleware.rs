@@ -40,7 +40,7 @@ where
     actix_web::dev::forward_ready!(service);
 
     fn call(&self, req: actix_web::dev::ServiceRequest) -> Self::Future {
-        use actix_session::UserSession as _;
+        use actix_session::SessionExt as _;
         use futures::FutureExt as _;
 
         match req.get_session().get::<String>("userID") {
@@ -49,7 +49,7 @@ where
                 "You are not logged in.",
             ))
             .right_future(),
-            Err(e) => future::err(e).right_future(),
+            Err(e) => future::err(e.into()).right_future(),
         }
     }
 }
@@ -92,7 +92,7 @@ where
     actix_web::dev::forward_ready!(service);
 
     fn call(&self, req: actix_web::dev::ServiceRequest) -> Self::Future {
-        use actix_session::UserSession as _;
+        use actix_session::SessionExt as _;
         use futures::FutureExt as _;
 
         match req.get_session().get::<bool>("isAdmin") {
@@ -101,7 +101,7 @@ where
                 future::err(actix_web::error::ErrorForbidden("You are not admin user."))
                     .right_future()
             }
-            Err(e) => future::err(e).right_future(),
+            Err(e) => future::err(e.into()).right_future(),
         }
     }
 }

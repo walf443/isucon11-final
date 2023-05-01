@@ -38,7 +38,7 @@ pub async fn get_announcement_detail<Service: HaveUnreadAnnouncementService>(
 #[cfg(test)]
 mod tests {
     use crate::routes::announcement_routes::get_announcement_detail::get_announcement_detail;
-    use actix_session::UserSession;
+    use actix_session::SessionExt;
     use actix_web::body::to_bytes;
     use actix_web::test::TestRequest;
     use actix_web::web::{Bytes, Data, Path};

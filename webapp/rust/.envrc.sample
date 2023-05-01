@@ -1,2 +1,3 @@
 export MYSQL_TEST_DATABASE=isucholar-test
 export DATABASE_URL=mysql://isucon:isucon@localhost:3306/$MYSQL_TEST_DATABASE
+export SESSION_KEY=IyohDeechaengeThee9zoiNgewai3eexu6aec2AuKai1wechiJei4eitheineiKangaiwia2Boh2Aip4tohcae2soo1eidei0ni9Ouci2qua4hoshaiphaLahNgoozie

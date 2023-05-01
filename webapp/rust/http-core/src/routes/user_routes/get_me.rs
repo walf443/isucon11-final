@@ -33,7 +33,7 @@ pub async fn get_me<Service: HaveUserService>(
 #[cfg(test)]
 mod tests {
     use crate::routes::user_routes::get_me::{get_me, GetMeResponse};
-    use actix_session::UserSession;
+    use actix_session::SessionExt;
     use actix_web::body::to_bytes;
     use actix_web::http::StatusCode;
     use actix_web::test::TestRequest;

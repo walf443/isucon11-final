@@ -2,6 +2,7 @@ use actix_web::HttpResponse;
 
 // POST /logout ログアウト
 pub async fn logout(session: actix_session::Session) -> actix_web::Result<HttpResponse> {
+    session.renew();
     session.purge();
     Ok(HttpResponse::Ok().finish())
 }
@@ -9,7 +10,7 @@ pub async fn logout(session: actix_session::Session) -> actix_web::Result<HttpRe
 #[cfg(test)]
 mod tests {
     use crate::routes::logout::logout;
-    use actix_session::UserSession;
+    use actix_session::SessionExt;
     use actix_web::http::StatusCode;
     use actix_web::test::TestRequest;
 
