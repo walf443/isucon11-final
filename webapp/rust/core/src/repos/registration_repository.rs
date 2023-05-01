@@ -1,4 +1,4 @@
-use crate::db::{DBConn, TxConn};
+use crate::db::DBConn;
 use crate::models::user::User;
 use crate::repos::error::Result;
 use async_trait::async_trait;
@@ -12,9 +12,9 @@ pub trait RegistrationRepository {
         user_id: &str,
         course_id: &str,
     ) -> Result<()>;
-    async fn exist_by_user_id_and_course_id<'c>(
+    async fn exist_by_user_id_and_course_id(
         &self,
-        tx: &mut TxConn<'c>,
+        conn: &mut DBConn,
         user_id: &str,
         course_id: &str,
     ) -> Result<bool>;

@@ -1,6 +1,5 @@
-use crate::db;
 use async_trait::async_trait;
-use isucholar_core::db::{DBConn, TxConn};
+use isucholar_core::db::DBConn;
 use isucholar_core::models::user::User;
 use isucholar_core::models::user_type::UserType;
 use isucholar_core::repos::error::Result;
@@ -35,20 +34,18 @@ impl RegistrationRepository for RegistrationRepositoryInfra {
         Ok(())
     }
 
-    async fn exist_by_user_id_and_course_id<'c>(
+    async fn exist_by_user_id_and_course_id(
         &self,
-        tx: &mut TxConn<'c>,
+        conn: &mut DBConn,
         user_id: &str,
         course_id: &str,
     ) -> Result<bool> {
-        let registration_count: i64 = db::fetch_one_scalar(
-            sqlx::query_scalar!(
-                "SELECT COUNT(*) FROM `registrations` WHERE `user_id` = ? AND `course_id` = ?",
-                user_id,
-                course_id
-            ),
-            tx,
+        let registration_count: i64 = sqlx::query_scalar!(
+            "SELECT COUNT(*) FROM `registrations` WHERE `user_id` = ? AND `course_id` = ?",
+            user_id,
+            course_id
         )
+        .fetch_one(conn)
         .await?;
 
         Ok(registration_count != 0)
