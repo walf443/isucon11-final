@@ -21,7 +21,8 @@ pub trait HaveUserService {
 pub trait UserServiceImpl: Sync + HaveDBPool + HaveUserRepository {
     async fn find_by_code(&self, code: &str) -> Result<Option<User>> {
         let pool = self.get_db_pool();
-        let result = self.user_repo().find_by_code(pool, code).await?;
+        let mut conn = pool.acquire().await?;
+        let result = self.user_repo().find_by_code(&mut conn, code).await?;
         Ok(result)
     }
 
