@@ -12,6 +12,8 @@ mod count_unread_by_user_id;
 #[cfg(test)]
 mod create;
 #[cfg(test)]
+mod find_announcement_detail_by_announcement_id_and_user_id;
+#[cfg(test)]
 mod mark_read;
 
 #[derive(Clone)]
@@ -102,17 +104,25 @@ impl UnreadAnnouncementRepository for UnreadAnnouncementRepositoryInfra {
         announcement_id: &str,
         user_id: &str,
     ) -> Result<Option<AnnouncementDetail>> {
-        let announcement: Option<AnnouncementDetail> = db::fetch_optional_as(
-            sqlx::query_as(concat!(
-            "SELECT `announcements`.`id`, `courses`.`id` AS `course_id`, `courses`.`name` AS `course_name`, `announcements`.`title`, `announcements`.`message`, NOT `unread_announcements`.`is_deleted` AS `unread`",
-            " FROM `announcements`",
-            " JOIN `courses` ON `courses`.`id` = `announcements`.`course_id`",
-            " JOIN `unread_announcements` ON `unread_announcements`.`announcement_id` = `announcements`.`id`",
-            " WHERE `announcements`.`id` = ?",
-            " AND `unread_announcements`.`user_id` = ?",
-            )).bind(announcement_id).bind(user_id),
-            tx
-        ).await?;
+        let announcement: Option<AnnouncementDetail> = sqlx::query_as!(
+            AnnouncementDetail,
+            r"
+                SELECT
+                    `announcements`.`id`,
+                    `courses`.`id` AS `course_id`,
+                    `courses`.`name` AS `course_name`,
+                    `announcements`.`title`,
+                    `announcements`.`message`,
+                    NOT `unread_announcements`.`is_deleted` AS `unread:bool`
+                FROM `announcements`
+                JOIN `courses` ON `courses`.`id` = `announcements`.`course_id`
+                JOIN `unread_announcements` ON `unread_announcements`.`announcement_id` = `announcements`.`id`
+                WHERE
+                    `announcements`.`id` = ? AND `unread_announcements`.`user_id` = ?
+            ",
+            announcement_id,
+            user_id,
+        ).fetch_optional(tx).await?;
 
         Ok(announcement)
     }
