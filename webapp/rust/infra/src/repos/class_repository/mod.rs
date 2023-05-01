@@ -68,16 +68,12 @@ impl ClassRepository for ClassRepositoryInfra {
         Ok(())
     }
 
-    async fn update_submission_closed_by_id<'c>(
-        &self,
-        tx: &mut TxConn<'c>,
-        id: &str,
-    ) -> Result<()> {
+    async fn update_submission_closed_by_id(&self, conn: &mut DBConn, id: &str) -> Result<()> {
         sqlx::query!(
             "UPDATE `classes` SET `submission_closed` = true WHERE `id` = ?",
             id
         )
-        .execute(tx)
+        .execute(conn)
         .await?;
 
         Ok(())
@@ -155,9 +151,9 @@ impl ClassRepository for ClassRepositoryInfra {
         Ok(classes)
     }
 
-    async fn find_all_with_submitted_by_user_id_and_course_id<'c>(
+    async fn find_all_with_submitted_by_user_id_and_course_id(
         &self,
-        tx: &mut TxConn<'c>,
+        conn: &mut DBConn,
         user_id: &str,
         course_id: &str,
     ) -> Result<Vec<ClassWithSubmitted>> {
@@ -179,7 +175,7 @@ impl ClassRepository for ClassRepositoryInfra {
             user_id,
             course_id,
         )
-            .fetch_all(tx)
+            .fetch_all(conn)
             .await?;
 
         Ok(classes)

@@ -7,8 +7,7 @@ use async_trait::async_trait;
 pub trait ClassRepository {
     async fn for_update_by_id<'c>(&self, tx: &mut TxConn<'c>, id: &str) -> Result<bool>;
     async fn create(&self, conn: &mut DBConn, class: &CreateClass) -> Result<()>;
-    async fn update_submission_closed_by_id<'c>(&self, tx: &mut TxConn<'c>, id: &str)
-        -> Result<()>;
+    async fn update_submission_closed_by_id(&self, conn: &mut DBConn, id: &str) -> Result<()>;
     async fn find_submission_closed_by_id_with_shared_lock<'c>(
         &self,
         tx: &mut TxConn<'c>,
@@ -22,9 +21,9 @@ pub trait ClassRepository {
     ) -> Result<Class>;
     async fn find_all_by_course_id(&self, conn: &mut DBConn, course_id: &str)
         -> Result<Vec<Class>>;
-    async fn find_all_with_submitted_by_user_id_and_course_id<'c>(
+    async fn find_all_with_submitted_by_user_id_and_course_id(
         &self,
-        tx: &mut TxConn<'c>,
+        conn: &mut DBConn,
         user_id: &str,
         course_id: &str,
     ) -> Result<Vec<ClassWithSubmitted>>;
