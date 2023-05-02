@@ -7,7 +7,7 @@ use async_trait::async_trait;
 #[cfg_attr(any(test, feature = "test"), mockall::automock)]
 #[async_trait]
 pub trait UserService: Sync {
-    async fn find_by_code(&self, code: &str) -> Result<Option<User>>;
+    async fn find_by_code(&self, code: &UserCode) -> Result<Option<User>>;
     async fn find_code_by_id(&self, user_id: &str) -> Result<Option<String>>;
     fn verify_password(&self, user: &User, password: &str) -> Result<bool>;
 }
@@ -19,11 +19,9 @@ pub trait HaveUserService {
 
 #[async_trait]
 pub trait UserServiceImpl: Sync + HaveDBPool + HaveUserRepository {
-    async fn find_by_code(&self, code: &str) -> Result<Option<User>> {
+    async fn find_by_code(&self, code: &UserCode) -> Result<Option<User>> {
         let pool = self.get_db_pool();
         let mut conn = pool.acquire().await?;
-
-        let code = UserCode::new(code.to_string());
 
         let result = self.user_repo().find_by_code(&mut conn, &code).await?;
         Ok(result)
@@ -60,7 +58,7 @@ pub trait UserServiceImpl: Sync + HaveDBPool + HaveUserRepository {
 
 #[async_trait]
 impl<S: UserServiceImpl> UserService for S {
-    async fn find_by_code(&self, code: &str) -> Result<Option<User>> {
+    async fn find_by_code(&self, code: &UserCode) -> Result<Option<User>> {
         UserServiceImpl::find_by_code(self, code).await
     }
 

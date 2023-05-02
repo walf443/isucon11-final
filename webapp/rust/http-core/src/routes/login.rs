@@ -1,6 +1,7 @@
 use crate::responses::error::ResponseError::{AlreadyLogin, Unauthorized};
 use crate::responses::error::ResponseResult;
 use actix_web::{web, HttpResponse};
+use isucholar_core::models::user::UserCode;
 use isucholar_core::models::user_type::UserType;
 use isucholar_core::services::user_service::{HaveUserService, UserService};
 
@@ -16,7 +17,8 @@ pub async fn login<Service: HaveUserService>(
     session: actix_session::Session,
     req: web::Json<LoginRequest>,
 ) -> ResponseResult<HttpResponse> {
-    let user = service.user_service().find_by_code(&req.code).await?;
+    let code = UserCode::new(req.code.to_string());
+    let user = service.user_service().find_by_code(&code).await?;
 
     if user.is_none() {
         return Err(Unauthorized);
