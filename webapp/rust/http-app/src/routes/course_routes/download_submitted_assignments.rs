@@ -75,7 +75,9 @@ async fn create_submissions_zip(
             ))
             .arg(&format!(
                 "{}{}-{}",
-                tmp_dir, submission.user_code, submission.file_name
+                tmp_dir,
+                submission.user_code.to_string(),
+                submission.file_name
             ))
             .status()
             .await?;

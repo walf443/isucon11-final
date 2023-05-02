@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use isucholar_core::db::DBConn;
 use isucholar_core::models::course::CourseID;
-use isucholar_core::models::user::{User, UserID};
+use isucholar_core::models::user::{User, UserCode, UserID};
 use isucholar_core::models::user_type::UserType;
 use isucholar_core::repos::error::Result;
 use isucholar_core::repos::registration_repository::RegistrationRepository;
@@ -62,7 +62,7 @@ impl RegistrationRepository for RegistrationRepositoryInfra {
             r"
                 SELECT
                   `users`.id,
-                  `users`.code,
+                  `users`.code as `code:UserCode`,
                   `users`.name,
                   `users`.hashed_password,
                   `users`.type as `type_:UserType`

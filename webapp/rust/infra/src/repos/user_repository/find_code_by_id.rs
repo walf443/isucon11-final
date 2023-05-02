@@ -1,7 +1,7 @@
 use crate::repos::user_repository::UserRepositoryInfra;
 use fake::{Fake, Faker};
 use isucholar_core::db::get_test_db_conn;
-use isucholar_core::models::user::{User, UserCode, UserID};
+use isucholar_core::models::user::{User, UserID};
 use isucholar_core::repos::user_repository::UserRepository;
 
 #[tokio::test]
@@ -45,5 +45,5 @@ async fn success_case() {
         .unwrap()
         .unwrap();
 
-    assert_eq!(got, UserCode::new(user.code.clone()));
+    assert_eq!(got, user.code);
 }

@@ -5,8 +5,7 @@ use serde::Serialize;
 #[derive(Debug, sqlx::FromRow, PartialEq, Eq, Dummy)]
 pub struct User {
     pub id: String,
-    #[dummy(faker = "6")]
-    pub code: String,
+    pub code: UserCode,
     pub name: String,
     pub hashed_password: Vec<u8>,
     #[sqlx(rename = "type")]
@@ -29,7 +28,7 @@ impl UserID {
 
 #[derive(Debug, Clone, PartialEq, Eq, Dummy, sqlx::Type, Serialize)]
 #[sqlx(transparent)]
-pub struct UserCode(String);
+pub struct UserCode(#[dummy(faker = "6")] String);
 
 impl UserCode {
     pub fn new(code: String) -> Self {
