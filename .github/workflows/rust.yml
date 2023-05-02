@@ -30,6 +30,7 @@ jobs:
           do
             sleep 1
           done
+          MYSQL_DATABASE=$MYSQL_TEST_DATBASE ../sql/init.sh
     - uses: ./.github/actions/cache_cargo
     - name: Build
       run: |
