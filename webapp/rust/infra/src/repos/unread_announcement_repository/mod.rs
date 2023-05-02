@@ -42,8 +42,8 @@ impl UnreadAnnouncementRepository for UnreadAnnouncementRepositoryInfra {
     async fn mark_read(
         &self,
         conn: &mut DBConn,
-        announcement_id: &str,
-        user_id: &str,
+        announcement_id: &AnnouncementID,
+        user_id: &UserID,
     ) -> Result<()> {
         sqlx::query!(
             "UPDATE `unread_announcements` SET `is_deleted` = true WHERE `announcement_id` = ? AND `user_id` = ?",

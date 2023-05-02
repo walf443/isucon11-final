@@ -17,8 +17,8 @@ pub trait UnreadAnnouncementRepository {
     async fn mark_read(
         &self,
         conn: &mut DBConn,
-        announcement_id: &str,
-        user_id: &str,
+        announcement_id: &AnnouncementID,
+        user_id: &UserID,
     ) -> Result<()>;
     async fn count_unread_by_user_id(&self, conn: &mut DBConn, user_id: &str) -> Result<i64>;
     async fn find_unread_announcements_by_user_id(

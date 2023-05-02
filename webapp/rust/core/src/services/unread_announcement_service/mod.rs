@@ -1,4 +1,4 @@
-use crate::models::announcement::AnnouncementWithoutDetail;
+use crate::models::announcement::{AnnouncementID, AnnouncementWithoutDetail};
 use crate::models::announcement_detail::AnnouncementDetail;
 use crate::models::course::CourseID;
 use crate::models::user::UserID;
@@ -74,12 +74,13 @@ pub trait UnreadAnnouncementServiceImpl:
         let mut tx = pool.begin().await?;
 
         let user_id = UserID::new(user_id.to_string());
+        let announcement_id =  AnnouncementID::new(announcement_id.to_string());
 
         let announcement = self
             .unread_announcement_repo()
             .find_announcement_detail_by_announcement_id_and_user_id(
                 &mut tx,
-                announcement_id,
+                &announcement_id.to_string(),
                 &user_id.to_string(),
             )
             .await?;
@@ -100,7 +101,7 @@ pub trait UnreadAnnouncementServiceImpl:
         }
 
         self.unread_announcement_repo()
-            .mark_read(&mut tx, announcement_id, &user_id.to_string())
+            .mark_read(&mut tx, &announcement_id, &user_id)
             .await?;
 
         tx.commit().await?;
