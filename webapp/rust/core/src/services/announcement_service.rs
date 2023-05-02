@@ -1,5 +1,4 @@
 use crate::models::announcement::{Announcement, AnnouncementID};
-use crate::models::user::UserID;
 use crate::repos::announcement_repository::{AnnouncementRepository, HaveAnnouncementRepository};
 use crate::repos::course_repository::{CourseRepository, HaveCourseRepository};
 use crate::repos::error::ReposError;
@@ -80,8 +79,7 @@ pub trait AnnouncementServiceImpl:
 
         let repo = self.unread_announcement_repo();
         for user in targets {
-            let uid = UserID::new(user.id.clone());
-            repo.create(&mut tx, &aid, &uid).await?;
+            repo.create(&mut tx, &aid, &user.id).await?;
         }
 
         tx.commit().await?;

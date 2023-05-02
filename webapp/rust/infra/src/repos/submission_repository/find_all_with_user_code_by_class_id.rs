@@ -29,7 +29,7 @@ async fn success_case() {
     .unwrap();
 
     let mut submission: CreateSubmission = Faker.fake();
-    submission.user_id = user.id;
+    submission.user_id = user.id.to_string();
 
     sqlx::query!(
         "INSERT INTO submissions (user_id, class_id, file_name) VALUES (?, ?, ?)",

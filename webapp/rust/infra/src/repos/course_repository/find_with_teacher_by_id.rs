@@ -2,7 +2,7 @@ use crate::repos::course_repository::CourseRepositoryInfra;
 use fake::{Fake, Faker};
 use isucholar_core::db::get_test_db_conn;
 use isucholar_core::models::course::{Course, CourseID};
-use isucholar_core::models::user::{User, UserID};
+use isucholar_core::models::user::User;
 use isucholar_core::models::user_type::UserType::Teacher;
 use isucholar_core::repos::course_repository::CourseRepository;
 
@@ -41,7 +41,7 @@ async fn success_case() {
     .unwrap();
 
     let mut course: Course = Faker.fake();
-    course.teacher_id = UserID::new(teacher.id.clone());
+    course.teacher_id = teacher.id.clone();
 
     sqlx::query!("INSERT INTO courses (id, code, type, name, description, credit, period, day_of_week, teacher_id, keywords, status) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
         &course.id,

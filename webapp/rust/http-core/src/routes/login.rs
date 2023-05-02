@@ -33,7 +33,7 @@ pub async fn login<Service: HaveUserService>(
     }
 
     if let Some(user_id) = session.get::<String>("userID")? {
-        if user_id == user.id {
+        if user_id == user.id.to_string() {
             return Err(AlreadyLogin);
         }
     }

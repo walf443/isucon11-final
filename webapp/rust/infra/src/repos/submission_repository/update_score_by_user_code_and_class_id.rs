@@ -30,7 +30,7 @@ async fn exist_case() {
     .unwrap();
 
     let mut submission: CreateSubmission = Faker.fake();
-    submission.user_id = user.id.clone();
+    submission.user_id = user.id.clone().to_string();
 
     let repo = SubmissionRepositoryInfra {};
     sqlx::query!(

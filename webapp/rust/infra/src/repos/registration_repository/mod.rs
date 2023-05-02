@@ -61,7 +61,7 @@ impl RegistrationRepository for RegistrationRepositoryInfra {
             User,
             r"
                 SELECT
-                  `users`.id,
+                  `users`.id as `id:UserID`,
                   `users`.code as `code:UserCode`,
                   `users`.name,
                   `users`.hashed_password,

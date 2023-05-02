@@ -27,7 +27,7 @@ impl UserRepository for UserRepositoryInfra {
             User,
             r"
                 SELECT
-                    id,
+                    id as `id:UserID`,
                     code as `code:UserCode`,
                     name,
                     hashed_password,
@@ -47,7 +47,7 @@ impl UserRepository for UserRepositoryInfra {
             User,
             r"
                 SELECT
-                    id,
+                    id as `id:UserID`,
                     code as `code:UserCode`,
                     name,
                     hashed_password,
