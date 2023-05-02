@@ -1,5 +1,4 @@
 use crate::models::announcement::{Announcement, AnnouncementID};
-use crate::models::course::CourseID;
 use crate::models::user::UserID;
 use crate::repos::announcement_repository::{AnnouncementRepository, HaveAnnouncementRepository};
 use crate::repos::course_repository::{CourseRepository, HaveCourseRepository};
@@ -39,8 +38,10 @@ pub trait AnnouncementServiceImpl:
         let mut tx = pool.begin().await?;
 
         let aid = AnnouncementID::new(announcement.id.to_string());
-        let course_id = CourseID::new(announcement.course_id.clone());
-        let is_exist = self.course_repo().exist_by_id(&mut tx, &course_id).await?;
+        let is_exist = self
+            .course_repo()
+            .exist_by_id(&mut tx, &announcement.course_id)
+            .await?;
         if !is_exist {
             return Err(CourseNotFound);
         }
@@ -74,7 +75,7 @@ pub trait AnnouncementServiceImpl:
 
         let targets = self
             .registration_repo()
-            .find_users_by_course_id(&mut tx, &course_id)
+            .find_users_by_course_id(&mut tx, &announcement.course_id)
             .await?;
 
         let repo = self.unread_announcement_repo();

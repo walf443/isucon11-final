@@ -38,7 +38,7 @@ async fn record_exist_case() {
         .unwrap();
 
     let mut announcement: Announcement = Faker.fake();
-    announcement.course_id = course.id.clone().to_string();
+    announcement.course_id = course.id.clone();
     sqlx::query!(
         "INSERT INTO announcements (id, course_id, title, message) VALUES (?, ?, ?, ?)",
         &announcement.id,
@@ -108,7 +108,7 @@ async fn none_case() {
         .unwrap();
 
     let mut announcement: Announcement = Faker.fake();
-    announcement.course_id = course.id.clone().to_string();
+    announcement.course_id = course.id.clone();
     sqlx::query!(
         "INSERT INTO announcements (id, course_id, title, message) VALUES (?, ?, ?, ?)",
         &announcement.id,

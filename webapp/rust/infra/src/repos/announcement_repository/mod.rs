@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 use isucholar_core::db::DBConn;
 use isucholar_core::models::announcement::{Announcement, AnnouncementID};
+use isucholar_core::models::course::CourseID;
 use isucholar_core::repos::announcement_repository::AnnouncementRepository;
 use isucholar_core::repos::error::ReposError::AnnouncementDuplicate;
 use isucholar_core::repos::error::Result;
@@ -49,7 +50,7 @@ impl AnnouncementRepository for AnnouncementRepositoryInfra {
             r"
                 SELECT
                     id as `id:AnnouncementID`,
-                    course_id,
+                    course_id as `course_id:CourseID`,
                     title,
                     message
                 FROM `announcements` WHERE `id` = ?
