@@ -39,7 +39,7 @@ impl SubmissionRepository for SubmissionRepositoryInfra {
         Ok(())
     }
 
-    async fn count_by_class_id(&self, conn: &mut DBConn, class_id: &str) -> Result<i64> {
+    async fn count_by_class_id(&self, conn: &mut DBConn, class_id: &ClassID) -> Result<i64> {
         let submissions_count: i64 = sqlx::query_scalar!(
             "SELECT COUNT(*) FROM `submissions` WHERE `class_id` = ?",
             class_id

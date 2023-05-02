@@ -12,7 +12,7 @@ pub trait SubmissionRepository {
         conn: &mut DBConn,
         submission: &CreateSubmission,
     ) -> Result<()>;
-    async fn count_by_class_id(&self, conn: &mut DBConn, class_id: &str) -> Result<i64>;
+    async fn count_by_class_id(&self, conn: &mut DBConn, class_id: &ClassID) -> Result<i64>;
     async fn update_score_by_user_code_and_class_id(
         &self,
         conn: &mut DBConn,
