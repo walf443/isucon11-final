@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use futures::StreamExt;
 use isucholar_core::db::DBConn;
-use isucholar_core::models::course::Course;
+use isucholar_core::models::course::{Course, CourseID};
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::models::course_type::CourseType;
 use isucholar_core::models::day_of_week::DayOfWeek;
@@ -90,7 +90,7 @@ impl RegistrationCourseRepository for RegistrationCourseRepositoryInfra {
     async fn find_total_scores_by_course_id_group_by_user_id(
         &self,
         conn: &mut DBConn,
-        course_id: &str,
+        course_id: &CourseID,
     ) -> Result<Vec<i64>> {
         let mut rows = sqlx::query_scalar!(
         r"

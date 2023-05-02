@@ -2,7 +2,7 @@ use crate::repos::registration_course_repository::RegistrationCourseRepositoryIn
 use fake::{Fake, Faker};
 use isucholar_core::db::get_test_db_conn;
 use isucholar_core::models::class::Class;
-use isucholar_core::models::course::Course;
+use isucholar_core::models::course::{Course, CourseID};
 use isucholar_core::models::user::User;
 use isucholar_core::repos::registration_course_repository::RegistrationCourseRepository;
 
@@ -11,9 +11,11 @@ async fn empty_case() {
     let db_pool = get_test_db_conn().await.unwrap();
     let mut tx = db_pool.begin().await.unwrap();
 
+    let course_id: CourseID = Faker.fake();
+
     let repo = RegistrationCourseRepositoryInfra {};
     let scores = repo
-        .find_total_scores_by_course_id_group_by_user_id(&mut tx, "none_exist_course_id")
+        .find_total_scores_by_course_id_group_by_user_id(&mut tx, &course_id)
         .await
         .unwrap();
     assert_eq!(scores.len(), 0);
@@ -90,9 +92,11 @@ async fn success_case() {
     .await
     .unwrap();
 
+    let course_id = CourseID::new(course.id.clone());
+
     let repo = RegistrationCourseRepositoryInfra {};
     let scores = repo
-        .find_total_scores_by_course_id_group_by_user_id(&mut tx, &course.id)
+        .find_total_scores_by_course_id_group_by_user_id(&mut tx, &course_id)
         .await
         .unwrap();
     assert_eq!(scores.len(), 1);

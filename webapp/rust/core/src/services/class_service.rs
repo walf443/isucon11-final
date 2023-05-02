@@ -124,9 +124,10 @@ pub trait ClassServiceImpl:
             }
         }
 
+        let course_id = CourseID::new(course.id.to_string());
         let totals = self
             .registration_course_repo()
-            .find_total_scores_by_course_id_group_by_user_id(&mut conn, &course.id)
+            .find_total_scores_by_course_id_group_by_user_id(&mut conn, &course_id)
             .await?;
 
         Ok(CourseResult {

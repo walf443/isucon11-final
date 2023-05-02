@@ -1,5 +1,5 @@
 use crate::db::DBConn;
-use crate::models::course::Course;
+use crate::models::course::{Course, CourseID};
 use crate::models::user::UserID;
 use crate::repos::error::Result;
 use async_trait::async_trait;
@@ -19,7 +19,7 @@ pub trait RegistrationCourseRepository {
     async fn find_total_scores_by_course_id_group_by_user_id(
         &self,
         conn: &mut DBConn,
-        course_id: &str,
+        course_id: &CourseID,
     ) -> Result<Vec<i64>>;
 }
 
