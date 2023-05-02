@@ -21,13 +21,13 @@ use async_trait::async_trait;
 pub trait ClassService {
     async fn get_user_scores_by_course_id(
         &self,
-        user_id: &str,
-        course_id: &str,
+        user_id: &UserID,
+        course_id: &CourseID,
     ) -> Result<Vec<ClassScore>>;
 
     async fn get_user_course_result_by_course(
         &self,
-        user_id: &str,
+        user_id: &UserID,
         course: &Course,
     ) -> Result<CourseResult>;
     async fn get_user_courses_result_by_courses(
@@ -59,14 +59,11 @@ pub trait ClassServiceImpl:
 {
     async fn get_user_scores_by_course_id(
         &self,
-        user_id: &str,
-        course_id: &str,
+        user_id: &UserID,
+        course_id: &CourseID,
     ) -> Result<Vec<ClassScore>> {
         let pool = self.get_db_pool();
         let mut conn = pool.acquire().await?;
-
-        let user_id = UserID::new(user_id.to_string());
-        let course_id = CourseID::new(course_id.to_string());
 
         let classes = self
             .class_repo()
@@ -107,14 +104,15 @@ pub trait ClassServiceImpl:
 
     async fn get_user_course_result_by_course(
         &self,
-        user_id: &str,
+        user_id: &UserID,
         course: &Course,
     ) -> Result<CourseResult> {
         let pool = self.get_db_pool();
         let mut conn = pool.acquire().await?;
 
+        let course_id = CourseID::new(course.id.clone());
         let class_scores = self
-            .get_user_scores_by_course_id(&user_id, &course.id)
+            .get_user_scores_by_course_id(&user_id, &course_id)
             .await?;
 
         let mut my_total_score: i64 = 0;
@@ -151,6 +149,8 @@ pub trait ClassServiceImpl:
         let mut course_results = Vec::with_capacity(courses.len());
         let mut my_gpa = 0f64;
         let mut my_credits = 0;
+
+        let user_id = UserID::new(user_id.to_string());
 
         for course in courses {
             let course_result = self
@@ -205,15 +205,15 @@ pub trait ClassServiceImpl:
 impl<S: ClassServiceImpl> ClassService for S {
     async fn get_user_scores_by_course_id(
         &self,
-        user_id: &str,
-        course_id: &str,
+        user_id: &UserID,
+        course_id: &CourseID,
     ) -> Result<Vec<ClassScore>> {
         ClassServiceImpl::get_user_scores_by_course_id(self, user_id, course_id).await
     }
 
     async fn get_user_course_result_by_course(
         &self,
-        user_id: &str,
+        user_id: &UserID,
         course: &Course,
     ) -> Result<CourseResult> {
         ClassServiceImpl::get_user_course_result_by_course(self, user_id, course).await
