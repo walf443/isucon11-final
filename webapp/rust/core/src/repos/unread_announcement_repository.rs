@@ -1,6 +1,7 @@
 use crate::db::DBConn;
 use crate::models::announcement::{AnnouncementID, AnnouncementWithoutDetail};
 use crate::models::announcement_detail::AnnouncementDetail;
+use crate::models::course::CourseID;
 use crate::models::user::UserID;
 use crate::repos::error::Result;
 use async_trait::async_trait;
@@ -24,10 +25,10 @@ pub trait UnreadAnnouncementRepository {
     async fn find_unread_announcements_by_user_id(
         &self,
         tx: &mut DBConn,
-        user_id: &str,
+        user_id: &UserID,
         limit: i64,
         offset: i64,
-        course_id: Option<String>,
+        course_id: Option<CourseID>,
     ) -> Result<Vec<AnnouncementWithoutDetail>>;
     async fn find_announcement_detail_by_announcement_id_and_user_id(
         &self,

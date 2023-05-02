@@ -2,6 +2,7 @@ use async_trait::async_trait;
 use isucholar_core::db::DBConn;
 use isucholar_core::models::announcement::{AnnouncementID, AnnouncementWithoutDetail};
 use isucholar_core::models::announcement_detail::AnnouncementDetail;
+use isucholar_core::models::course::CourseID;
 use isucholar_core::models::user::UserID;
 use isucholar_core::repos::error::Result;
 use isucholar_core::repos::unread_announcement_repository::UnreadAnnouncementRepository;
@@ -70,10 +71,10 @@ impl UnreadAnnouncementRepository for UnreadAnnouncementRepositoryInfra {
     async fn find_unread_announcements_by_user_id(
         &self,
         tx: &mut DBConn,
-        user_id: &str,
+        user_id: &UserID,
         limit: i64,
         offset: i64,
-        course_id: Option<String>,
+        course_id: Option<CourseID>,
     ) -> Result<Vec<AnnouncementWithoutDetail>> {
         let mut query = concat!(
         "SELECT `announcements`.`id`, `courses`.`id` AS `course_id`, `courses`.`name` AS `course_name`, `announcements`.`title`, NOT `unread_announcements`.`is_deleted` AS `unread`",

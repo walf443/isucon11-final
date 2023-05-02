@@ -3,6 +3,7 @@ use fake::{Fake, Faker};
 use isucholar_core::db::get_test_db_conn;
 use isucholar_core::models::announcement::Announcement;
 use isucholar_core::models::course::Course;
+use isucholar_core::models::user::UserID;
 use isucholar_core::repos::unread_announcement_repository::UnreadAnnouncementRepository;
 
 #[tokio::test]
@@ -36,7 +37,7 @@ async fn record_exist_case() {
         .await
         .unwrap();
 
-    let user_id = Faker.fake::<String>();
+    let user_id: UserID = Faker.fake();
     sqlx::query!(
         "INSERT INTO registrations (course_id, user_id) VALUES (?, ?)",
         &course.id,
@@ -87,7 +88,7 @@ async fn empty_case() {
     let pool = get_test_db_conn().await.unwrap();
     let mut tx = pool.begin().await.unwrap();
 
-    let user_id = Faker.fake::<String>();
+    let user_id: UserID = Faker.fake();
 
     let repo = UnreadAnnouncementRepositoryInfra {};
 
