@@ -70,7 +70,7 @@ async fn success_case() {
     .unwrap();
 
     let mut class: Class = Faker.fake();
-    class.course_id = course.id.clone().to_string();
+    class.course_id = course.id.clone();
     sqlx::query!(
         "INSERT INTO classes (id, course_id, part, title, description, submission_closed) VALUES (?, ?, ?, ?, ?, ?)",
         &class.id,

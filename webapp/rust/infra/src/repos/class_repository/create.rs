@@ -2,6 +2,7 @@ use crate::repos::class_repository::ClassRepositoryInfra;
 use fake::{Fake, Faker};
 use isucholar_core::db::get_test_db_conn;
 use isucholar_core::models::class::{Class, ClassID, CreateClass};
+use isucholar_core::models::course::CourseID;
 use isucholar_core::repos::class_repository::ClassRepository;
 
 #[tokio::test]
@@ -20,13 +21,13 @@ async fn success_case() {
     repo.create(&mut tx, &class).await.unwrap();
 
     let got = sqlx::query_as!(Class,
-        "SELECT id as `id:ClassID`, course_id, part, title, description, submission_closed as `submission_closed:bool` FROM classes WHERE id = ?",
+        "SELECT id as `id:ClassID`, course_id as `course_id:CourseID`, part, title, description, submission_closed as `submission_closed:bool` FROM classes WHERE id = ?",
         &class.id)
         .fetch_one(&mut tx)
         .await
         .unwrap();
 
-    assert_eq!(got.course_id, class.course_id.to_string());
+    assert_eq!(got.course_id, class.course_id);
     assert_eq!(got.part, class.part);
     assert_eq!(got.title, class.title);
     assert_eq!(got.description, class.description);

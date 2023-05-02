@@ -42,18 +42,14 @@ async fn without_submission_record_case() {
     let user_id: UserID = Faker.fake();
     let repo = ClassRepositoryInfra {};
     let got = repo
-        .find_all_with_submitted_by_user_id_and_course_id(
-            &mut tx,
-            &user_id,
-            &CourseID::new(class.course_id.to_string()),
-        )
+        .find_all_with_submitted_by_user_id_and_course_id(&mut tx, &user_id, &class.course_id)
         .await
         .unwrap();
     assert_eq!(got.len(), 1);
 
     let got = got.first().unwrap();
     assert_eq!(got.id, class.id);
-    assert_eq!(got.course_id.to_string(), class.course_id);
+    assert_eq!(got.course_id, class.course_id);
     assert_eq!(got.part, class.part);
     assert_eq!(got.title, class.title);
     assert_eq!(got.description, class.description);
@@ -93,18 +89,14 @@ async fn success_case() {
 
     let repo = ClassRepositoryInfra {};
     let got = repo
-        .find_all_with_submitted_by_user_id_and_course_id(
-            &mut tx,
-            &user_id,
-            &CourseID::new(class.course_id.to_string()),
-        )
+        .find_all_with_submitted_by_user_id_and_course_id(&mut tx, &user_id, &class.course_id)
         .await
         .unwrap();
     assert_eq!(got.len(), 1);
 
     let got = got.first().unwrap();
     assert_eq!(got.id, class.id);
-    assert_eq!(got.course_id.to_string(), class.course_id);
+    assert_eq!(got.course_id, class.course_id);
     assert_eq!(got.part, class.part);
     assert_eq!(got.title, class.title);
     assert_eq!(got.description, class.description);

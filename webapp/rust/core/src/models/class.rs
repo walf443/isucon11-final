@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, sqlx::FromRow, PartialEq, Eq, Dummy)]
 pub struct Class {
     pub id: ClassID,
-    pub course_id: String,
+    pub course_id: CourseID,
     pub part: u8,
     pub title: String,
     pub description: String,
