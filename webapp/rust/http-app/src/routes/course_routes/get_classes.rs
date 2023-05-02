@@ -1,4 +1,6 @@
 use actix_web::{web, HttpResponse};
+use isucholar_core::models::course::CourseID;
+use isucholar_core::models::user::UserID;
 use isucholar_core::services::class_service::{ClassService, HaveClassService};
 use isucholar_http_core::responses::error::ResponseResult;
 use isucholar_http_core::routes::util::get_user_info;
@@ -20,12 +22,14 @@ pub async fn get_classes<Service: HaveClassService>(
     course_id: web::Path<(String,)>,
 ) -> ResponseResult<HttpResponse> {
     let (user_id, _, _) = get_user_info(session)?;
+    let user_id = UserID::new(user_id);
 
     let course_id = &course_id.0;
+    let course_id = CourseID::new(course_id.to_string());
 
     let classes = service
         .class_service()
-        .find_all_with_submitted_by_user_id_and_course_id(&user_id, course_id)
+        .find_all_with_submitted_by_user_id_and_course_id(&user_id, &course_id)
         .await?;
 
     // 結果が0件の時は空配列を返却

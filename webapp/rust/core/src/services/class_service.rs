@@ -37,8 +37,8 @@ pub trait ClassService {
     ) -> Result<(Vec<CourseResult>, f64, i64)>;
     async fn find_all_with_submitted_by_user_id_and_course_id<'c>(
         &self,
-        user_id: &str,
-        course_id: &str,
+        user_id: &UserID,
+        course_id: &CourseID,
     ) -> Result<Vec<ClassWithSubmitted>>;
 }
 
@@ -172,12 +172,10 @@ pub trait ClassServiceImpl:
 
     async fn find_all_with_submitted_by_user_id_and_course_id<'c>(
         &self,
-        user_id: &str,
-        course_id: &str,
+        user_id: &UserID,
+        course_id: &CourseID,
     ) -> Result<Vec<ClassWithSubmitted>> {
         let pool = self.get_db_pool();
-
-        let course_id = CourseID::new(course_id.to_string());
 
         let mut tx = pool.begin().await?;
         let is_exist = self.course_repo().exist_by_id(&mut tx, &course_id).await?;
@@ -185,8 +183,6 @@ pub trait ClassServiceImpl:
         if !is_exist {
             return Err(CourseNotFound);
         }
-
-        let user_id = UserID::new(user_id.to_string());
 
         let classes = self
             .class_repo()
@@ -227,8 +223,8 @@ impl<S: ClassServiceImpl> ClassService for S {
 
     async fn find_all_with_submitted_by_user_id_and_course_id<'c>(
         &self,
-        user_id: &str,
-        course_id: &str,
+        user_id: &UserID,
+        course_id: &CourseID,
     ) -> Result<Vec<ClassWithSubmitted>> {
         ClassServiceImpl::find_all_with_submitted_by_user_id_and_course_id(self, user_id, course_id)
             .await
