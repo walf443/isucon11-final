@@ -32,7 +32,7 @@ pub trait ClassService {
     ) -> Result<CourseResult>;
     async fn get_user_courses_result_by_courses(
         &self,
-        user_id: &str,
+        user_id: &UserID,
         courses: &Vec<Course>,
     ) -> Result<(Vec<CourseResult>, f64, i64)>;
     async fn find_all_with_submitted_by_user_id_and_course_id<'c>(
@@ -142,15 +142,13 @@ pub trait ClassServiceImpl:
 
     async fn get_user_courses_result_by_courses(
         &self,
-        user_id: &str,
+        user_id: &UserID,
         courses: &Vec<Course>,
     ) -> Result<(Vec<CourseResult>, f64, i64)> {
         // 科目毎の成績計算処理
         let mut course_results = Vec::with_capacity(courses.len());
         let mut my_gpa = 0f64;
         let mut my_credits = 0;
-
-        let user_id = UserID::new(user_id.to_string());
 
         for course in courses {
             let course_result = self
@@ -221,7 +219,7 @@ impl<S: ClassServiceImpl> ClassService for S {
 
     async fn get_user_courses_result_by_courses(
         &self,
-        user_id: &str,
+        user_id: &UserID,
         courses: &Vec<Course>,
     ) -> Result<(Vec<CourseResult>, f64, i64)> {
         ClassServiceImpl::get_user_courses_result_by_courses(self, user_id, courses).await
