@@ -1,7 +1,8 @@
 use async_trait::async_trait;
 use isucholar_core::db::DBConn;
-use isucholar_core::models::announcement::AnnouncementWithoutDetail;
+use isucholar_core::models::announcement::{AnnouncementID, AnnouncementWithoutDetail};
 use isucholar_core::models::announcement_detail::AnnouncementDetail;
+use isucholar_core::models::user::UserID;
 use isucholar_core::repos::error::Result;
 use isucholar_core::repos::unread_announcement_repository::UnreadAnnouncementRepository;
 use sqlx::Arguments;
@@ -22,7 +23,12 @@ pub struct UnreadAnnouncementRepositoryInfra {}
 
 #[async_trait]
 impl UnreadAnnouncementRepository for UnreadAnnouncementRepositoryInfra {
-    async fn create(&self, conn: &mut DBConn, announcement_id: &str, user_id: &str) -> Result<()> {
+    async fn create(
+        &self,
+        conn: &mut DBConn,
+        announcement_id: &AnnouncementID,
+        user_id: &UserID,
+    ) -> Result<()> {
         sqlx::query!(
             "INSERT INTO `unread_announcements` (`announcement_id`, `user_id`) VALUES (?, ?)",
             announcement_id,

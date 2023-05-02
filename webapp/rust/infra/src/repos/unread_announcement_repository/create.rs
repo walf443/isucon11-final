@@ -1,6 +1,8 @@
 use crate::repos::unread_announcement_repository::UnreadAnnouncementRepositoryInfra;
 use fake::{Fake, Faker};
 use isucholar_core::db::get_test_db_conn;
+use isucholar_core::models::announcement::AnnouncementID;
+use isucholar_core::models::user::UserID;
 use isucholar_core::repos::unread_announcement_repository::UnreadAnnouncementRepository;
 
 #[tokio::test]
@@ -14,8 +16,8 @@ async fn success_case() {
         .unwrap();
 
     let repo = UnreadAnnouncementRepositoryInfra {};
-    let announcement_id = Faker.fake::<String>();
-    let user_id = Faker.fake::<String>();
+    let announcement_id: AnnouncementID = Faker.fake();
+    let user_id: UserID = Faker.fake();
 
     repo.create(&mut tx, &announcement_id, &user_id)
         .await

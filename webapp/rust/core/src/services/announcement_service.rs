@@ -1,5 +1,6 @@
 use crate::models::announcement::{Announcement, AnnouncementID};
 use crate::models::course::CourseID;
+use crate::models::user::UserID;
 use crate::repos::announcement_repository::{AnnouncementRepository, HaveAnnouncementRepository};
 use crate::repos::course_repository::{CourseRepository, HaveCourseRepository};
 use crate::repos::error::ReposError;
@@ -37,6 +38,7 @@ pub trait AnnouncementServiceImpl:
         let pool = self.get_db_pool();
         let mut tx = pool.begin().await?;
 
+        let aid = AnnouncementID::new(announcement.id.to_string());
         let course_id = CourseID::new(announcement.course_id.clone());
         let is_exist = self.course_repo().exist_by_id(&mut tx, &course_id).await?;
         if !is_exist {
@@ -54,7 +56,6 @@ pub trait AnnouncementServiceImpl:
                 let _ = tx.rollback().await;
                 match e {
                     ReposError::AnnouncementDuplicate => {
-                        let aid = AnnouncementID::new(announcement.id.to_string());
                         let mut conn = pool.acquire().await?;
                         let an = self.announcement_repo().find_by_id(&mut conn, &aid).await?;
                         if announcement.course_id != an.course_id
@@ -78,7 +79,8 @@ pub trait AnnouncementServiceImpl:
 
         let repo = self.unread_announcement_repo();
         for user in targets {
-            repo.create(&mut tx, &announcement.id, &user.id).await?;
+            let uid = UserID::new(user.id.clone());
+            repo.create(&mut tx, &aid, &uid).await?;
         }
 
         tx.commit().await?;
