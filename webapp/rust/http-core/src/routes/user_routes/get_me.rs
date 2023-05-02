@@ -2,11 +2,12 @@ use crate::responses::error::ResponseError::UserNotFound;
 use crate::responses::error::ResponseResult;
 use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
+use isucholar_core::models::user::{UserCode, UserID};
 use isucholar_core::services::user_service::{HaveUserService, UserService};
 
 #[derive(Debug, serde::Serialize)]
 pub struct GetMeResponse {
-    code: String,
+    code: UserCode,
     name: String,
     is_admin: bool,
 }
@@ -17,6 +18,7 @@ pub async fn get_me<Service: HaveUserService>(
     session: actix_session::Session,
 ) -> ResponseResult<HttpResponse> {
     let (user_id, user_name, is_admin) = get_user_info(session)?;
+    let user_id = UserID::new(user_id);
 
     let user_code = service.user_service().find_code_by_id(&user_id).await?;
 
@@ -38,6 +40,7 @@ mod tests {
     use actix_web::http::StatusCode;
     use actix_web::test::TestRequest;
     use actix_web::web;
+    use isucholar_core::models::user::UserCode;
     use isucholar_core::services::error::Error::TestError;
     use isucholar_core::services::manager::tests::MockServiceManager;
     use std::str::from_utf8;
@@ -50,7 +53,7 @@ mod tests {
         service
             .user_service
             .expect_find_code_by_id()
-            .withf(|uid| uid == "1")
+            .withf(|uid| uid.to_string() == "1")
             .returning(|_| Ok(None));
 
         let req = TestRequest::with_uri("/user/me").to_http_request();
@@ -70,7 +73,7 @@ mod tests {
         service
             .user_service
             .expect_find_code_by_id()
-            .withf(|uid| uid == "1")
+            .withf(|uid| uid.to_string() == "1")
             .returning(|_| Err(TestError));
 
         let req = TestRequest::with_uri("/user/me").to_http_request();
@@ -89,8 +92,8 @@ mod tests {
         service
             .user_service
             .expect_find_code_by_id()
-            .withf(|uid| uid == "1")
-            .returning(|_| Ok(Some("abc".to_string())));
+            .withf(|uid| uid.to_string() == "1")
+            .returning(|_| Ok(Some(UserCode::new("abc".to_string()))));
 
         let req = TestRequest::with_uri("/user/me").to_http_request();
         let session = req.get_session();
@@ -101,7 +104,7 @@ mod tests {
         let result = get_me(web::Data::new(service), session).await.unwrap();
         assert_eq!(result.status(), StatusCode::OK);
         let expected = GetMeResponse {
-            code: "abc".to_string(),
+            code: UserCode::new("abc".to_string()),
             name: "1".to_string(),
             is_admin: false,
         };

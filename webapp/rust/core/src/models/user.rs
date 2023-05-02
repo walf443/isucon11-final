@@ -1,5 +1,6 @@
 use crate::models::user_type::UserType;
 use fake::{Dummy, Fake};
+use serde::Serialize;
 
 #[derive(Debug, sqlx::FromRow, PartialEq, Eq, Dummy)]
 pub struct User {
@@ -26,7 +27,7 @@ impl UserID {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Dummy, sqlx::Type)]
+#[derive(Debug, Clone, PartialEq, Eq, Dummy, sqlx::Type, Serialize)]
 #[sqlx(transparent)]
 pub struct UserCode(String);
 

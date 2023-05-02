@@ -8,7 +8,7 @@ use async_trait::async_trait;
 #[async_trait]
 pub trait UserService: Sync {
     async fn find_by_code(&self, code: &UserCode) -> Result<Option<User>>;
-    async fn find_code_by_id(&self, user_id: &str) -> Result<Option<String>>;
+    async fn find_code_by_id(&self, user_id: &UserID) -> Result<Option<UserCode>>;
     fn verify_password(&self, user: &User, password: &str) -> Result<bool>;
 }
 
@@ -27,21 +27,16 @@ pub trait UserServiceImpl: Sync + HaveDBPool + HaveUserRepository {
         Ok(result)
     }
 
-    async fn find_code_by_id(&self, user_id: &str) -> Result<Option<String>> {
+    async fn find_code_by_id(&self, user_id: &UserID) -> Result<Option<UserCode>> {
         let pool = self.get_db_pool();
         let mut conn = pool.acquire().await?;
-
-        let user_id = UserID::new(user_id.to_string());
 
         let result = self
             .user_repo()
             .find_code_by_id(&mut conn, &user_id)
             .await?;
 
-        match result {
-            None => Ok(None),
-            Some(code) => Ok(Some(code.to_string())),
-        }
+        Ok(result)
     }
 
     fn verify_password(&self, user: &User, password: &str) -> Result<bool> {
@@ -62,7 +57,7 @@ impl<S: UserServiceImpl> UserService for S {
         UserServiceImpl::find_by_code(self, code).await
     }
 
-    async fn find_code_by_id(&self, user_id: &str) -> Result<Option<String>> {
+    async fn find_code_by_id(&self, user_id: &UserID) -> Result<Option<UserCode>> {
         UserServiceImpl::find_code_by_id(self, user_id).await
     }
 
