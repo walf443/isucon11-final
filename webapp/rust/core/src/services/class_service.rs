@@ -65,6 +65,7 @@ pub trait ClassServiceImpl:
         let pool = self.get_db_pool();
         let mut conn = pool.acquire().await?;
 
+        let user_id = UserID::new(user_id.to_string());
         let course_id = CourseID::new(course_id.to_string());
 
         let classes = self
@@ -78,7 +79,7 @@ pub trait ClassServiceImpl:
             let cid = ClassID::new(class.id.clone());
             let submissions_count = submission_repo.count_by_class_id(&mut conn, &cid).await?;
             let my_score = submission_repo
-                .find_score_by_class_id_and_user_id(&mut conn, &class.id, user_id)
+                .find_score_by_class_id_and_user_id(&mut conn, &cid, &user_id)
                 .await?;
 
             if let Some(my_score) = my_score {

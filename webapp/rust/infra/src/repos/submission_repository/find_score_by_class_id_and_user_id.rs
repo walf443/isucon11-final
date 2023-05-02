@@ -1,7 +1,9 @@
 use crate::repos::submission_repository::SubmissionRepositoryInfra;
 use fake::{Fake, Faker};
 use isucholar_core::db::get_test_db_conn;
+use isucholar_core::models::class::ClassID;
 use isucholar_core::models::submission::CreateSubmission;
+use isucholar_core::models::user::UserID;
 use isucholar_core::repos::submission_repository::SubmissionRepository;
 
 #[tokio::test]
@@ -28,8 +30,10 @@ async fn exist_case() {
     .await
     .unwrap();
 
+    let class_id = ClassID::new(submission.class_id.clone());
+    let user_id = UserID::new(submission.user_id.clone());
     let score = repo
-        .find_score_by_class_id_and_user_id(&mut tx, &submission.class_id, &submission.user_id)
+        .find_score_by_class_id_and_user_id(&mut tx, &class_id, &user_id)
         .await
         .unwrap();
     assert_eq!(score.unwrap(), 100);
@@ -58,8 +62,10 @@ async fn exist_but_null_case() {
     .await
     .unwrap();
 
+    let class_id = ClassID::new(submission.class_id.clone());
+    let user_id = UserID::new(submission.user_id.clone());
     let score = repo
-        .find_score_by_class_id_and_user_id(&mut tx, &submission.class_id, &submission.user_id)
+        .find_score_by_class_id_and_user_id(&mut tx, &class_id, &user_id)
         .await
         .unwrap();
     assert_eq!(score.is_none(), true);
@@ -73,8 +79,10 @@ async fn empty_case() {
     let submission: CreateSubmission = Faker.fake();
     let repo = SubmissionRepositoryInfra {};
 
+    let class_id = ClassID::new(submission.class_id.clone());
+    let user_id = UserID::new(submission.user_id.clone());
     let score = repo
-        .find_score_by_class_id_and_user_id(&mut tx, &submission.class_id, &submission.user_id)
+        .find_score_by_class_id_and_user_id(&mut tx, &class_id, &user_id)
         .await
         .unwrap();
     assert_eq!(score.is_none(), true);

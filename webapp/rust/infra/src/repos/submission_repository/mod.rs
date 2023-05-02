@@ -2,7 +2,7 @@ use async_trait::async_trait;
 use isucholar_core::db::DBConn;
 use isucholar_core::models::class::ClassID;
 use isucholar_core::models::submission::{CreateSubmission, SubmissionWithUserCode};
-use isucholar_core::models::user::UserCode;
+use isucholar_core::models::user::{UserCode, UserID};
 use isucholar_core::repos::error::Result;
 use isucholar_core::repos::submission_repository::SubmissionRepository;
 
@@ -71,8 +71,8 @@ impl SubmissionRepository for SubmissionRepositoryInfra {
     async fn find_score_by_class_id_and_user_id(
         &self,
         conn: &mut DBConn,
-        class_id: &str,
-        user_id: &str,
+        class_id: &ClassID,
+        user_id: &UserID,
     ) -> Result<Option<u8>> {
         let score: Option<Option<u8>> = sqlx::query_scalar!(
             r"
