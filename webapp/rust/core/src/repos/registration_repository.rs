@@ -22,7 +22,7 @@ pub trait RegistrationRepository {
     async fn find_users_by_course_id(
         &self,
         conn: &mut DBConn,
-        course_id: &str,
+        course_id: &CourseID,
     ) -> Result<Vec<User>>;
 }
 

@@ -55,7 +55,7 @@ impl RegistrationRepository for RegistrationRepositoryInfra {
     async fn find_users_by_course_id(
         &self,
         conn: &mut DBConn,
-        course_id: &str,
+        course_id: &CourseID,
     ) -> Result<Vec<User>> {
         let users: Vec<User> = sqlx::query_as!(
             User,
