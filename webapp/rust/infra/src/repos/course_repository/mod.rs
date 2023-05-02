@@ -6,6 +6,7 @@ use isucholar_core::models::course::{
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::models::course_type::CourseType;
 use isucholar_core::models::day_of_week::DayOfWeek;
+use isucholar_core::models::user::UserID;
 use isucholar_core::repos::course_repository::{CourseRepository, SearchCoursesQuery};
 use isucholar_core::repos::error::{ReposError, Result};
 use isucholar_core::MYSQL_ERR_NUM_DUPLICATE_ENTRY;
@@ -242,7 +243,7 @@ impl CourseRepository for CourseRepositoryInfra {
                    credit,
                    period,
                    day_of_week as `day_of_week:DayOfWeek`,
-                   teacher_id,
+                   teacher_id as `teacher_id:UserID`,
                    keywords,
                    status as `status:CourseStatus`
                 FROM `courses`
@@ -272,7 +273,7 @@ impl CourseRepository for CourseRepositoryInfra {
                    credit,
                    period,
                    day_of_week as `day_of_week:DayOfWeek`,
-                   teacher_id,
+                   teacher_id as `teacher_id:UserID`,
                    keywords,
                    status as `status:CourseStatus`,
                     `users`.`name` AS `teacher`

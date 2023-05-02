@@ -39,7 +39,7 @@ impl RegistrationCourseRepository for RegistrationCourseRepositoryInfra {
                     courses.credit,
                     courses.period,
                     courses.day_of_week as `day_of_week:DayOfWeek`,
-                    courses.teacher_id,
+                    courses.teacher_id as `teacher_id:UserID`,
                     courses.keywords,
                     courses.status as `status:CourseStatus`
                 FROM `registrations`
@@ -71,7 +71,7 @@ impl RegistrationCourseRepository for RegistrationCourseRepositoryInfra {
                     courses.credit,
                     courses.period,
                     courses.day_of_week as `day_of_week:DayOfWeek`,
-                    courses.teacher_id,
+                    courses.teacher_id as `teacher_id:UserID`,
                     courses.keywords,
                     courses.status as `status:CourseStatus`
                 FROM `courses`

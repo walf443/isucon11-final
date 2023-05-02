@@ -1,6 +1,7 @@
 use crate::models::course_status::CourseStatus;
 use crate::models::course_type::CourseType;
 use crate::models::day_of_week::DayOfWeek;
+use crate::models::user::UserID;
 use fake::{Dummy, Fake};
 use serde::{Deserialize, Serialize};
 
@@ -15,7 +16,7 @@ pub struct Course {
     pub credit: u8,
     pub period: u8,
     pub day_of_week: DayOfWeek,
-    pub teacher_id: String,
+    pub teacher_id: UserID,
     pub keywords: String,
     pub status: CourseStatus,
 }
@@ -61,7 +62,7 @@ pub struct CourseWithTeacher {
     pub period: u8,
     pub day_of_week: DayOfWeek,
     #[serde(skip)]
-    pub teacher_id: String,
+    pub teacher_id: UserID,
     pub keywords: String,
     pub status: CourseStatus,
     pub teacher: String,
