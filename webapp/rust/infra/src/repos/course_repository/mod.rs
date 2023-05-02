@@ -257,7 +257,7 @@ impl CourseRepository for CourseRepositoryInfra {
     async fn find_with_teacher_by_id(
         &self,
         conn: &mut DBConn,
-        id: &str,
+        id: &CourseID,
     ) -> Result<Option<CourseWithTeacher>> {
         let res: Option<CourseWithTeacher> = sqlx::query_as!(
             CourseWithTeacher,

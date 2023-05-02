@@ -102,11 +102,13 @@ pub trait CourseServiceImpl:
     }
 
     async fn find_with_teacher_by_id(&self, course_id: &str) -> Result<Option<CourseWithTeacher>> {
+        let course_id = CourseID::new(course_id.to_string());
+
         let pool = self.get_db_pool();
         let mut conn = pool.acquire().await?;
         let course = self
             .course_repo()
-            .find_with_teacher_by_id(&mut conn, course_id)
+            .find_with_teacher_by_id(&mut conn, &course_id)
             .await?;
 
         Ok(course)

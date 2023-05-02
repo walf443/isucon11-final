@@ -29,7 +29,10 @@ async fn success_case() {
     ).execute(&mut tx).await.unwrap();
 
     let repo = CourseRepositoryInfra {};
-    let got = repo.find_by_code(&mut tx, &CourseCode::new(course.code.clone())).await.unwrap();
+    let got = repo
+        .find_by_code(&mut tx, &CourseCode::new(course.code.clone()))
+        .await
+        .unwrap();
     assert_eq!(got, course)
 }
 

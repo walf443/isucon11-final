@@ -1,7 +1,7 @@
 use crate::repos::course_repository::CourseRepositoryInfra;
 use fake::{Fake, Faker};
 use isucholar_core::db::get_test_db_conn;
-use isucholar_core::models::course::Course;
+use isucholar_core::models::course::{Course, CourseID};
 use isucholar_core::models::user::User;
 use isucholar_core::models::user_type::UserType::Teacher;
 use isucholar_core::repos::course_repository::CourseRepository;
@@ -11,9 +11,11 @@ async fn empty_case() {
     let db_pool = get_test_db_conn().await.unwrap();
     let mut tx = db_pool.begin().await.unwrap();
 
+    let course_id: CourseID = Faker.fake();
+
     let repo = CourseRepositoryInfra {};
     let got = repo
-        .find_with_teacher_by_id(&mut tx, "none_exist_id")
+        .find_with_teacher_by_id(&mut tx, &course_id)
         .await
         .unwrap();
     assert_eq!(got.is_none(), true);
@@ -57,7 +59,7 @@ async fn success_case() {
 
     let repo = CourseRepositoryInfra {};
     let got = repo
-        .find_with_teacher_by_id(&mut tx, &course.id)
+        .find_with_teacher_by_id(&mut tx, &CourseID::new(course.id.clone()))
         .await
         .unwrap()
         .unwrap();
