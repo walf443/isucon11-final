@@ -1,4 +1,6 @@
-pub fn get_user_info(session: actix_session::Session) -> actix_web::Result<(String, String, bool)> {
+use isucholar_core::models::user::UserID;
+
+pub fn get_user_info(session: actix_session::Session) -> actix_web::Result<(UserID, String, bool)> {
     let user_id = session.get("userID")?;
     if user_id.is_none() {
         return Err(actix_web::error::ErrorInternalServerError(
@@ -17,5 +19,9 @@ pub fn get_user_info(session: actix_session::Session) -> actix_web::Result<(Stri
             "failed to get isAdmin from session",
         ));
     }
-    Ok((user_id.unwrap(), user_name.unwrap(), is_admin.unwrap()))
+    Ok((
+        UserID::new(user_id.unwrap()),
+        user_name.unwrap(),
+        is_admin.unwrap(),
+    ))
 }

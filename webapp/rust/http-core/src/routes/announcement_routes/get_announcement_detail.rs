@@ -3,7 +3,6 @@ use crate::responses::error::ResponseResult;
 use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::announcement::AnnouncementID;
-use isucholar_core::models::user::UserID;
 use isucholar_core::services::error::Error;
 use isucholar_core::services::unread_announcement_service::{
     HaveUnreadAnnouncementService, UnreadAnnouncementService,
@@ -16,7 +15,6 @@ pub async fn get_announcement_detail<Service: HaveUnreadAnnouncementService>(
     announcement_id: web::Path<(String,)>,
 ) -> ResponseResult<HttpResponse> {
     let (user_id, _, _) = get_user_info(session)?;
-    let user_id = UserID::new(user_id);
 
     let announcement_id: &str = &announcement_id.0;
     let announcement_id = AnnouncementID::new(announcement_id.to_string());

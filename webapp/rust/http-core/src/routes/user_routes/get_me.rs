@@ -2,7 +2,7 @@ use crate::responses::error::ResponseError::UserNotFound;
 use crate::responses::error::ResponseResult;
 use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
-use isucholar_core::models::user::{UserCode, UserID};
+use isucholar_core::models::user::UserCode;
 use isucholar_core::services::user_service::{HaveUserService, UserService};
 
 #[derive(Debug, serde::Serialize)]
@@ -18,7 +18,6 @@ pub async fn get_me<Service: HaveUserService>(
     session: actix_session::Session,
 ) -> ResponseResult<HttpResponse> {
     let (user_id, user_name, is_admin) = get_user_info(session)?;
-    let user_id = UserID::new(user_id);
 
     let user_code = service.user_service().find_code_by_id(&user_id).await?;
 

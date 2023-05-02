@@ -22,10 +22,10 @@ pub struct AddCourseRequest {
 }
 
 impl AddCourseRequest {
-    fn convert_create_course(&self, course_id: String, user_id: String) -> CreateCourse {
+    fn convert_create_course(&self, course_id: String, user_id: UserID) -> CreateCourse {
         CreateCourse {
             id: CourseID::new(course_id),
-            user_id: UserID::new(user_id),
+            user_id: user_id,
             code: CourseCode::new(self.code.clone()),
             type_: self.type_.clone(),
             name: self.name.clone(),

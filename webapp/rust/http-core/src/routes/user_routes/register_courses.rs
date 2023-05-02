@@ -3,7 +3,6 @@ use crate::responses::error::ResponseResult;
 use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::course::CourseID;
-use isucholar_core::models::user::UserID;
 use isucholar_core::services::error::Error;
 use isucholar_core::services::registration_course_service::{
     HaveRegistrationCourseService, RegistrationCourseService,
@@ -16,7 +15,6 @@ pub async fn register_courses<Service: HaveRegistrationCourseService>(
     req: web::Json<Vec<RegisterCourseRequestContent>>,
 ) -> ResponseResult<HttpResponse> {
     let (user_id, _, _) = get_user_info(session)?;
-    let user_id = UserID::new(user_id.to_string());
 
     let mut req = req.into_inner();
     req.sort_by(|x, y| x.id.cmp(&y.id));

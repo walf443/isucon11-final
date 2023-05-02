@@ -2,7 +2,6 @@ use crate::responses::error::ResponseResult;
 use crate::responses::get_grade_response::GetGradeResponse;
 use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
-use isucholar_core::models::user::UserID;
 use isucholar_core::services::class_service::{ClassService, HaveClassService};
 use isucholar_core::services::grade_summary_service::{
     GradeSummaryService, HaveGradeSummaryService,
@@ -19,7 +18,6 @@ pub async fn get_grades<
     session: actix_session::Session,
 ) -> ResponseResult<HttpResponse> {
     let (user_id, _, _) = get_user_info(session)?;
-    let user_id = UserID::new(user_id);
 
     let registered_courses = service
         .registration_course_service()

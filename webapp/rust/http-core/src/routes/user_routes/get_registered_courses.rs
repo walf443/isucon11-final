@@ -2,7 +2,6 @@ use crate::responses::error::ResponseResult;
 use crate::responses::get_registered_course_response::GetRegisteredCourseResponseContent;
 use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
-use isucholar_core::models::user::UserID;
 use isucholar_core::services::course_service::{CourseService, HaveCourseService};
 
 // GET /api/users/me/courses 履修中の科目一覧取得
@@ -11,8 +10,6 @@ pub async fn get_registered_courses<Service: HaveCourseService>(
     session: actix_session::Session,
 ) -> ResponseResult<HttpResponse> {
     let (user_id, _, _) = get_user_info(session)?;
-
-    let user_id = UserID::new(user_id);
 
     let course_with_teachers = service
         .course_service()

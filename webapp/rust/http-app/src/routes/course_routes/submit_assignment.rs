@@ -5,7 +5,6 @@ use isucholar_core::models::class::ClassID;
 use isucholar_core::models::course::CourseID;
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::models::submission::CreateSubmission;
-use isucholar_core::models::user::UserID;
 use isucholar_core::repos::class_repository::ClassRepository;
 use isucholar_core::repos::course_repository::CourseRepository;
 use isucholar_core::repos::registration_repository::RegistrationRepository;
@@ -32,7 +31,6 @@ pub async fn submit_assignment(
 ) -> ResponseResult<HttpResponse> {
     let (user_id, _, _) = get_user_info(session)?;
 
-    let user_id = UserID::new(user_id);
     let course_id = CourseID::new(path.course_id.to_string());
     let class_id = ClassID::new(path.class_id.to_string());
 
