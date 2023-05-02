@@ -189,7 +189,7 @@ impl CourseRepository for CourseRepositoryInfra {
         Ok(course)
     }
 
-    async fn exist_by_id(&self, conn: &mut DBConn, id: &str) -> Result<bool> {
+    async fn exist_by_id(&self, conn: &mut DBConn, id: &CourseID) -> Result<bool> {
         let count = sqlx::query_scalar!("SELECT COUNT(*) FROM `courses` WHERE `id` = ?", id)
             .fetch_one(conn)
             .await?;

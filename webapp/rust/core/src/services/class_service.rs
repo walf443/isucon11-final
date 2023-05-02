@@ -178,15 +178,16 @@ pub trait ClassServiceImpl:
     ) -> Result<Vec<ClassWithSubmitted>> {
         let pool = self.get_db_pool();
 
+        let course_id = CourseID::new(course_id.to_string());
+
         let mut tx = pool.begin().await?;
-        let is_exist = self.course_repo().exist_by_id(&mut tx, course_id).await?;
+        let is_exist = self.course_repo().exist_by_id(&mut tx, &course_id).await?;
 
         if !is_exist {
             return Err(CourseNotFound);
         }
 
         let user_id = UserID::new(user_id.to_string());
-        let course_id = CourseID::new(course_id.to_string());
 
         let classes = self
             .class_repo()
