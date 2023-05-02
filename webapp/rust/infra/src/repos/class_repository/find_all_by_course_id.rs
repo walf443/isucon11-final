@@ -2,6 +2,7 @@ use crate::repos::class_repository::ClassRepositoryInfra;
 use fake::{Fake, Faker};
 use isucholar_core::db::get_test_db_conn;
 use isucholar_core::models::class::Class;
+use isucholar_core::models::course::CourseID;
 use isucholar_core::repos::class_repository::ClassRepository;
 
 #[tokio::test]
@@ -9,9 +10,11 @@ async fn empty_case() {
     let db_pool = get_test_db_conn().await.unwrap();
     let mut tx = db_pool.begin().await.unwrap();
 
+    let course_id: CourseID = Faker.fake();
+
     let repo = ClassRepositoryInfra {};
     let got = repo
-        .find_all_by_course_id(&mut tx, "course_id")
+        .find_all_by_course_id(&mut tx, &course_id)
         .await
         .unwrap();
     assert_eq!(got.len(), 0);
@@ -37,7 +40,7 @@ async fn success_case() {
 
     let repo = ClassRepositoryInfra {};
     let got = repo
-        .find_all_by_course_id(&mut tx, &class.course_id)
+        .find_all_by_course_id(&mut tx, &CourseID::new(class.course_id.to_string()))
         .await
         .unwrap();
     assert_eq!(got.len(), 1);

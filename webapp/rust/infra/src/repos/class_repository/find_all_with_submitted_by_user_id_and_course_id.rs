@@ -2,6 +2,7 @@ use crate::repos::class_repository::ClassRepositoryInfra;
 use fake::{Fake, Faker};
 use isucholar_core::db::get_test_db_conn;
 use isucholar_core::models::class::Class;
+use isucholar_core::models::course::CourseID;
 use isucholar_core::models::user::UserID;
 use isucholar_core::repos::class_repository::ClassRepository;
 
@@ -12,8 +13,9 @@ async fn empty_case() {
 
     let repo = ClassRepositoryInfra {};
     let user_id: UserID = Faker.fake();
+    let course_id: CourseID = Faker.fake();
     let got = repo
-        .find_all_with_submitted_by_user_id_and_course_id(&mut tx, &user_id, "1")
+        .find_all_with_submitted_by_user_id_and_course_id(&mut tx, &user_id, &course_id)
         .await
         .unwrap();
     assert_eq!(got.len(), 0);
@@ -40,7 +42,7 @@ async fn without_submission_record_case() {
     let user_id: UserID = Faker.fake();
     let repo = ClassRepositoryInfra {};
     let got = repo
-        .find_all_with_submitted_by_user_id_and_course_id(&mut tx, &user_id, &class.course_id)
+        .find_all_with_submitted_by_user_id_and_course_id(&mut tx, &user_id, &CourseID::new(class.course_id.to_string()))
         .await
         .unwrap();
     assert_eq!(got.len(), 1);
@@ -87,7 +89,7 @@ async fn success_case() {
 
     let repo = ClassRepositoryInfra {};
     let got = repo
-        .find_all_with_submitted_by_user_id_and_course_id(&mut tx, &user_id, &class.course_id)
+        .find_all_with_submitted_by_user_id_and_course_id(&mut tx, &user_id, &CourseID::new(class.course_id.to_string()))
         .await
         .unwrap();
     assert_eq!(got.len(), 1);

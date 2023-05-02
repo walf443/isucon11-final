@@ -124,7 +124,7 @@ impl ClassRepository for ClassRepositoryInfra {
     async fn find_all_by_course_id(
         &self,
         conn: &mut DBConn,
-        course_id: &str,
+        course_id: &CourseID,
     ) -> Result<Vec<Class>> {
         let classes: Vec<Class> = sqlx::query_as!(
             Class,
@@ -152,7 +152,7 @@ impl ClassRepository for ClassRepositoryInfra {
         &self,
         conn: &mut DBConn,
         user_id: &UserID,
-        course_id: &str,
+        course_id: &CourseID,
     ) -> Result<Vec<ClassWithSubmitted>> {
         let classes: Vec<ClassWithSubmitted> = sqlx::query_as!(ClassWithSubmitted,
             r"

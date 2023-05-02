@@ -3,7 +3,7 @@ use crate::models::class::{Class, ClassWithSubmitted, CreateClass};
 use crate::models::user::UserID;
 use crate::repos::error::Result;
 use async_trait::async_trait;
-use crate::models::course::CourseID;
+use crate::models::course::{CourseID};
 
 #[async_trait]
 pub trait ClassRepository {
@@ -21,13 +21,13 @@ pub trait ClassRepository {
         course_id: &CourseID,
         part: &u8,
     ) -> Result<Class>;
-    async fn find_all_by_course_id(&self, conn: &mut DBConn, course_id: &str)
+    async fn find_all_by_course_id(&self, conn: &mut DBConn, course_id: &CourseID)
         -> Result<Vec<Class>>;
     async fn find_all_with_submitted_by_user_id_and_course_id(
         &self,
         conn: &mut DBConn,
         user_id: &UserID,
-        course_id: &str,
+        course_id: &CourseID,
     ) -> Result<Vec<ClassWithSubmitted>>;
 }
 

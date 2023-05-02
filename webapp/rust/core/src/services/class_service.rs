@@ -1,6 +1,6 @@
 use crate::models::class::ClassWithSubmitted;
 use crate::models::class_score::ClassScore;
-use crate::models::course::Course;
+use crate::models::course::{Course, CourseID};
 use crate::models::course_result::CourseResult;
 use crate::models::course_status::CourseStatus;
 use crate::models::user::UserID;
@@ -64,6 +64,8 @@ pub trait ClassServiceImpl:
     ) -> Result<Vec<ClassScore>> {
         let pool = self.get_db_pool();
         let mut conn = pool.acquire().await?;
+
+        let course_id = CourseID::new(course_id.to_string());
 
         let classes = self
             .class_repo()
@@ -184,9 +186,11 @@ pub trait ClassServiceImpl:
         }
 
         let user_id = UserID::new(user_id.to_string());
+        let course_id = CourseID::new(course_id.to_string());
+
         let classes = self
             .class_repo()
-            .find_all_with_submitted_by_user_id_and_course_id(&mut tx, &user_id, course_id)
+            .find_all_with_submitted_by_user_id_and_course_id(&mut tx, &user_id, &course_id)
             .await?;
 
         tx.commit().await?;
