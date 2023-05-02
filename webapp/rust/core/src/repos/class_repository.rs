@@ -13,7 +13,7 @@ pub trait ClassRepository {
     async fn find_submission_closed_by_id_with_shared_lock(
         &self,
         conn: &mut DBConn,
-        id: &str,
+        id: &ClassID,
     ) -> Result<Option<bool>>;
     async fn find_by_course_id_and_part(
         &self,

@@ -1,6 +1,8 @@
 use actix_web::{web, HttpResponse};
 use futures::{StreamExt, TryStreamExt};
 use isucholar_core::models::assignment_path::AssignmentPath;
+use isucholar_core::models::class::ClassID;
+use isucholar_core::models::course::CourseID;
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::models::submission::CreateSubmission;
 use isucholar_core::repos::class_repository::ClassRepository;
@@ -29,13 +31,13 @@ pub async fn submit_assignment(
 ) -> ResponseResult<HttpResponse> {
     let (user_id, _, _) = get_user_info(session)?;
 
-    let course_id = &path.course_id;
-    let class_id = &path.class_id;
+    let course_id = CourseID::new(path.course_id.to_string());
+    let class_id = ClassID::new(path.class_id.to_string());
 
     let mut tx = pool.begin().await?;
     let course_repo = CourseRepositoryInfra {};
     let status = course_repo
-        .find_status_for_share_lock_by_id(&mut tx, course_id)
+        .find_status_for_share_lock_by_id(&mut tx, &course_id.to_string())
         .await?;
     if let Some(status) = status {
         if status != CourseStatus::InProgress {
@@ -48,7 +50,7 @@ pub async fn submit_assignment(
     let registration_repo = RegistrationRepositoryInfra {};
 
     let is_registered = registration_repo
-        .exist_by_user_id_and_course_id(&mut tx, &user_id, &course_id)
+        .exist_by_user_id_and_course_id(&mut tx, &user_id, &course_id.to_string())
         .await?;
     if is_registered {
         return Err(RegistrationAlready);
@@ -56,7 +58,7 @@ pub async fn submit_assignment(
 
     let class_repo = ClassRepositoryInfra {};
     let submission_closed = class_repo
-        .find_submission_closed_by_id_with_shared_lock(&mut tx, course_id)
+        .find_submission_closed_by_id_with_shared_lock(&mut tx, &class_id)
         .await?;
 
     if let Some(submission_closed) = submission_closed {
@@ -89,7 +91,7 @@ pub async fn submit_assignment(
             &mut tx,
             &CreateSubmission {
                 user_id: user_id.clone(),
-                class_id: class_id.clone(),
+                class_id: class_id.to_string(),
                 file_name: file
                     .content_disposition()
                     .get_filename()
@@ -103,7 +105,12 @@ pub async fn submit_assignment(
         .map_ok(|b| web::BytesMut::from(&b[..]))
         .try_concat()
         .await?;
-    let dst = format!("{}{}-{}.pdf", ASSIGNMENTS_DIRECTORY, class_id, user_id);
+    let dst = format!(
+        "{}{}-{}.pdf",
+        ASSIGNMENTS_DIRECTORY,
+        class_id.to_string(),
+        user_id
+    );
     let mut file = tokio::fs::OpenOptions::new()
         .write(true)
         .create(true)

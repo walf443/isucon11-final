@@ -81,7 +81,7 @@ impl ClassRepository for ClassRepositoryInfra {
     async fn find_submission_closed_by_id_with_shared_lock(
         &self,
         conn: &mut DBConn,
-        id: &str,
+        id: &ClassID,
     ) -> Result<Option<bool>> {
         let submission_closed = sqlx::query_scalar!(
             "SELECT `submission_closed` AS `s:bool` FROM `classes` WHERE `id` = ? FOR SHARE",

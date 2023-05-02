@@ -1,7 +1,7 @@
 use crate::repos::class_repository::ClassRepositoryInfra;
 use fake::{Fake, Faker};
 use isucholar_core::db::get_test_db_conn;
-use isucholar_core::models::class::Class;
+use isucholar_core::models::class::{Class, ClassID};
 use isucholar_core::repos::class_repository::ClassRepository;
 
 #[tokio::test]
@@ -28,7 +28,7 @@ async fn true_case() {
 
     let repo = ClassRepositoryInfra {};
     let result = repo
-        .find_submission_closed_by_id_with_shared_lock(&mut tx, &class.id)
+        .find_submission_closed_by_id_with_shared_lock(&mut tx, &ClassID::new(class.id))
         .await
         .unwrap()
         .unwrap();
@@ -59,7 +59,7 @@ async fn false_case() {
 
     let repo = ClassRepositoryInfra {};
     let result = repo
-        .find_submission_closed_by_id_with_shared_lock(&mut tx, &class.id)
+        .find_submission_closed_by_id_with_shared_lock(&mut tx, &ClassID::new(class.id))
         .await
         .unwrap()
         .unwrap();
@@ -71,9 +71,11 @@ async fn none_case() {
     let db_pool = get_test_db_conn().await.unwrap();
     let mut tx = db_pool.begin().await.unwrap();
 
+    let class_id: ClassID = Faker.fake();
+
     let repo = ClassRepositoryInfra {};
     let result = repo
-        .find_submission_closed_by_id_with_shared_lock(&mut tx, "none_exist_class_id")
+        .find_submission_closed_by_id_with_shared_lock(&mut tx, &class_id)
         .await
         .unwrap();
     assert_eq!(result.is_none(), true);

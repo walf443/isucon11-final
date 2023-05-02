@@ -1,5 +1,6 @@
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::assignment_path::AssignmentPath;
+use isucholar_core::models::class::ClassID;
 use isucholar_core::models::score::Score;
 use isucholar_core::repos::class_repository::ClassRepository;
 use isucholar_core::repos::submission_repository::SubmissionRepository;
@@ -16,12 +17,12 @@ pub async fn register_scores(
     path: web::Path<AssignmentPath>,
     req: web::Json<Vec<Score>>,
 ) -> ResponseResult<HttpResponse> {
-    let class_id = &path.class_id;
+    let class_id = ClassID::new(path.class_id.to_string());
 
     let mut tx = pool.begin().await?;
     let class_repo = ClassRepositoryInfra {};
     let submission_closed = class_repo
-        .find_submission_closed_by_id_with_shared_lock(&mut tx, class_id)
+        .find_submission_closed_by_id_with_shared_lock(&mut tx, &class_id)
         .await?;
 
     if let Some(submission_closed) = submission_closed {
@@ -39,7 +40,7 @@ pub async fn register_scores(
             .update_score_by_user_code_and_class_id(
                 &mut tx,
                 &score.user_code,
-                &class_id,
+                &class_id.to_string(),
                 score.score,
             )
             .await?;
