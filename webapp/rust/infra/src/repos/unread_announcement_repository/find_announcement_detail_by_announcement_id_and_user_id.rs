@@ -1,8 +1,9 @@
 use crate::repos::unread_announcement_repository::UnreadAnnouncementRepositoryInfra;
 use fake::{Fake, Faker};
 use isucholar_core::db::get_test_db_conn;
-use isucholar_core::models::announcement::Announcement;
+use isucholar_core::models::announcement::{Announcement, AnnouncementID};
 use isucholar_core::models::course::Course;
+use isucholar_core::models::user::UserID;
 use isucholar_core::repos::unread_announcement_repository::UnreadAnnouncementRepository;
 
 #[tokio::test]
@@ -49,7 +50,7 @@ async fn record_exist_case() {
     .await
     .unwrap();
 
-    let user_id = Faker.fake::<String>();
+    let user_id: UserID = Faker.fake();
     sqlx::query!(
         "INSERT INTO unread_announcements (announcement_id, user_id) VALUES (?, ?)",
         &announcement.id,
@@ -59,12 +60,9 @@ async fn record_exist_case() {
     .await
     .unwrap();
 
+    let aid = AnnouncementID::new(announcement.id.clone());
     let detail = repo
-        .find_announcement_detail_by_announcement_id_and_user_id(
-            &mut tx,
-            &announcement.id,
-            &user_id,
-        )
+        .find_announcement_detail_by_announcement_id_and_user_id(&mut tx, &aid, &user_id)
         .await
         .unwrap()
         .unwrap();
@@ -119,14 +117,11 @@ async fn none_case() {
     .await
     .unwrap();
 
-    let user_id = Faker.fake::<String>();
+    let user_id: UserID = Faker.fake();
 
+    let aid = AnnouncementID::new(announcement.id.clone());
     let detail = repo
-        .find_announcement_detail_by_announcement_id_and_user_id(
-            &mut tx,
-            &announcement.id,
-            &user_id,
-        )
+        .find_announcement_detail_by_announcement_id_and_user_id(&mut tx, &aid, &user_id)
         .await
         .unwrap();
 

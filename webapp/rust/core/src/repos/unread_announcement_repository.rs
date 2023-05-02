@@ -33,8 +33,8 @@ pub trait UnreadAnnouncementRepository {
     async fn find_announcement_detail_by_announcement_id_and_user_id(
         &self,
         conn: &mut DBConn,
-        announcement_id: &str,
-        user_id: &str,
+        announcement_id: &AnnouncementID,
+        user_id: &UserID,
     ) -> Result<Option<AnnouncementDetail>>;
 }
 

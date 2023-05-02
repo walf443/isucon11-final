@@ -86,8 +86,8 @@ pub trait UnreadAnnouncementServiceImpl:
             .unread_announcement_repo()
             .find_announcement_detail_by_announcement_id_and_user_id(
                 &mut tx,
-                &announcement_id.to_string(),
-                &user_id.to_string(),
+                &announcement_id,
+                &user_id,
             )
             .await?;
 
