@@ -1,0 +1,51 @@
+name: Rust
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+
+env:
+  CARGO_TERM_COLOR: always
+  MYSQL_TEST_DATBASE: isucholar-test
+  DATABASE_URL: mysql://isucon:isucon@localhost:3306/isucholar_test
+  SESSION_KEY: IyohDeechaengeThee9zoiNgewai3eexu6aec2AuKai1wechiJei4eitheineiKangaiwia2Boh2Aip4tohcae2soo1eidei0ni9Ouci2qua4hoshaiphaLahNgoozie
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Start services
+      run: |
+          cd webapp/rust
+          docker-compose up -d
+
+          # wait for db ready
+          while ! mysql -h 127.0.0.1 -u root -P 3306 -e "SELECT 1"  >/dev/null 2>&1
+          do
+            sleep 1
+          done
+    - uses: ./.github/actions/cache_cargo
+    - name: Build
+      run: |
+          cd webapp/rust
+          cargo build --verbose
+    - name: Run tests
+      run: |
+          cd webapp/rust
+          cargo test --workspace --verbose
+    - name: generate doc
+      run: |
+          cd webapp/rust
+          cargo doc --no-deps --offline --frozen
+    - name: publish pages
+      if: github.ref == 'refs/heads/master'
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./target/doc/
