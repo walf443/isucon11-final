@@ -26,7 +26,7 @@ pub async fn download_submitted_assignments(
     }
     let submission_repo = SubmissionRepositoryInfra {};
     let submissions = submission_repo
-        .find_all_with_user_code_by_class_id(&mut tx, &class_id.to_string())
+        .find_all_with_user_code_by_class_id(&mut tx, &class_id)
         .await?;
 
     let zip_file_path = format!("{}{}.zip", ASSIGNMENTS_DIRECTORY, class_id.to_string());

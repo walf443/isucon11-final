@@ -29,7 +29,7 @@ pub trait SubmissionRepository {
     async fn find_all_with_user_code_by_class_id(
         &self,
         conn: &mut DBConn,
-        class_id: &str,
+        class_id: &ClassID,
     ) -> Result<Vec<SubmissionWithUserCode>>;
 }
 
