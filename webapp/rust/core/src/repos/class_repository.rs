@@ -9,7 +9,7 @@ use async_trait::async_trait;
 pub trait ClassRepository {
     async fn for_update_by_id(&self, conn: &mut DBConn, id: &ClassID) -> Result<bool>;
     async fn create(&self, conn: &mut DBConn, class: &CreateClass) -> Result<()>;
-    async fn update_submission_closed_by_id(&self, conn: &mut DBConn, id: &str) -> Result<()>;
+    async fn update_submission_closed_by_id(&self, conn: &mut DBConn, id: &ClassID) -> Result<()>;
     async fn find_submission_closed_by_id_with_shared_lock(
         &self,
         conn: &mut DBConn,

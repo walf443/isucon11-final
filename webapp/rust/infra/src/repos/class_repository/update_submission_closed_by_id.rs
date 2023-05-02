@@ -1,7 +1,7 @@
 use crate::repos::class_repository::ClassRepositoryInfra;
 use fake::{Fake, Faker};
 use isucholar_core::db::get_test_db_conn;
-use isucholar_core::models::class::Class;
+use isucholar_core::models::class::{Class, ClassID};
 use isucholar_core::repos::class_repository::ClassRepository;
 
 #[tokio::test]
@@ -25,7 +25,7 @@ async fn success_case() {
     ).execute(&mut tx).await.unwrap();
 
     let repo = ClassRepositoryInfra {};
-    repo.update_submission_closed_by_id(&mut tx, &class.id)
+    repo.update_submission_closed_by_id(&mut tx, &ClassID::new(class.id.clone()))
         .await
         .unwrap();
 
@@ -45,7 +45,8 @@ async fn specify_none_exist_id_case() {
     let mut tx = db_pool.begin().await.unwrap();
 
     let repo = ClassRepositoryInfra {};
-    repo.update_submission_closed_by_id(&mut tx, "none_exist_id")
+    let class_id: ClassID = Faker.fake();
+    repo.update_submission_closed_by_id(&mut tx, &class_id)
         .await
         .unwrap();
 }

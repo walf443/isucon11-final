@@ -33,7 +33,7 @@ pub async fn download_submitted_assignments(
     create_submissions_zip(&zip_file_path, &class_id.to_string(), &submissions).await?;
 
     class_repo
-        .update_submission_closed_by_id(&mut tx, &class_id.to_string())
+        .update_submission_closed_by_id(&mut tx, &class_id)
         .await?;
 
     tx.commit().await?;

@@ -67,7 +67,7 @@ impl ClassRepository for ClassRepositoryInfra {
         Ok(())
     }
 
-    async fn update_submission_closed_by_id(&self, conn: &mut DBConn, id: &str) -> Result<()> {
+    async fn update_submission_closed_by_id(&self, conn: &mut DBConn, id: &ClassID) -> Result<()> {
         sqlx::query!(
             "UPDATE `classes` SET `submission_closed` = true WHERE `id` = ?",
             id
