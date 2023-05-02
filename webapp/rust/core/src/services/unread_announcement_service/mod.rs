@@ -1,5 +1,7 @@
 use crate::models::announcement::AnnouncementWithoutDetail;
 use crate::models::announcement_detail::AnnouncementDetail;
+use crate::models::course::CourseID;
+use crate::models::user::UserID;
 use crate::repos::registration_repository::{HaveRegistrationRepository, RegistrationRepository};
 use crate::repos::unread_announcement_repository::{
     HaveUnreadAnnouncementRepository, UnreadAnnouncementRepository,
@@ -71,12 +73,14 @@ pub trait UnreadAnnouncementServiceImpl:
         let pool = self.get_db_pool();
         let mut tx = pool.begin().await?;
 
+        let user_id = UserID::new(user_id.to_string());
+
         let announcement = self
             .unread_announcement_repo()
             .find_announcement_detail_by_announcement_id_and_user_id(
                 &mut tx,
                 announcement_id,
-                user_id,
+                &user_id.to_string(),
             )
             .await?;
 
@@ -84,10 +88,11 @@ pub trait UnreadAnnouncementServiceImpl:
             return Err(AnnouncementNotFound);
         }
         let announcement = announcement.unwrap();
+        let course_id = CourseID::new(announcement.course_id.clone());
 
         let is_exist = self
             .registration_repo()
-            .exist_by_user_id_and_course_id(&mut tx, user_id, &announcement.course_id)
+            .exist_by_user_id_and_course_id(&mut tx, &user_id, &course_id)
             .await?;
 
         if !is_exist {
@@ -95,7 +100,7 @@ pub trait UnreadAnnouncementServiceImpl:
         }
 
         self.unread_announcement_repo()
-            .mark_read(&mut tx, announcement_id, user_id)
+            .mark_read(&mut tx, announcement_id, &user_id.to_string())
             .await?;
 
         tx.commit().await?;

@@ -16,8 +16,8 @@ pub trait RegistrationRepository {
     async fn exist_by_user_id_and_course_id(
         &self,
         conn: &mut DBConn,
-        user_id: &str,
-        course_id: &str,
+        user_id: &UserID,
+        course_id: &CourseID,
     ) -> Result<bool>;
     async fn find_users_by_course_id(
         &self,

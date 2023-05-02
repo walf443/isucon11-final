@@ -5,6 +5,7 @@ use isucholar_core::models::class::ClassID;
 use isucholar_core::models::course::CourseID;
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::models::submission::CreateSubmission;
+use isucholar_core::models::user::UserID;
 use isucholar_core::repos::class_repository::ClassRepository;
 use isucholar_core::repos::course_repository::CourseRepository;
 use isucholar_core::repos::registration_repository::RegistrationRepository;
@@ -31,6 +32,7 @@ pub async fn submit_assignment(
 ) -> ResponseResult<HttpResponse> {
     let (user_id, _, _) = get_user_info(session)?;
 
+    let user_id = UserID::new(user_id);
     let course_id = CourseID::new(path.course_id.to_string());
     let class_id = ClassID::new(path.class_id.to_string());
 
@@ -50,7 +52,7 @@ pub async fn submit_assignment(
     let registration_repo = RegistrationRepositoryInfra {};
 
     let is_registered = registration_repo
-        .exist_by_user_id_and_course_id(&mut tx, &user_id, &course_id.to_string())
+        .exist_by_user_id_and_course_id(&mut tx, &user_id, &course_id)
         .await?;
     if is_registered {
         return Err(RegistrationAlready);
@@ -90,7 +92,7 @@ pub async fn submit_assignment(
         .create_or_update(
             &mut tx,
             &CreateSubmission {
-                user_id: user_id.clone(),
+                user_id: user_id.to_string(),
                 class_id: class_id.to_string(),
                 file_name: file
                     .content_disposition()
@@ -109,7 +111,7 @@ pub async fn submit_assignment(
         "{}{}-{}.pdf",
         ASSIGNMENTS_DIRECTORY,
         class_id.to_string(),
-        user_id
+        user_id.to_string(),
     );
     let mut file = tokio::fs::OpenOptions::new()
         .write(true)

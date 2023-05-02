@@ -38,8 +38,8 @@ impl RegistrationRepository for RegistrationRepositoryInfra {
     async fn exist_by_user_id_and_course_id(
         &self,
         conn: &mut DBConn,
-        user_id: &str,
-        course_id: &str,
+        user_id: &UserID,
+        course_id: &CourseID,
     ) -> Result<bool> {
         let registration_count: i64 = sqlx::query_scalar!(
             "SELECT COUNT(*) FROM `registrations` WHERE `user_id` = ? AND `course_id` = ?",

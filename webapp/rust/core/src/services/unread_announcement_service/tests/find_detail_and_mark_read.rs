@@ -127,19 +127,26 @@ async fn success_case() -> Result<()> {
     service
         .unread_announcement_repo
         .expect_find_announcement_detail_by_announcement_id_and_user_id()
-        .withf(|_, aid, user_id| aid == "aid" && user_id == "user_id")
+        .withf(|_, aid, user_id| {
+            aid.to_string() == "aid".to_string() && user_id.to_string() == "user_id".to_string()
+        })
         .returning(move |_, _, _| Ok(Some(detail.clone())));
 
     service
         .registration_repo
         .expect_exist_by_user_id_and_course_id()
-        .withf(|_, user_id, course_id| user_id == "user_id" && course_id == "course_id")
+        .withf(|_, user_id, course_id| {
+            user_id.to_string() == "user_id".to_string()
+                && course_id.to_string() == "course_id".to_string()
+        })
         .returning(|_, _, _| Ok(true));
 
     service
         .unread_announcement_repo
         .expect_mark_read()
-        .withf(|_, aid, user_id| aid == "aid" && user_id == "user_id")
+        .withf(|_, aid, user_id| {
+            aid.to_string() == "aid".to_string() && user_id.to_string() == "user_id".to_string()
+        })
         .returning(|_, _, _| Ok(()));
 
     let detail = service
