@@ -8,6 +8,20 @@ pub struct Announcement {
     pub message: String,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Dummy, sqlx::Type)]
+#[sqlx(transparent)]
+pub struct AnnouncementID(String);
+
+impl AnnouncementID {
+    pub fn new(id: String) -> Self {
+        Self(id)
+    }
+
+    pub fn to_string(&self) -> String {
+        self.0.clone()
+    }
+}
+
 #[derive(Debug, sqlx::FromRow, serde::Serialize)]
 pub struct AnnouncementWithoutDetail {
     pub id: String,

@@ -1,4 +1,4 @@
-use crate::models::announcement::Announcement;
+use crate::models::announcement::{Announcement, AnnouncementID};
 use crate::repos::announcement_repository::{AnnouncementRepository, HaveAnnouncementRepository};
 use crate::repos::course_repository::{CourseRepository, HaveCourseRepository};
 use crate::repos::error::ReposError;
@@ -55,11 +55,9 @@ pub trait AnnouncementServiceImpl:
                 let _ = tx.rollback().await;
                 match e {
                     ReposError::AnnouncementDuplicate => {
+                        let aid = AnnouncementID::new(announcement.id.to_string());
                         let mut conn = pool.acquire().await?;
-                        let an = self
-                            .announcement_repo()
-                            .find_by_id(&mut conn, &announcement.id)
-                            .await?;
+                        let an = self.announcement_repo().find_by_id(&mut conn, &aid).await?;
                         if announcement.course_id != an.course_id
                             || announcement.title != an.title
                             || announcement.message != an.message

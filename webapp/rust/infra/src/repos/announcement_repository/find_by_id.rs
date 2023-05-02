@@ -1,7 +1,7 @@
 use crate::repos::announcement_repository::AnnouncementRepositoryInfra;
 use fake::{Fake, Faker};
 use isucholar_core::db::get_test_db_conn;
-use isucholar_core::models::announcement::Announcement;
+use isucholar_core::models::announcement::{Announcement, AnnouncementID};
 use isucholar_core::repos::announcement_repository::AnnouncementRepository;
 
 #[tokio::test]
@@ -10,8 +10,9 @@ async fn empty_case() {
     let db_pool = get_test_db_conn().await.unwrap();
     let mut tx = db_pool.begin().await.unwrap();
 
+    let aid: AnnouncementID = Faker.fake();
     let repo = AnnouncementRepositoryInfra {};
-    repo.find_by_id(&mut tx, "1").await.unwrap();
+    repo.find_by_id(&mut tx, &aid).await.unwrap();
 }
 
 #[tokio::test]
@@ -38,6 +39,9 @@ async fn success() {
     .unwrap();
 
     let repo = AnnouncementRepositoryInfra {};
-    let result = repo.find_by_id(&mut tx, &announcement.id).await.unwrap();
+    let result = repo
+        .find_by_id(&mut tx, &AnnouncementID::new(announcement.id.clone()))
+        .await
+        .unwrap();
     assert_eq!(result, announcement);
 }
