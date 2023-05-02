@@ -20,7 +20,7 @@ pub struct SearchCoursesQuery {
 
 #[async_trait]
 pub trait CourseRepository {
-    async fn create(&self, pool: &DBPool, course: &CreateCourse) -> Result<String>;
+    async fn create(&self, pool: &DBPool, course: &CreateCourse) -> Result<CourseID>;
     async fn find_all_with_teacher(
         &self,
         pool: &DBPool,

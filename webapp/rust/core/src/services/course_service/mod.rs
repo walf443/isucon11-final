@@ -14,7 +14,7 @@ use async_trait::async_trait;
 #[cfg_attr(any(test, feature = "test"), mockall::automock)]
 #[async_trait]
 pub trait CourseService: Sync {
-    async fn create(&self, course: &CreateCourse) -> Result<String>;
+    async fn create(&self, course: &CreateCourse) -> Result<CourseID>;
     async fn update_status_by_id(&self, course_id: &str, status: &CourseStatus) -> Result<()>;
     async fn find_all_with_teacher(
         &self,
@@ -35,7 +35,7 @@ pub trait HaveCourseService {
 pub trait CourseServiceImpl:
     Sync + HaveDBPool + HaveUserRepository + HaveCourseRepository + HaveRegistrationCourseRepository
 {
-    async fn create(&self, course: &CreateCourse) -> Result<String> {
+    async fn create(&self, course: &CreateCourse) -> Result<CourseID> {
         let db_pool = self.get_db_pool();
 
         let course_id = self.course_repo().create(&db_pool, course).await?;
@@ -119,7 +119,7 @@ pub trait CourseServiceImpl:
 
 #[async_trait]
 impl<S: CourseServiceImpl> CourseService for S {
-    async fn create(&self, course: &CreateCourse) -> Result<String> {
+    async fn create(&self, course: &CreateCourse) -> Result<CourseID> {
         CourseServiceImpl::create(self, course).await
     }
 

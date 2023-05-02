@@ -2,6 +2,7 @@ use crate::models::course_status::CourseStatus;
 use crate::models::course_type::CourseType;
 use crate::models::day_of_week::DayOfWeek;
 use fake::{Dummy, Fake};
+use serde::Serialize;
 
 #[derive(Debug, sqlx::FromRow, PartialEq, Eq, Dummy)]
 pub struct Course {
@@ -19,7 +20,7 @@ pub struct Course {
     pub status: CourseStatus,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Dummy, sqlx::Type)]
+#[derive(Debug, Clone, PartialEq, Eq, Dummy, sqlx::Type, Serialize)]
 #[sqlx(transparent)]
 pub struct CourseID(String);
 

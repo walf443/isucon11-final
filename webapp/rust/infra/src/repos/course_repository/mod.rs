@@ -31,7 +31,9 @@ pub struct CourseRepositoryInfra {}
 
 #[async_trait]
 impl CourseRepository for CourseRepositoryInfra {
-    async fn create(&self, pool: &DBPool, req: &CreateCourse) -> Result<String> {
+    async fn create(&self, pool: &DBPool, req: &CreateCourse) -> Result<CourseID> {
+        let course_id = CourseID::new(req.id.clone());
+
         let result = sqlx::query!(
             "INSERT INTO `courses` (`id`, `code`, `type`, `name`, `description`, `credit`, `period`, `day_of_week`, `teacher_id`, `keywords`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             &req.id,
@@ -67,7 +69,7 @@ impl CourseRepository for CourseRepositoryInfra {
                     {
                         return Err(ReposError::CourseDuplicate);
                     } else {
-                        return Ok(course.id);
+                        return Ok(CourseID::new(course.id.clone()));
                     }
                 }
             }
@@ -75,7 +77,7 @@ impl CourseRepository for CourseRepositoryInfra {
 
         result?;
 
-        Ok(req.id.clone())
+        Ok(course_id)
     }
 
     async fn find_all_with_teacher(

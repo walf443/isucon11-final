@@ -1,5 +1,5 @@
 use actix_web::{web, HttpResponse};
-use isucholar_core::models::course::CreateCourse;
+use isucholar_core::models::course::{CourseID, CreateCourse};
 use isucholar_core::models::course_type::CourseType;
 use isucholar_core::models::day_of_week::DayOfWeek;
 use isucholar_core::services::course_service::{CourseService, HaveCourseService};
@@ -39,7 +39,7 @@ impl AddCourseRequest {
 
 #[derive(Debug, serde::Serialize)]
 pub struct AddCourseResponse {
-    pub id: String,
+    pub id: CourseID,
 }
 
 // POST /api/courses 新規科目登録
