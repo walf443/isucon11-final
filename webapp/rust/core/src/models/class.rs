@@ -1,3 +1,4 @@
+use crate::models::course::CourseID;
 use fake::{Dummy, Fake};
 use serde::{Deserialize, Serialize};
 
@@ -28,7 +29,7 @@ impl ClassID {
 #[derive(Dummy)]
 pub struct CreateClass {
     pub id: ClassID,
-    pub course_id: String,
+    pub course_id: CourseID,
     pub part: u8,
     pub title: String,
     pub description: String,
@@ -37,7 +38,7 @@ pub struct CreateClass {
 #[derive(Debug, sqlx::FromRow)]
 pub struct ClassWithSubmitted {
     pub id: ClassID,
-    pub course_id: String,
+    pub course_id: CourseID,
     pub part: u8,
     pub title: String,
     pub description: String,

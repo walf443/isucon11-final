@@ -158,7 +158,7 @@ impl ClassRepository for ClassRepositoryInfra {
             r"
                 SELECT
                   `classes`.id as `id:ClassID`,
-                  `classes`.course_id,
+                  `classes`.course_id as `course_id:CourseID`,
                   `classes`.part,
                   `classes`.title,
                   `classes`.description,

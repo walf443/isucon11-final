@@ -51,7 +51,7 @@ pub async fn add_class(
     let class_id = ClassID::new(util::new_ulid().await);
     let form = CreateClass {
         id: class_id.clone(),
-        course_id: course_id.to_string(),
+        course_id: course_id.clone(),
         part: req.part.clone(),
         title: req.title.clone(),
         description: req.description.clone(),

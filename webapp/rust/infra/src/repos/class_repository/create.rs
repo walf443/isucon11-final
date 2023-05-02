@@ -26,7 +26,7 @@ async fn success_case() {
         .await
         .unwrap();
 
-    assert_eq!(got.course_id, class.course_id);
+    assert_eq!(got.course_id, class.course_id.to_string());
     assert_eq!(got.part, class.part);
     assert_eq!(got.title, class.title);
     assert_eq!(got.description, class.description);

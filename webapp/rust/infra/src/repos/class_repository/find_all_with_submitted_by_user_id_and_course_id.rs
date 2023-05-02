@@ -53,7 +53,7 @@ async fn without_submission_record_case() {
 
     let got = got.first().unwrap();
     assert_eq!(got.id, class.id);
-    assert_eq!(got.course_id, class.course_id);
+    assert_eq!(got.course_id.to_string(), class.course_id);
     assert_eq!(got.part, class.part);
     assert_eq!(got.title, class.title);
     assert_eq!(got.description, class.description);
@@ -104,7 +104,7 @@ async fn success_case() {
 
     let got = got.first().unwrap();
     assert_eq!(got.id, class.id);
-    assert_eq!(got.course_id, class.course_id);
+    assert_eq!(got.course_id.to_string(), class.course_id);
     assert_eq!(got.part, class.part);
     assert_eq!(got.title, class.title);
     assert_eq!(got.description, class.description);
