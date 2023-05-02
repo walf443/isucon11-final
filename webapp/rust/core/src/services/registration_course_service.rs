@@ -1,4 +1,4 @@
-use crate::models::course::Course;
+use crate::models::course::{Course, CourseID};
 use crate::models::course_status::CourseStatus;
 use crate::repos::course_repository::{CourseRepository, HaveCourseRepository};
 use crate::repos::registration_course_repository::{
@@ -52,9 +52,8 @@ pub trait RegistrationCourseServiceImpl:
         let mut errors = RegistrationCourseValidationError::default();
         let mut newly_added = Vec::new();
         for course_id in course_ids {
-            let course = course_repo
-                .find_for_share_lock_by_id(&mut tx, &course_id)
-                .await?;
+            let cid = CourseID::new(course_id.to_string());
+            let course = course_repo.find_for_share_lock_by_id(&mut tx, &cid).await?;
             if course.is_none() {
                 errors.course_not_found.push(course_id.clone());
                 continue;

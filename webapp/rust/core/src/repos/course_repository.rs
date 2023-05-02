@@ -36,7 +36,7 @@ pub trait CourseRepository {
     async fn find_for_share_lock_by_id(
         &self,
         conn: &mut DBConn,
-        id: &str,
+        id: &CourseID,
     ) -> Result<Option<Course>>;
     async fn exist_by_id(&self, conn: &mut DBConn, id: &str) -> Result<bool>;
     async fn for_update_by_id(&self, conn: &mut DBConn, id: &str) -> Result<bool>;

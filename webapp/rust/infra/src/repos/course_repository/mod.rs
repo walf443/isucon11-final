@@ -178,7 +178,7 @@ impl CourseRepository for CourseRepositoryInfra {
     async fn find_for_share_lock_by_id(
         &self,
         conn: &mut DBConn,
-        id: &str,
+        id: &CourseID,
     ) -> Result<Option<Course>> {
         let course: Option<Course> =
             sqlx::query_as("SELECT * FROM `courses` WHERE `id` = ? FOR SHARE")

@@ -31,13 +31,13 @@ pub async fn add_class(
     course_id: web::Path<(String,)>,
     req: web::Json<AddClassRequest>,
 ) -> ResponseResult<HttpResponse> {
-    let course_id = &course_id.0;
+    let course_id = CourseID::new(course_id.0.to_string());
 
     let mut tx = pool.begin().await?;
 
     let course_repo = CourseRepositoryInfra {};
     let course = course_repo
-        .find_for_share_lock_by_id(&mut tx, course_id)
+        .find_for_share_lock_by_id(&mut tx, &course_id)
         .await?;
     if course.is_none() {
         return Err(CourseNotFound);
@@ -51,7 +51,7 @@ pub async fn add_class(
     let class_id = util::new_ulid().await;
     let form = CreateClass {
         id: class_id.clone(),
-        course_id: course_id.clone(),
+        course_id: course_id.to_string(),
         part: req.part.clone(),
         title: req.title.clone(),
         description: req.description.clone(),
@@ -67,11 +67,7 @@ pub async fn add_class(
                 ReposError::CourseDuplicate => {
                     let mut conn = pool.acquire().await?;
                     let class = class_repo
-                        .find_by_course_id_and_part(
-                            &mut conn,
-                            &CourseID::new(course_id.to_string()),
-                            &req.part,
-                        )
+                        .find_by_course_id_and_part(&mut conn, &course_id, &req.part)
                         .await?;
                     if req.title != class.title || req.description != class.description {
                         return Err(CourseConflict);
