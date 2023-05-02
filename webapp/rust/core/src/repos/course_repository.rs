@@ -1,5 +1,5 @@
 use crate::db::{DBConn, DBPool};
-use crate::models::course::{Course, CourseID, CourseWithTeacher, CreateCourse};
+use crate::models::course::{Course, CourseCode, CourseID, CourseWithTeacher, CreateCourse};
 use crate::models::course_status::CourseStatus;
 use crate::models::day_of_week::DayOfWeek;
 use crate::repos::error::Result;
@@ -46,7 +46,7 @@ pub trait CourseRepository {
         id: &CourseID,
         status: &CourseStatus,
     ) -> Result<()>;
-    async fn find_by_code(&self, conn: &mut DBConn, code: &str) -> Result<Course>;
+    async fn find_by_code(&self, conn: &mut DBConn, code: &CourseCode) -> Result<Course>;
     async fn find_with_teacher_by_id(
         &self,
         conn: &mut DBConn,

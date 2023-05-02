@@ -1,6 +1,8 @@
 use async_trait::async_trait;
 use isucholar_core::db::{DBConn, DBPool};
-use isucholar_core::models::course::{Course, CourseID, CourseWithTeacher, CreateCourse};
+use isucholar_core::models::course::{
+    Course, CourseCode, CourseID, CourseWithTeacher, CreateCourse,
+};
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::models::course_type::CourseType;
 use isucholar_core::models::day_of_week::DayOfWeek;
@@ -51,8 +53,9 @@ impl CourseRepository for CourseRepositoryInfra {
                 db_error.try_downcast_ref::<sqlx::mysql::MySqlDatabaseError>()
             {
                 if mysql_error.number() == MYSQL_ERR_NUM_DUPLICATE_ENTRY {
+                    let code = CourseCode::new(req.code.clone());
                     let mut conn = pool.acquire().await?;
-                    let course = self.find_by_code(&mut conn, &req.code).await?;
+                    let course = self.find_by_code(&mut conn, &code).await?;
 
                     if req.type_ != course.type_
                         || req.name != course.name
@@ -225,7 +228,7 @@ impl CourseRepository for CourseRepositoryInfra {
         Ok(())
     }
 
-    async fn find_by_code(&self, conn: &mut DBConn, code: &str) -> Result<Course> {
+    async fn find_by_code(&self, conn: &mut DBConn, code: &CourseCode) -> Result<Course> {
         let course = sqlx::query_as!(
             Course,
             r"
