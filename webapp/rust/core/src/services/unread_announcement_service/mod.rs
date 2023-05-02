@@ -27,8 +27,8 @@ pub trait UnreadAnnouncementService: Sync {
 
     async fn find_detail_and_mark_read(
         &self,
-        announcement_id: &str,
-        user_id: &str,
+        announcement_id: &AnnouncementID,
+        user_id: &UserID,
     ) -> Result<AnnouncementDetail>;
 }
 
@@ -68,14 +68,11 @@ pub trait UnreadAnnouncementServiceImpl:
 
     async fn find_detail_and_mark_read(
         &self,
-        announcement_id: &str,
-        user_id: &str,
+        announcement_id: &AnnouncementID,
+        user_id: &UserID,
     ) -> Result<AnnouncementDetail> {
         let pool = self.get_db_pool();
         let mut tx = pool.begin().await?;
-
-        let user_id = UserID::new(user_id.to_string());
-        let announcement_id = AnnouncementID::new(announcement_id.to_string());
 
         let announcement = self
             .unread_announcement_repo()
@@ -126,8 +123,8 @@ impl<S: UnreadAnnouncementServiceImpl> UnreadAnnouncementService for S {
 
     async fn find_detail_and_mark_read(
         &self,
-        announcement_id: &str,
-        user_id: &str,
+        announcement_id: &AnnouncementID,
+        user_id: &UserID,
     ) -> Result<AnnouncementDetail> {
         UnreadAnnouncementServiceImpl::find_detail_and_mark_read(self, announcement_id, user_id)
             .await

@@ -1,8 +1,11 @@
+use crate::models::announcement::AnnouncementID;
 use crate::models::announcement_detail::AnnouncementDetail;
+use crate::models::user::UserID;
 use crate::repos::error::ReposError::TestError;
 use crate::services::error::Result;
 use crate::services::unread_announcement_service::tests::S;
 use crate::services::unread_announcement_service::UnreadAnnouncementServiceImpl;
+use fake::{Fake, Faker};
 
 #[tokio::test]
 #[should_panic(expected = "ReposError(TestError)")]
@@ -13,7 +16,13 @@ async fn find_announcement_detail_by_announcement_id_and_user_id_err() -> () {
         .expect_find_announcement_detail_by_announcement_id_and_user_id()
         .returning(|_, _, _| Err(TestError));
 
-    service.find_detail_and_mark_read("", "").await.unwrap();
+    let aid: AnnouncementID = Faker.fake();
+    let user_id: UserID = Faker.fake();
+
+    service
+        .find_detail_and_mark_read(&aid, &user_id)
+        .await
+        .unwrap();
 }
 
 #[tokio::test]
@@ -25,13 +34,22 @@ async fn find_announcement_detail_by_announcement_id_and_user_id_none() -> () {
         .expect_find_announcement_detail_by_announcement_id_and_user_id()
         .returning(|_, _, _| Ok(None));
 
-    service.find_detail_and_mark_read("", "").await.unwrap();
+    let aid: AnnouncementID = Faker.fake();
+    let user_id: UserID = Faker.fake();
+    service
+        .find_detail_and_mark_read(&aid, &user_id)
+        .await
+        .unwrap();
 }
 
 #[tokio::test]
 #[should_panic(expected = "ReposError(TestError)")]
 async fn exist_by_user_id_and_course_id_err() -> () {
     let mut service = S::new().await;
+
+    let aid: AnnouncementID = Faker.fake();
+    let user_id: UserID = Faker.fake();
+
     service
         .unread_announcement_repo
         .expect_find_announcement_detail_by_announcement_id_and_user_id()
@@ -51,12 +69,18 @@ async fn exist_by_user_id_and_course_id_err() -> () {
         .expect_exist_by_user_id_and_course_id()
         .returning(|_, _, _| Err(TestError));
 
-    service.find_detail_and_mark_read("", "").await.unwrap();
+    service
+        .find_detail_and_mark_read(&aid, &user_id)
+        .await
+        .unwrap();
 }
 
 #[tokio::test]
 #[should_panic(expected = "AnnouncementNotFound")]
 async fn exist_by_user_id_and_course_id_false() -> () {
+    let aid: AnnouncementID = Faker.fake();
+    let user_id: UserID = Faker.fake();
+
     let mut service = S::new().await;
     service
         .unread_announcement_repo
@@ -77,12 +101,18 @@ async fn exist_by_user_id_and_course_id_false() -> () {
         .expect_exist_by_user_id_and_course_id()
         .returning(|_, _, _| Ok(false));
 
-    service.find_detail_and_mark_read("", "").await.unwrap();
+    service
+        .find_detail_and_mark_read(&aid, &user_id)
+        .await
+        .unwrap();
 }
 
 #[tokio::test]
 #[should_panic(expected = "ReposError(TestError)")]
 async fn mark_read_failed() -> () {
+    let aid: AnnouncementID = Faker.fake();
+    let user_id: UserID = Faker.fake();
+
     let mut service = S::new().await;
     service
         .unread_announcement_repo
@@ -108,11 +138,17 @@ async fn mark_read_failed() -> () {
         .expect_mark_read()
         .returning(|_, _, _| Err(TestError));
 
-    service.find_detail_and_mark_read("", "").await.unwrap();
+    service
+        .find_detail_and_mark_read(&aid, &user_id)
+        .await
+        .unwrap();
 }
 
 #[tokio::test]
 async fn success_case() -> Result<()> {
+    let aid: AnnouncementID = Faker.fake();
+    let user_id: UserID = Faker.fake();
+
     let mut service = S::new().await;
     let expected = AnnouncementDetail {
         id: "aid".to_string(),
@@ -124,33 +160,38 @@ async fn success_case() -> Result<()> {
     };
     let detail = expected.clone();
 
+    let announcement_id = aid.clone();
+    let uid = user_id.clone();
     service
         .unread_announcement_repo
         .expect_find_announcement_detail_by_announcement_id_and_user_id()
-        .withf(|_, aid, user_id| {
-            aid.to_string() == "aid".to_string() && user_id.to_string() == "user_id".to_string()
+        .withf(move |_, aid, user_id| {
+            aid.to_string() == announcement_id.to_string() && user_id.to_string() == uid.to_string()
         })
         .returning(move |_, _, _| Ok(Some(detail.clone())));
 
+    let uid = user_id.clone();
     service
         .registration_repo
         .expect_exist_by_user_id_and_course_id()
-        .withf(|_, user_id, course_id| {
-            user_id.to_string() == "user_id".to_string()
+        .withf(move |_, user_id, course_id| {
+            user_id.to_string() == uid.to_string()
                 && course_id.to_string() == "course_id".to_string()
         })
         .returning(|_, _, _| Ok(true));
 
+    let announcement_id = aid.clone();
+    let uid = user_id.clone();
     service
         .unread_announcement_repo
         .expect_mark_read()
-        .withf(|_, aid, user_id| {
-            aid.to_string() == "aid".to_string() && user_id.to_string() == "user_id".to_string()
+        .withf(move |_, aid, user_id| {
+            aid.to_string() == announcement_id.to_string() && user_id.to_string() == uid.to_string()
         })
         .returning(|_, _, _| Ok(()));
 
     let detail = service
-        .find_detail_and_mark_read("aid", "user_id")
+        .find_detail_and_mark_read(&aid, &user_id)
         .await
         .unwrap();
 
