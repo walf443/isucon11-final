@@ -39,7 +39,7 @@ pub trait CourseRepository {
         id: &CourseID,
     ) -> Result<Option<Course>>;
     async fn exist_by_id(&self, conn: &mut DBConn, id: &CourseID) -> Result<bool>;
-    async fn for_update_by_id(&self, conn: &mut DBConn, id: &str) -> Result<bool>;
+    async fn for_update_by_id(&self, conn: &mut DBConn, id: &CourseID) -> Result<bool>;
     async fn update_status_by_id(
         &self,
         conn: &mut DBConn,

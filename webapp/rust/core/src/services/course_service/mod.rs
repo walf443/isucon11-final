@@ -1,4 +1,4 @@
-use crate::models::course::{Course, CourseWithTeacher, CreateCourse};
+use crate::models::course::{Course, CourseID, CourseWithTeacher, CreateCourse};
 use crate::models::course_status::CourseStatus;
 use crate::models::user::User;
 use crate::repos::course_repository::{CourseRepository, HaveCourseRepository, SearchCoursesQuery};
@@ -44,17 +44,19 @@ pub trait CourseServiceImpl:
     }
 
     async fn update_status_by_id(&self, course_id: &str, status: &CourseStatus) -> Result<()> {
+        let course_id = CourseID::new(course_id.to_string());
+
         let db_pool = self.get_db_pool();
         let course_repo = self.course_repo();
         let mut tx = db_pool.begin().await?;
 
-        let is_exist = course_repo.for_update_by_id(&mut tx, course_id).await?;
+        let is_exist = course_repo.for_update_by_id(&mut tx, &course_id).await?;
         if !is_exist {
             return Err(CourseNotFound);
         }
 
         course_repo
-            .update_status_by_id(&mut tx, course_id, status)
+            .update_status_by_id(&mut tx, &course_id.to_string(), status)
             .await?;
 
         tx.commit().await?;

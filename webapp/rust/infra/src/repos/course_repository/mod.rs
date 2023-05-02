@@ -197,7 +197,7 @@ impl CourseRepository for CourseRepositoryInfra {
         Ok(count == 1)
     }
 
-    async fn for_update_by_id(&self, conn: &mut DBConn, id: &str) -> Result<bool> {
+    async fn for_update_by_id(&self, conn: &mut DBConn, id: &CourseID) -> Result<bool> {
         let count = sqlx::query_scalar!(
             "SELECT COUNT(*) FROM `courses` WHERE `id` = ? FOR UPDATE",
             id
