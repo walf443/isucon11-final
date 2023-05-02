@@ -40,7 +40,7 @@ async fn success_case() {
 
     let repo = ClassRepositoryInfra {};
     let got = repo
-        .find_all_by_course_id(&mut tx, &CourseID::new(class.course_id.to_string()))
+        .find_all_by_course_id(&mut tx, &class.course_id)
         .await
         .unwrap();
     assert_eq!(got.len(), 1);
