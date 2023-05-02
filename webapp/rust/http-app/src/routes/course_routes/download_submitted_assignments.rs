@@ -1,5 +1,6 @@
 use actix_web::web;
 use isucholar_core::models::assignment_path::AssignmentPath;
+use isucholar_core::models::class::ClassID;
 use isucholar_core::models::submission::SubmissionWithUserCode;
 use isucholar_core::repos::class_repository::ClassRepository;
 use isucholar_core::repos::submission_repository::SubmissionRepository;
@@ -14,25 +15,25 @@ pub async fn download_submitted_assignments(
     pool: web::Data<sqlx::MySqlPool>,
     path: web::Path<AssignmentPath>,
 ) -> ResponseResult<actix_files::NamedFile> {
-    let class_id = &path.class_id;
+    let class_id = ClassID::new(path.class_id.clone());
 
     let mut tx = pool.begin().await?;
     let class_repo = ClassRepositoryInfra {};
-    let is_exist = class_repo.for_update_by_id(&mut tx, class_id).await?;
+    let is_exist = class_repo.for_update_by_id(&mut tx, &class_id).await?;
 
     if !is_exist {
         return Err(ClassNotFound);
     }
     let submission_repo = SubmissionRepositoryInfra {};
     let submissions = submission_repo
-        .find_all_with_user_code_by_class_id(&mut tx, &class_id)
+        .find_all_with_user_code_by_class_id(&mut tx, &class_id.to_string())
         .await?;
 
-    let zip_file_path = format!("{}{}.zip", ASSIGNMENTS_DIRECTORY, class_id);
-    create_submissions_zip(&zip_file_path, class_id, &submissions).await?;
+    let zip_file_path = format!("{}{}.zip", ASSIGNMENTS_DIRECTORY, class_id.to_string());
+    create_submissions_zip(&zip_file_path, &class_id.to_string(), &submissions).await?;
 
     class_repo
-        .update_submission_closed_by_id(&mut tx, &class_id)
+        .update_submission_closed_by_id(&mut tx, &class_id.to_string())
         .await?;
 
     tx.commit().await?;

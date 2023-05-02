@@ -42,7 +42,11 @@ async fn without_submission_record_case() {
     let user_id: UserID = Faker.fake();
     let repo = ClassRepositoryInfra {};
     let got = repo
-        .find_all_with_submitted_by_user_id_and_course_id(&mut tx, &user_id, &CourseID::new(class.course_id.to_string()))
+        .find_all_with_submitted_by_user_id_and_course_id(
+            &mut tx,
+            &user_id,
+            &CourseID::new(class.course_id.to_string()),
+        )
         .await
         .unwrap();
     assert_eq!(got.len(), 1);
@@ -89,7 +93,11 @@ async fn success_case() {
 
     let repo = ClassRepositoryInfra {};
     let got = repo
-        .find_all_with_submitted_by_user_id_and_course_id(&mut tx, &user_id, &CourseID::new(class.course_id.to_string()))
+        .find_all_with_submitted_by_user_id_and_course_id(
+            &mut tx,
+            &user_id,
+            &CourseID::new(class.course_id.to_string()),
+        )
         .await
         .unwrap();
     assert_eq!(got.len(), 1);

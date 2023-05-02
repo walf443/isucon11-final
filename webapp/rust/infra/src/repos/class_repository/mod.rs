@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 use isucholar_core::db::DBConn;
-use isucholar_core::models::class::{Class, ClassWithSubmitted, CreateClass};
+use isucholar_core::models::class::{Class, ClassID, ClassWithSubmitted, CreateClass};
 use isucholar_core::models::course::CourseID;
 use isucholar_core::models::user::UserID;
 use isucholar_core::repos::class_repository::ClassRepository;
@@ -28,7 +28,7 @@ pub struct ClassRepositoryInfra {}
 
 #[async_trait]
 impl ClassRepository for ClassRepositoryInfra {
-    async fn for_update_by_id(&self, conn: &mut DBConn, id: &str) -> Result<bool> {
+    async fn for_update_by_id(&self, conn: &mut DBConn, id: &ClassID) -> Result<bool> {
         let class_count = sqlx::query_scalar!(
             "SELECT COUNT(*) FROM `classes` WHERE `id` = ? FOR UPDATE",
             id

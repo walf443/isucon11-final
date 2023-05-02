@@ -10,6 +10,20 @@ pub struct Class {
     pub submission_closed: bool,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Dummy, sqlx::Type)]
+#[sqlx(transparent)]
+pub struct ClassID(String);
+
+impl ClassID {
+    pub fn new(id: String) -> Self {
+        Self(id)
+    }
+
+    pub fn to_string(&self) -> String {
+        self.0.clone()
+    }
+}
+
 #[derive(Dummy)]
 pub struct CreateClass {
     pub id: String,

@@ -25,7 +25,11 @@ async fn success_case() {
 
     let repo = ClassRepositoryInfra {};
     let got = repo
-        .find_by_course_id_and_part(&mut tx, &CourseID::new(class.course_id.to_string()), &class.part)
+        .find_by_course_id_and_part(
+            &mut tx,
+            &CourseID::new(class.course_id.to_string()),
+            &class.part,
+        )
         .await
         .unwrap();
     assert_eq!(got, class)
@@ -38,7 +42,11 @@ async fn empty_case() {
     let mut tx = db_pool.begin().await.unwrap();
 
     let repo = ClassRepositoryInfra {};
-    repo.find_by_course_id_and_part(&mut tx, &CourseID::new("none_exist_course_id".to_string()), &0)
-        .await
-        .unwrap();
+    repo.find_by_course_id_and_part(
+        &mut tx,
+        &CourseID::new("none_exist_course_id".to_string()),
+        &0,
+    )
+    .await
+    .unwrap();
 }
