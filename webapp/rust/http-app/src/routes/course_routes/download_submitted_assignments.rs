@@ -1,6 +1,5 @@
 use actix_web::web;
 use isucholar_core::models::assignment_path::AssignmentPath;
-use isucholar_core::models::class::ClassID;
 use isucholar_core::models::submission::SubmissionWithUserCode;
 use isucholar_core::repos::class_repository::ClassRepository;
 use isucholar_core::repos::submission_repository::SubmissionRepository;
@@ -15,7 +14,7 @@ pub async fn download_submitted_assignments(
     pool: web::Data<sqlx::MySqlPool>,
     path: web::Path<AssignmentPath>,
 ) -> ResponseResult<actix_files::NamedFile> {
-    let class_id = ClassID::new(path.class_id.clone());
+    let class_id = path.class_id.clone();
 
     let mut tx = pool.begin().await?;
     let class_repo = ClassRepositoryInfra {};
