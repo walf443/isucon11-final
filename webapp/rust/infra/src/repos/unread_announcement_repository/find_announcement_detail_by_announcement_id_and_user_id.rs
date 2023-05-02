@@ -73,7 +73,7 @@ async fn record_exist_case() {
     assert_eq!(detail.id, announcement.id);
     assert_eq!(detail.title, announcement.title);
     assert_eq!(detail.message, announcement.message);
-    assert_eq!(detail.course_id, course.id.to_string());
+    assert_eq!(detail.course_id, course.id);
 }
 
 #[tokio::test]

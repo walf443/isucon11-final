@@ -1,5 +1,6 @@
 use crate::models::announcement::AnnouncementID;
 use crate::models::announcement_detail::AnnouncementDetail;
+use crate::models::course::CourseID;
 use crate::models::user::UserID;
 use crate::repos::error::ReposError::TestError;
 use crate::services::error::Result;
@@ -56,7 +57,7 @@ async fn exist_by_user_id_and_course_id_err() -> () {
         .returning(|_, _, _| {
             Ok(Some(AnnouncementDetail {
                 id: AnnouncementID::new("".to_string()),
-                course_id: "".to_string(),
+                course_id: CourseID::new("".to_string()),
                 course_name: "".to_string(),
                 title: "".to_string(),
                 message: "".to_string(),
@@ -88,7 +89,7 @@ async fn exist_by_user_id_and_course_id_false() -> () {
         .returning(|_, _, _| {
             Ok(Some(AnnouncementDetail {
                 id: AnnouncementID::new("".to_string()),
-                course_id: "".to_string(),
+                course_id: CourseID::new("".to_string()),
                 course_name: "".to_string(),
                 title: "".to_string(),
                 message: "".to_string(),
@@ -120,7 +121,7 @@ async fn mark_read_failed() -> () {
         .returning(|_, _, _| {
             Ok(Some(AnnouncementDetail {
                 id: AnnouncementID::new("".to_string()),
-                course_id: "".to_string(),
+                course_id: CourseID::new("".to_string()),
                 course_name: "".to_string(),
                 title: "".to_string(),
                 message: "".to_string(),
@@ -152,7 +153,7 @@ async fn success_case() -> Result<()> {
     let mut service = S::new().await;
     let expected = AnnouncementDetail {
         id: AnnouncementID::new("aid".to_string()),
-        course_id: "course_id".to_string(),
+        course_id: CourseID::new("course_id".to_string()),
         course_name: "course_name".to_string(),
         title: "title".to_string(),
         message: "message".to_string(),

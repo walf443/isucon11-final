@@ -87,11 +87,10 @@ pub trait UnreadAnnouncementServiceImpl:
             return Err(AnnouncementNotFound);
         }
         let announcement = announcement.unwrap();
-        let course_id = CourseID::new(announcement.course_id.clone());
 
         let is_exist = self
             .registration_repo()
-            .exist_by_user_id_and_course_id(&mut tx, &user_id, &course_id)
+            .exist_by_user_id_and_course_id(&mut tx, &user_id, &announcement.course_id)
             .await?;
 
         if !is_exist {

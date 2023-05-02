@@ -27,7 +27,7 @@ impl AnnouncementID {
 #[derive(Debug, sqlx::FromRow, serde::Serialize)]
 pub struct AnnouncementWithoutDetail {
     pub id: AnnouncementID,
-    pub course_id: String,
+    pub course_id: CourseID,
     pub course_name: String,
     pub title: String,
     pub unread: bool,

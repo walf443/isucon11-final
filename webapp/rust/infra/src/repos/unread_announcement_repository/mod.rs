@@ -117,7 +117,7 @@ impl UnreadAnnouncementRepository for UnreadAnnouncementRepositoryInfra {
             r"
                 SELECT
                     `announcements`.`id` as `id:AnnouncementID`,
-                    `courses`.`id` AS `course_id`,
+                    `courses`.`id` AS `course_id:CourseID`,
                     `courses`.`name` AS `course_name`,
                     `announcements`.`title`,
                     `announcements`.`message`,

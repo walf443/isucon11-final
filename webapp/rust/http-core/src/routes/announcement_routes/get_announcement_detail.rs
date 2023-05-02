@@ -49,6 +49,7 @@ mod tests {
     use actix_web::FromRequest;
     use isucholar_core::models::announcement::AnnouncementID;
     use isucholar_core::models::announcement_detail::AnnouncementDetail;
+    use isucholar_core::models::course::CourseID;
     use isucholar_core::services::error::Error::{AnnouncementNotFound, TestError};
     use isucholar_core::services::manager::tests::MockServiceManager;
     use std::str::from_utf8;
@@ -118,7 +119,7 @@ mod tests {
             .returning(|_, _| {
                 Ok(AnnouncementDetail {
                     id: AnnouncementID::new("id".to_string()),
-                    course_id: "course_id".to_string(),
+                    course_id: CourseID::new("course_id".to_string()),
                     course_name: "course_name".to_string(),
                     title: "title".to_string(),
                     message: "message".to_string(),
@@ -145,7 +146,7 @@ mod tests {
         eprintln!("{:?}", result.body());
         let expected = AnnouncementDetail {
             id: AnnouncementID::new("id".to_string()),
-            course_id: "course_id".to_string(),
+            course_id: CourseID::new("course_id".to_string()),
             course_name: "course_name".to_string(),
             title: "title".to_string(),
             message: "message".to_string(),
