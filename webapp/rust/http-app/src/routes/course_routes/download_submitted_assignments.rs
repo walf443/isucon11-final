@@ -70,7 +70,9 @@ async fn create_submissions_zip(
             .stderr(std::process::Stdio::null())
             .arg(&format!(
                 "{}{}-{}.pdf",
-                ASSIGNMENTS_DIRECTORY, class_id, submission.user_id
+                ASSIGNMENTS_DIRECTORY,
+                class_id,
+                submission.user_id.to_string()
             ))
             .arg(&format!(
                 "{}{}-{}",

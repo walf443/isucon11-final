@@ -102,7 +102,10 @@ impl SubmissionRepository for SubmissionRepositoryInfra {
         let submissions: Vec<SubmissionWithUserCode> = sqlx::query_as!(
             SubmissionWithUserCode,
             r"
-                SELECT `submissions`.`user_id`, `submissions`.`file_name`, `users`.`code` AS `user_code:UserCode`
+                SELECT
+                  `submissions`.`user_id` as `user_id:UserID`,
+                  `users`.`code` AS `user_code:UserCode`,
+                  `submissions`.`file_name`
                 FROM `submissions`
                 JOIN `users` ON `users`.`id` = `submissions`.`user_id`
                 WHERE `class_id` = ?
