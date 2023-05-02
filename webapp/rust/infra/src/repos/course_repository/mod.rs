@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 use isucholar_core::db::{DBConn, DBPool};
-use isucholar_core::models::course::{Course, CourseWithTeacher, CreateCourse};
+use isucholar_core::models::course::{Course, CourseID, CourseWithTeacher, CreateCourse};
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::models::course_type::CourseType;
 use isucholar_core::models::day_of_week::DayOfWeek;
@@ -163,7 +163,7 @@ impl CourseRepository for CourseRepositoryInfra {
     async fn find_status_for_share_lock_by_id(
         &self,
         conn: &mut DBConn,
-        id: &str,
+        id: &CourseID,
     ) -> Result<Option<CourseStatus>> {
         let status = sqlx::query_scalar!(
             "SELECT `status` AS `status:CourseStatus` FROM `courses` WHERE `id` = ? FOR SHARE",

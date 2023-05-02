@@ -1,5 +1,5 @@
 use crate::db::{DBConn, DBPool};
-use crate::models::course::{Course, CourseWithTeacher, CreateCourse};
+use crate::models::course::{Course, CourseID, CourseWithTeacher, CreateCourse};
 use crate::models::course_status::CourseStatus;
 use crate::models::day_of_week::DayOfWeek;
 use crate::repos::error::Result;
@@ -31,7 +31,7 @@ pub trait CourseRepository {
     async fn find_status_for_share_lock_by_id(
         &self,
         conn: &mut DBConn,
-        id: &str,
+        id: &CourseID,
     ) -> Result<Option<CourseStatus>>;
     async fn find_for_share_lock_by_id(
         &self,

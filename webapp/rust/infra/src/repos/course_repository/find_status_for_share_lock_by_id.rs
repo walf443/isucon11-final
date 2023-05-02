@@ -1,7 +1,7 @@
 use crate::repos::course_repository::CourseRepositoryInfra;
 use fake::{Fake, Faker};
 use isucholar_core::db::get_test_db_conn;
-use isucholar_core::models::course::Course;
+use isucholar_core::models::course::{Course, CourseID};
 use isucholar_core::repos::course_repository::CourseRepository;
 
 #[tokio::test]
@@ -30,7 +30,7 @@ async fn success_case() {
 
     let repo = CourseRepositoryInfra {};
     let got = repo
-        .find_status_for_share_lock_by_id(&mut tx, &course.id)
+        .find_status_for_share_lock_by_id(&mut tx, &CourseID::new(course.id))
         .await
         .unwrap();
     assert_eq!(got.unwrap(), course.status)
@@ -42,8 +42,9 @@ async fn none_case() {
     let mut tx = db_pool.begin().await.unwrap();
 
     let repo = CourseRepositoryInfra {};
+    let course_id: CourseID = Faker.fake();
     let got = repo
-        .find_status_for_share_lock_by_id(&mut tx, "none_exist_course_id")
+        .find_status_for_share_lock_by_id(&mut tx, &course_id)
         .await
         .unwrap();
     assert_eq!(got.is_none(), true)
