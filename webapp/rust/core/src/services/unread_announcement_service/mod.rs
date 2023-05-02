@@ -51,11 +51,19 @@ pub trait UnreadAnnouncementServiceImpl:
     ) -> Result<(Vec<AnnouncementWithoutDetail>, i64)> {
         let pool = self.get_db_pool();
         let mut tx = pool.begin().await?;
+        let user_id = UserID::new(user_id.to_string());
+
         let offset = limit * (page - 1);
 
         let repo = self.unread_announcement_repo();
         let announcements = repo
-            .find_unread_announcements_by_user_id(&mut tx, &user_id, limit, offset, course_id)
+            .find_unread_announcements_by_user_id(
+                &mut tx,
+                &user_id.to_string(),
+                limit,
+                offset,
+                course_id,
+            )
             .await?;
 
         let unread_count = repo.count_unread_by_user_id(&mut tx, &user_id).await?;
@@ -74,7 +82,7 @@ pub trait UnreadAnnouncementServiceImpl:
         let mut tx = pool.begin().await?;
 
         let user_id = UserID::new(user_id.to_string());
-        let announcement_id =  AnnouncementID::new(announcement_id.to_string());
+        let announcement_id = AnnouncementID::new(announcement_id.to_string());
 
         let announcement = self
             .unread_announcement_repo()

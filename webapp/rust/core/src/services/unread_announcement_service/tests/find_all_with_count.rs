@@ -32,7 +32,7 @@ async fn count_unread_by_user_id_failed() -> () {
     service
         .unread_announcement_repo
         .expect_count_unread_by_user_id()
-        .withf(move |_, uid| uid == user_id)
+        .withf(move |_, uid| uid.to_string() == user_id.to_string())
         .returning(|_, _| Err(TestError));
 
     service
@@ -53,7 +53,7 @@ async fn success_case() -> () {
     service
         .unread_announcement_repo
         .expect_count_unread_by_user_id()
-        .withf(move |_, uid| uid == user_id)
+        .withf(move |_, uid| uid.to_string() == user_id.to_string())
         .returning(|_, _| Ok(1));
 
     let result = service

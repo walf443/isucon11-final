@@ -56,7 +56,7 @@ impl UnreadAnnouncementRepository for UnreadAnnouncementRepositoryInfra {
         Ok(())
     }
 
-    async fn count_unread_by_user_id(&self, conn: &mut DBConn, user_id: &str) -> Result<i64> {
+    async fn count_unread_by_user_id(&self, conn: &mut DBConn, user_id: &UserID) -> Result<i64> {
         let unread_count: i64 = sqlx::query_scalar!(
             "SELECT COUNT(*) FROM `unread_announcements` WHERE `user_id` = ? AND NOT `is_deleted`",
             user_id

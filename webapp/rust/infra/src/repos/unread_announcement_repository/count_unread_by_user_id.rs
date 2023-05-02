@@ -1,6 +1,7 @@
 use crate::repos::unread_announcement_repository::UnreadAnnouncementRepositoryInfra;
 use fake::{Fake, Faker};
 use isucholar_core::db::get_test_db_conn;
+use isucholar_core::models::user::UserID;
 use isucholar_core::repos::unread_announcement_repository::UnreadAnnouncementRepository;
 
 #[tokio::test]
@@ -14,7 +15,7 @@ async fn record_exist_case() {
         .unwrap();
 
     let repo = UnreadAnnouncementRepositoryInfra {};
-    let user_id = Faker.fake::<String>();
+    let user_id: UserID = Faker.fake();
     let announcement_id1 = Faker.fake::<String>();
     let announcement_id2 = Faker.fake::<String>();
     let announcement_id3 = Faker.fake::<String>();
@@ -48,7 +49,7 @@ async fn empty_case() {
     let mut tx = pool.begin().await.unwrap();
 
     let repo = UnreadAnnouncementRepositoryInfra {};
-    let user_id = Faker.fake::<String>();
+    let user_id: UserID = Faker.fake();
 
     let unread_count = repo
         .count_unread_by_user_id(&mut tx, &user_id)
