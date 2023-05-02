@@ -1,7 +1,6 @@
 use crate::repos::submission_repository::SubmissionRepositoryInfra;
 use fake::{Fake, Faker};
 use isucholar_core::db::get_test_db_conn;
-use isucholar_core::models::class::ClassID;
 use isucholar_core::models::submission::CreateSubmission;
 use isucholar_core::models::user::User;
 use isucholar_core::repos::submission_repository::SubmissionRepository;
@@ -42,12 +41,10 @@ async fn success_case() {
     .await
     .unwrap();
 
-    let class_id = ClassID::new(submission.class_id.clone());
-
     let repo = SubmissionRepositoryInfra {};
 
     let submissions = repo
-        .find_all_with_user_code_by_class_id(&mut tx, &class_id)
+        .find_all_with_user_code_by_class_id(&mut tx, &submission.class_id)
         .await
         .unwrap();
     assert_eq!(submissions.len(), 1);
@@ -64,12 +61,10 @@ async fn empty_case() {
 
     let submission: CreateSubmission = Faker.fake();
 
-    let class_id = ClassID::new(submission.class_id.clone());
-
     let repo = SubmissionRepositoryInfra {};
 
     let submissions = repo
-        .find_all_with_user_code_by_class_id(&mut tx, &class_id)
+        .find_all_with_user_code_by_class_id(&mut tx, &submission.class_id)
         .await
         .unwrap();
     assert_eq!(submissions.len(), 0);

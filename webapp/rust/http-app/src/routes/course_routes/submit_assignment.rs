@@ -93,7 +93,7 @@ pub async fn submit_assignment(
             &mut tx,
             &CreateSubmission {
                 user_id: user_id.to_string(),
-                class_id: class_id.to_string(),
+                class_id: class_id.clone(),
                 file_name: file
                     .content_disposition()
                     .get_filename()

@@ -1,7 +1,6 @@
 use crate::repos::submission_repository::SubmissionRepositoryInfra;
 use fake::{Fake, Faker};
 use isucholar_core::db::get_test_db_conn;
-use isucholar_core::models::class::ClassID;
 use isucholar_core::models::submission::CreateSubmission;
 use isucholar_core::models::user::User;
 use isucholar_core::repos::submission_repository::SubmissionRepository;
@@ -44,8 +43,7 @@ async fn exist_case() {
     .await
     .unwrap();
 
-    let class_id = ClassID::new(submission.class_id.clone());
-    repo.update_score_by_user_code_and_class_id(&mut tx, &user.code, &class_id, 100)
+    repo.update_score_by_user_code_and_class_id(&mut tx, &user.code, &submission.class_id, 100)
         .await
         .unwrap();
 
