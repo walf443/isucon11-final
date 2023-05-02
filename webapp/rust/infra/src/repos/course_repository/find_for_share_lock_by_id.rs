@@ -30,7 +30,7 @@ async fn success_case() {
 
     let repo = CourseRepositoryInfra {};
     let got = repo
-        .find_for_share_lock_by_id(&mut tx, &CourseID::new(course.id.clone()))
+        .find_for_share_lock_by_id(&mut tx, &course.id.clone())
         .await
         .unwrap();
     assert_eq!(got.unwrap(), course)

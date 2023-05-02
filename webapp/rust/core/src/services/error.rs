@@ -29,6 +29,6 @@ pub type Result<T> = std::result::Result<T, Error>;
 #[derive(Debug, Default, Serialize)]
 pub struct RegistrationCourseValidationError {
     pub course_not_found: Vec<CourseID>,
-    pub not_registrable_status: Vec<String>,
-    pub schedule_conflict: Vec<String>,
+    pub not_registrable_status: Vec<CourseID>,
+    pub schedule_conflict: Vec<CourseID>,
 }

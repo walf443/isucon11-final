@@ -31,13 +31,9 @@ async fn success_case() {
     ).execute(&mut tx).await.unwrap();
 
     let repo = CourseRepositoryInfra {};
-    repo.update_status_by_id(
-        &mut tx,
-        &CourseID::new(course.id.clone()),
-        &CourseStatus::Closed,
-    )
-    .await
-    .unwrap();
+    repo.update_status_by_id(&mut tx, &course.id, &CourseStatus::Closed)
+        .await
+        .unwrap();
     let status = sqlx::query_scalar!(
         "SELECT status AS `status:CourseStatus` FROM courses WHERE id = ?",
         &course.id

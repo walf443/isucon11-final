@@ -31,7 +31,7 @@ impl RegistrationCourseRepository for RegistrationCourseRepositoryInfra {
             Course,
             r"
                 SELECT
-                    courses.id,
+                    courses.id as `id:CourseID`,
                     courses.code as `code:CourseCode`,
                     courses.type as `type_:CourseType`,
                     courses.name,
@@ -63,7 +63,7 @@ impl RegistrationCourseRepository for RegistrationCourseRepositoryInfra {
             Course,
             r"
                 SELECT
-                    courses.id,
+                    courses.id as `id:CourseID`,
                     courses.code as `code:CourseCode`,
                     courses.type as `type_:CourseType`,
                     courses.name,

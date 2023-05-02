@@ -59,11 +59,11 @@ async fn success_case() {
 
     let repo = CourseRepositoryInfra {};
     let got = repo
-        .find_with_teacher_by_id(&mut tx, &CourseID::new(course.id.clone()))
+        .find_with_teacher_by_id(&mut tx, &course.id)
         .await
         .unwrap()
         .unwrap();
-    assert_eq!(got.id, course.id);
+    assert_eq!(got.id, course.id.to_string());
     assert_eq!(got.code, course.code);
     assert_eq!(got.name, course.name);
     assert_eq!(got.description, course.description);

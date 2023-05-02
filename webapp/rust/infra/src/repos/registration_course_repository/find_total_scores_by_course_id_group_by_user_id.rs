@@ -70,7 +70,7 @@ async fn success_case() {
     .unwrap();
 
     let mut class: Class = Faker.fake();
-    class.course_id = course.id.clone();
+    class.course_id = course.id.clone().to_string();
     sqlx::query!(
         "INSERT INTO classes (id, course_id, part, title, description, submission_closed) VALUES (?, ?, ?, ?, ?, ?)",
         &class.id,
@@ -92,11 +92,9 @@ async fn success_case() {
     .await
     .unwrap();
 
-    let course_id = CourseID::new(course.id.clone());
-
     let repo = RegistrationCourseRepositoryInfra {};
     let scores = repo
-        .find_total_scores_by_course_id_group_by_user_id(&mut tx, &course_id)
+        .find_total_scores_by_course_id_group_by_user_id(&mut tx, &course.id)
         .await
         .unwrap();
     assert_eq!(scores.len(), 1);

@@ -29,10 +29,7 @@ async fn true_case() {
     ).execute(&mut tx).await.unwrap();
 
     let repo = CourseRepositoryInfra {};
-    let got = repo
-        .exist_by_id(&mut tx, &CourseID::new(course.id.clone()))
-        .await
-        .unwrap();
+    let got = repo.exist_by_id(&mut tx, &course.id.clone()).await.unwrap();
     assert_eq!(got, true)
 }
 

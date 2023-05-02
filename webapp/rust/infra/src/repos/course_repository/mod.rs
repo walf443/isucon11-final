@@ -68,7 +68,7 @@ impl CourseRepository for CourseRepositoryInfra {
                     {
                         return Err(ReposError::CourseDuplicate);
                     } else {
-                        return Ok(CourseID::new(course.id.clone()));
+                        return Ok(course.id.clone());
                     }
                 }
             }
@@ -234,7 +234,7 @@ impl CourseRepository for CourseRepositoryInfra {
             Course,
             r"
                 SELECT
-                   id,
+                   id as `id:CourseID`,
                    code as `code:CourseCode`,
                    type as `type_:CourseType`,
                    name,

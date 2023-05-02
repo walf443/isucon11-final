@@ -102,9 +102,8 @@ pub trait RegistrationCourseServiceImpl:
         }
 
         for course in newly_added {
-            let course_id = CourseID::new(course.id.clone());
             registration_repo
-                .create_or_update(&mut tx, &user_id, &course_id)
+                .create_or_update(&mut tx, &user_id, &course.id)
                 .await?;
         }
 

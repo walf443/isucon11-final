@@ -111,9 +111,8 @@ pub trait ClassServiceImpl:
         let pool = self.get_db_pool();
         let mut conn = pool.acquire().await?;
 
-        let course_id = CourseID::new(course.id.clone());
         let class_scores = self
-            .get_user_scores_by_course_id(&user_id, &course_id)
+            .get_user_scores_by_course_id(&user_id, &course.id)
             .await?;
 
         let mut my_total_score: i64 = 0;
