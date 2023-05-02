@@ -1,5 +1,6 @@
 use crate::models::course::{Course, CourseID};
 use crate::models::course_status::CourseStatus;
+use crate::models::user::UserID;
 use crate::repos::course_repository::{CourseRepository, HaveCourseRepository};
 use crate::repos::registration_course_repository::{
     HaveRegistrationCourseRepository, RegistrationCourseRepository,
@@ -31,11 +32,13 @@ pub trait RegistrationCourseServiceImpl:
     + HaveCourseRepository
 {
     async fn find_courses_by_user_id(&self, user_id: &str) -> Result<Vec<Course>> {
+        let user_id = UserID::new(user_id.to_string());
+
         let pool = self.get_db_pool();
         let mut conn = pool.acquire().await?;
         let result = self
             .registration_course_repo()
-            .find_courses_by_user_id(&mut conn, user_id)
+            .find_courses_by_user_id(&mut conn, &user_id)
             .await?;
 
         Ok(result)

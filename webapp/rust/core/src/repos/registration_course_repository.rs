@@ -1,5 +1,6 @@
 use crate::db::DBConn;
 use crate::models::course::Course;
+use crate::models::user::UserID;
 use crate::repos::error::Result;
 use async_trait::async_trait;
 
@@ -8,7 +9,7 @@ pub trait RegistrationCourseRepository {
     async fn find_courses_by_user_id(
         &self,
         conn: &mut DBConn,
-        user_id: &str,
+        user_id: &UserID,
     ) -> Result<Vec<Course>>;
     async fn find_open_courses_by_user_id(
         &self,

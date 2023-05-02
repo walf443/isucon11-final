@@ -5,6 +5,7 @@ use isucholar_core::models::course::Course;
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::models::course_type::CourseType;
 use isucholar_core::models::day_of_week::DayOfWeek;
+use isucholar_core::models::user::UserID;
 use isucholar_core::repos::error::Result;
 use isucholar_core::repos::registration_course_repository::RegistrationCourseRepository;
 use num_traits::ToPrimitive;
@@ -24,7 +25,7 @@ impl RegistrationCourseRepository for RegistrationCourseRepositoryInfra {
     async fn find_courses_by_user_id(
         &self,
         conn: &mut DBConn,
-        user_id: &str,
+        user_id: &UserID,
     ) -> Result<Vec<Course>> {
         let registered_courses: Vec<Course> = sqlx::query_as!(
             Course,
