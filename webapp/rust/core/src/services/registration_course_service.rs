@@ -47,6 +47,7 @@ pub trait RegistrationCourseServiceImpl:
     async fn create(&self, user_id: &str, course_ids: &Vec<String>) -> Result<()> {
         let pool = self.get_db_pool();
         let mut tx = pool.begin().await?;
+        let user_id = UserID::new(user_id.to_string());
 
         let course_repo = self.course_repo();
         let registration_course_repo = self.registration_course_repo();
@@ -70,7 +71,7 @@ pub trait RegistrationCourseServiceImpl:
 
             // すでに履修登録済みの科目は無視する
             let is_exist = registration_repo
-                .exist_by_user_id_and_course_id(&mut tx, &user_id, &course.id)
+                .exist_by_user_id_and_course_id(&mut tx, &user_id.to_string(), &course.id)
                 .await?;
             if is_exist {
                 continue;
@@ -104,7 +105,7 @@ pub trait RegistrationCourseServiceImpl:
 
         for course in newly_added {
             registration_repo
-                .create_or_update(&mut tx, &user_id, &course.id)
+                .create_or_update(&mut tx, &user_id.to_string(), &course.id)
                 .await?;
         }
 

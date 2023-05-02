@@ -1,6 +1,6 @@
 use crate::models::course::{Course, CourseID, CourseWithTeacher, CreateCourse};
 use crate::models::course_status::CourseStatus;
-use crate::models::user::User;
+use crate::models::user::{User, UserID};
 use crate::repos::course_repository::{CourseRepository, HaveCourseRepository, SearchCoursesQuery};
 use crate::repos::registration_course_repository::{
     HaveRegistrationCourseRepository, RegistrationCourseRepository,
@@ -82,6 +82,7 @@ pub trait CourseServiceImpl:
     async fn find_open_courses_by_user_id(&self, user_id: &str) -> Result<Vec<(Course, User)>> {
         let db_pool = self.get_db_pool();
         let mut tx = db_pool.begin().await?;
+        let user_id = UserID::new(user_id.to_string());
 
         let courses = self
             .registration_course_repo()

@@ -14,7 +14,7 @@ pub trait RegistrationCourseRepository {
     async fn find_open_courses_by_user_id(
         &self,
         conn: &mut DBConn,
-        user_id: &str,
+        user_id: &UserID,
     ) -> Result<Vec<Course>>;
     async fn find_total_scores_by_course_id_group_by_user_id(
         &self,

@@ -57,7 +57,7 @@ impl RegistrationCourseRepository for RegistrationCourseRepositoryInfra {
     async fn find_open_courses_by_user_id(
         &self,
         conn: &mut DBConn,
-        user_id: &str,
+        user_id: &UserID,
     ) -> Result<Vec<Course>> {
         let courses: Vec<Course> = sqlx::query_as!(
             Course,
