@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 use isucholar_core::db::DBConn;
 use isucholar_core::models::class::{Class, ClassWithSubmitted, CreateClass};
+use isucholar_core::models::user::UserID;
 use isucholar_core::repos::class_repository::ClassRepository;
 use isucholar_core::repos::error::ReposError::ClassDuplicate;
 use isucholar_core::repos::error::Result;
@@ -149,7 +150,7 @@ impl ClassRepository for ClassRepositoryInfra {
     async fn find_all_with_submitted_by_user_id_and_course_id(
         &self,
         conn: &mut DBConn,
-        user_id: &str,
+        user_id: &UserID,
         course_id: &str,
     ) -> Result<Vec<ClassWithSubmitted>> {
         let classes: Vec<ClassWithSubmitted> = sqlx::query_as!(ClassWithSubmitted,
@@ -167,7 +168,7 @@ impl ClassRepository for ClassRepositoryInfra {
                 WHERE `classes`.`course_id` = ?
                 ORDER BY `classes`.`part`
             ",
-            user_id,
+            user_id.to_string(),
             course_id,
         )
             .fetch_all(conn)

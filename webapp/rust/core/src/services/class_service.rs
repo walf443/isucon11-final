@@ -3,6 +3,7 @@ use crate::models::class_score::ClassScore;
 use crate::models::course::Course;
 use crate::models::course_result::CourseResult;
 use crate::models::course_status::CourseStatus;
+use crate::models::user::UserID;
 use crate::repos::class_repository::{ClassRepository, HaveClassRepository};
 use crate::repos::course_repository::{CourseRepository, HaveCourseRepository};
 use crate::repos::registration_course_repository::{
@@ -182,6 +183,7 @@ pub trait ClassServiceImpl:
             return Err(CourseNotFound);
         }
 
+        let user_id = UserID::new(user_id.to_string());
         let classes = self
             .class_repo()
             .find_all_with_submitted_by_user_id_and_course_id(&mut tx, &user_id, course_id)

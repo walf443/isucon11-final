@@ -11,3 +11,16 @@ pub struct User {
     #[sqlx(rename = "type")]
     pub type_: UserType,
 }
+
+#[derive(Debug, Clone, PartialEq, Eq, Dummy, sqlx::Type)]
+pub struct UserID(String);
+
+impl UserID {
+    pub fn new(user_id: String) -> Self {
+        Self(user_id)
+    }
+
+    pub fn to_string(&self) -> String {
+        self.0.clone()
+    }
+}

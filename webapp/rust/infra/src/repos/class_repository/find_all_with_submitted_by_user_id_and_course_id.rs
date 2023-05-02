@@ -2,6 +2,7 @@ use crate::repos::class_repository::ClassRepositoryInfra;
 use fake::{Fake, Faker};
 use isucholar_core::db::get_test_db_conn;
 use isucholar_core::models::class::Class;
+use isucholar_core::models::user::UserID;
 use isucholar_core::repos::class_repository::ClassRepository;
 
 #[tokio::test]
@@ -10,8 +11,9 @@ async fn empty_case() {
     let mut tx = db_pool.begin().await.unwrap();
 
     let repo = ClassRepositoryInfra {};
+    let user_id: UserID = Faker.fake();
     let got = repo
-        .find_all_with_submitted_by_user_id_and_course_id(&mut tx, "1", "1")
+        .find_all_with_submitted_by_user_id_and_course_id(&mut tx, &user_id, "1")
         .await
         .unwrap();
     assert_eq!(got.len(), 0);
@@ -35,9 +37,10 @@ async fn without_submission_record_case() {
         &class.submission_closed,
     ).execute(&mut tx).await.unwrap();
 
+    let user_id: UserID = Faker.fake();
     let repo = ClassRepositoryInfra {};
     let got = repo
-        .find_all_with_submitted_by_user_id_and_course_id(&mut tx, "1", &class.course_id)
+        .find_all_with_submitted_by_user_id_and_course_id(&mut tx, &user_id, &class.course_id)
         .await
         .unwrap();
     assert_eq!(got.len(), 1);
@@ -70,9 +73,10 @@ async fn success_case() {
         &class.submission_closed,
     ).execute(&mut tx).await.unwrap();
 
+    let user_id: UserID = Faker.fake();
     sqlx::query!(
         "INSERT INTO submissions (user_id,class_id,file_name,score) VALUES (?,?,?,?)",
-        "1",
+        user_id.to_string(),
         &class.id,
         "file_name",
         0,
@@ -83,7 +87,7 @@ async fn success_case() {
 
     let repo = ClassRepositoryInfra {};
     let got = repo
-        .find_all_with_submitted_by_user_id_and_course_id(&mut tx, "1", &class.course_id)
+        .find_all_with_submitted_by_user_id_and_course_id(&mut tx, &user_id, &class.course_id)
         .await
         .unwrap();
     assert_eq!(got.len(), 1);

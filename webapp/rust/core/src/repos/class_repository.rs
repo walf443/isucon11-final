@@ -1,5 +1,6 @@
 use crate::db::DBConn;
 use crate::models::class::{Class, ClassWithSubmitted, CreateClass};
+use crate::models::user::UserID;
 use crate::repos::error::Result;
 use async_trait::async_trait;
 
@@ -24,7 +25,7 @@ pub trait ClassRepository {
     async fn find_all_with_submitted_by_user_id_and_course_id(
         &self,
         conn: &mut DBConn,
-        user_id: &str,
+        user_id: &UserID,
         course_id: &str,
     ) -> Result<Vec<ClassWithSubmitted>>;
 }
