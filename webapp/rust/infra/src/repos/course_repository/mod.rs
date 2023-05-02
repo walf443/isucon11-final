@@ -55,9 +55,8 @@ impl CourseRepository for CourseRepositoryInfra {
                 db_error.try_downcast_ref::<sqlx::mysql::MySqlDatabaseError>()
             {
                 if mysql_error.number() == MYSQL_ERR_NUM_DUPLICATE_ENTRY {
-                    let code = CourseCode::new(req.code.clone());
                     let mut conn = pool.acquire().await?;
-                    let course = self.find_by_code(&mut conn, &code).await?;
+                    let course = self.find_by_code(&mut conn, &req.code).await?;
 
                     if req.type_ != course.type_
                         || req.name != course.name
@@ -236,7 +235,7 @@ impl CourseRepository for CourseRepositoryInfra {
             r"
                 SELECT
                    id,
-                   code,
+                   code as `code:CourseCode`,
                    type as `type_:CourseType`,
                    name,
                    description,
@@ -266,7 +265,7 @@ impl CourseRepository for CourseRepositoryInfra {
             r"
                 SELECT
                    courses.id,
-                   courses.code,
+                   courses.code as `code:CourseCode`,
                    courses.type as `type_`,
                    courses.name,
                    description,

@@ -1,7 +1,7 @@
 use async_trait::async_trait;
 use futures::StreamExt;
 use isucholar_core::db::DBConn;
-use isucholar_core::models::course::{Course, CourseID};
+use isucholar_core::models::course::{Course, CourseCode, CourseID};
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::models::course_type::CourseType;
 use isucholar_core::models::day_of_week::DayOfWeek;
@@ -32,7 +32,7 @@ impl RegistrationCourseRepository for RegistrationCourseRepositoryInfra {
             r"
                 SELECT
                     courses.id,
-                    courses.code,
+                    courses.code as `code:CourseCode`,
                     courses.type as `type_:CourseType`,
                     courses.name,
                     courses.description,
@@ -64,7 +64,7 @@ impl RegistrationCourseRepository for RegistrationCourseRepositoryInfra {
             r"
                 SELECT
                     courses.id,
-                    courses.code,
+                    courses.code as `code:CourseCode`,
                     courses.type as `type_:CourseType`,
                     courses.name,
                     courses.description,

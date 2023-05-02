@@ -1,5 +1,5 @@
 use actix_web::{web, HttpResponse};
-use isucholar_core::models::course::{CourseID, CreateCourse};
+use isucholar_core::models::course::{CourseCode, CourseID, CreateCourse};
 use isucholar_core::models::course_type::CourseType;
 use isucholar_core::models::day_of_week::DayOfWeek;
 use isucholar_core::services::course_service::{CourseService, HaveCourseService};
@@ -25,7 +25,7 @@ impl AddCourseRequest {
         CreateCourse {
             id: course_id,
             user_id: user_id,
-            code: self.code.clone(),
+            code: CourseCode::new(self.code.clone()),
             type_: self.type_.clone(),
             name: self.name.clone(),
             description: self.description.clone(),

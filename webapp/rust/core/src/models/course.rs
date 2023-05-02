@@ -2,12 +2,12 @@ use crate::models::course_status::CourseStatus;
 use crate::models::course_type::CourseType;
 use crate::models::day_of_week::DayOfWeek;
 use fake::{Dummy, Fake};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, sqlx::FromRow, PartialEq, Eq, Dummy)]
 pub struct Course {
     pub id: String,
-    pub code: String,
+    pub code: CourseCode,
     #[sqlx(rename = "type")]
     pub type_: CourseType,
     pub name: String,
@@ -34,7 +34,7 @@ impl CourseID {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Dummy, sqlx::Type)]
+#[derive(Debug, Clone, PartialEq, Eq, Dummy, sqlx::Type, Serialize, Deserialize)]
 #[sqlx(transparent)]
 pub struct CourseCode(String);
 
@@ -51,7 +51,7 @@ impl CourseCode {
 #[derive(Debug, sqlx::FromRow, serde::Serialize)]
 pub struct CourseWithTeacher {
     pub id: String,
-    pub code: String,
+    pub code: CourseCode,
     #[serde(rename = "type")]
     #[sqlx(rename = "type")]
     pub type_: String,
@@ -71,7 +71,7 @@ pub struct CourseWithTeacher {
 pub struct CreateCourse {
     pub id: String,
     pub user_id: String,
-    pub code: String,
+    pub code: CourseCode,
     #[serde(rename = "type")]
     pub type_: CourseType,
     pub name: String,
