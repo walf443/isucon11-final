@@ -70,7 +70,7 @@ pub struct CourseWithTeacher {
 
 #[derive(Debug, serde::Deserialize)]
 pub struct CreateCourse {
-    pub id: String,
+    pub id: CourseID,
     pub user_id: String,
     pub code: CourseCode,
     #[serde(rename = "type")]
