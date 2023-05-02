@@ -2,6 +2,7 @@ use actix_web::{web, HttpResponse};
 use isucholar_core::models::course::{CourseCode, CourseID, CreateCourse};
 use isucholar_core::models::course_type::CourseType;
 use isucholar_core::models::day_of_week::DayOfWeek;
+use isucholar_core::models::user::UserID;
 use isucholar_core::services::course_service::{CourseService, HaveCourseService};
 use isucholar_core::util;
 use isucholar_http_core::responses::error::ResponseResult;
@@ -24,7 +25,7 @@ impl AddCourseRequest {
     fn convert_create_course(&self, course_id: String, user_id: String) -> CreateCourse {
         CreateCourse {
             id: CourseID::new(course_id),
-            user_id: user_id,
+            user_id: UserID::new(user_id),
             code: CourseCode::new(self.code.clone()),
             type_: self.type_.clone(),
             name: self.name.clone(),
