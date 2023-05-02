@@ -15,7 +15,7 @@ use async_trait::async_trait;
 #[async_trait]
 pub trait CourseService: Sync {
     async fn create(&self, course: &CreateCourse) -> Result<CourseID>;
-    async fn update_status_by_id(&self, course_id: &str, status: &CourseStatus) -> Result<()>;
+    async fn update_status_by_id(&self, course_id: &CourseID, status: &CourseStatus) -> Result<()>;
     async fn find_all_with_teacher(
         &self,
         limit: i64,
@@ -43,9 +43,7 @@ pub trait CourseServiceImpl:
         Ok(course_id)
     }
 
-    async fn update_status_by_id(&self, course_id: &str, status: &CourseStatus) -> Result<()> {
-        let course_id = CourseID::new(course_id.to_string());
-
+    async fn update_status_by_id(&self, course_id: &CourseID, status: &CourseStatus) -> Result<()> {
         let db_pool = self.get_db_pool();
         let course_repo = self.course_repo();
         let mut tx = db_pool.begin().await?;
@@ -123,7 +121,7 @@ impl<S: CourseServiceImpl> CourseService for S {
         CourseServiceImpl::create(self, course).await
     }
 
-    async fn update_status_by_id(&self, course_id: &str, status: &CourseStatus) -> Result<()> {
+    async fn update_status_by_id(&self, course_id: &CourseID, status: &CourseStatus) -> Result<()> {
         CourseServiceImpl::update_status_by_id(self, course_id, status).await
     }
 
