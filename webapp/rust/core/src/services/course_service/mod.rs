@@ -22,8 +22,11 @@ pub trait CourseService: Sync {
         offset: i64,
         query: &SearchCoursesQuery,
     ) -> Result<Vec<CourseWithTeacher>>;
-    async fn find_with_teacher_by_id(&self, course_id: &str) -> Result<Option<CourseWithTeacher>>;
-    async fn find_open_courses_by_user_id(&self, user_id: &str) -> Result<Vec<(Course, User)>>;
+    async fn find_with_teacher_by_id(
+        &self,
+        course_id: &CourseID,
+    ) -> Result<Option<CourseWithTeacher>>;
+    async fn find_open_courses_by_user_id(&self, user_id: &UserID) -> Result<Vec<(Course, User)>>;
 }
 
 pub trait HaveCourseService {
@@ -77,10 +80,9 @@ pub trait CourseServiceImpl:
         Ok(courses)
     }
 
-    async fn find_open_courses_by_user_id(&self, user_id: &str) -> Result<Vec<(Course, User)>> {
+    async fn find_open_courses_by_user_id(&self, user_id: &UserID) -> Result<Vec<(Course, User)>> {
         let db_pool = self.get_db_pool();
         let mut tx = db_pool.begin().await?;
-        let user_id = UserID::new(user_id.to_string());
 
         let courses = self
             .registration_course_repo()
@@ -101,9 +103,10 @@ pub trait CourseServiceImpl:
         Ok(results)
     }
 
-    async fn find_with_teacher_by_id(&self, course_id: &str) -> Result<Option<CourseWithTeacher>> {
-        let course_id = CourseID::new(course_id.to_string());
-
+    async fn find_with_teacher_by_id(
+        &self,
+        course_id: &CourseID,
+    ) -> Result<Option<CourseWithTeacher>> {
         let pool = self.get_db_pool();
         let mut conn = pool.acquire().await?;
         let course = self
@@ -134,11 +137,14 @@ impl<S: CourseServiceImpl> CourseService for S {
         CourseServiceImpl::find_all_with_teacher(self, limit, offset, query).await
     }
 
-    async fn find_with_teacher_by_id(&self, course_id: &str) -> Result<Option<CourseWithTeacher>> {
+    async fn find_with_teacher_by_id(
+        &self,
+        course_id: &CourseID,
+    ) -> Result<Option<CourseWithTeacher>> {
         CourseServiceImpl::find_with_teacher_by_id(self, course_id).await
     }
 
-    async fn find_open_courses_by_user_id(&self, user_id: &str) -> Result<Vec<(Course, User)>> {
+    async fn find_open_courses_by_user_id(&self, user_id: &UserID) -> Result<Vec<(Course, User)>> {
         CourseServiceImpl::find_open_courses_by_user_id(self, user_id).await
     }
 }
