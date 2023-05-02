@@ -13,7 +13,7 @@ use async_trait::async_trait;
 #[cfg_attr(any(test, feature = "test"), mockall::automock)]
 #[async_trait]
 pub trait RegistrationCourseService {
-    async fn find_courses_by_user_id(&self, user_id: &str) -> Result<Vec<Course>>;
+    async fn find_courses_by_user_id(&self, user_id: &UserID) -> Result<Vec<Course>>;
     async fn create(&self, user_id: &str, course_ids: &Vec<String>) -> Result<()>;
 }
 
@@ -31,9 +31,7 @@ pub trait RegistrationCourseServiceImpl:
     + HaveRegistrationRepository
     + HaveCourseRepository
 {
-    async fn find_courses_by_user_id(&self, user_id: &str) -> Result<Vec<Course>> {
-        let user_id = UserID::new(user_id.to_string());
-
+    async fn find_courses_by_user_id(&self, user_id: &UserID) -> Result<Vec<Course>> {
         let pool = self.get_db_pool();
         let mut conn = pool.acquire().await?;
         let result = self
@@ -118,7 +116,7 @@ pub trait RegistrationCourseServiceImpl:
 
 #[async_trait]
 impl<S: RegistrationCourseServiceImpl> RegistrationCourseService for S {
-    async fn find_courses_by_user_id(&self, user_id: &str) -> Result<Vec<Course>> {
+    async fn find_courses_by_user_id(&self, user_id: &UserID) -> Result<Vec<Course>> {
         RegistrationCourseServiceImpl::find_courses_by_user_id(self, user_id).await
     }
 

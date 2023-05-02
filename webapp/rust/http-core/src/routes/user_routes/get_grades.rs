@@ -23,7 +23,7 @@ pub async fn get_grades<
 
     let registered_courses = service
         .registration_course_service()
-        .find_courses_by_user_id(&user_id.to_string())
+        .find_courses_by_user_id(&user_id)
         .await?;
 
     let (course_results, my_gpa, my_credits) = service
