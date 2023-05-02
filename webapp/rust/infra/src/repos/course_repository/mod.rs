@@ -211,7 +211,7 @@ impl CourseRepository for CourseRepositoryInfra {
     async fn update_status_by_id(
         &self,
         conn: &mut DBConn,
-        id: &str,
+        id: &CourseID,
         status: &CourseStatus,
     ) -> Result<()> {
         sqlx::query!(

@@ -56,7 +56,7 @@ pub trait CourseServiceImpl:
         }
 
         course_repo
-            .update_status_by_id(&mut tx, &course_id.to_string(), status)
+            .update_status_by_id(&mut tx, &course_id, status)
             .await?;
 
         tx.commit().await?;

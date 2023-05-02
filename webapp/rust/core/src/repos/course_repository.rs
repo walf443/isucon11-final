@@ -43,7 +43,7 @@ pub trait CourseRepository {
     async fn update_status_by_id(
         &self,
         conn: &mut DBConn,
-        id: &str,
+        id: &CourseID,
         status: &CourseStatus,
     ) -> Result<()>;
     async fn find_by_code(&self, conn: &mut DBConn, code: &str) -> Result<Course>;

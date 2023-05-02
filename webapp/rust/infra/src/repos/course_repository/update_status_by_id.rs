@@ -1,7 +1,7 @@
 use crate::repos::course_repository::CourseRepositoryInfra;
 use fake::{Fake, Faker};
 use isucholar_core::db::get_test_db_conn;
-use isucholar_core::models::course::Course;
+use isucholar_core::models::course::{Course, CourseID};
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::repos::course_repository::CourseRepository;
 
@@ -31,7 +31,7 @@ async fn success_case() {
     ).execute(&mut tx).await.unwrap();
 
     let repo = CourseRepositoryInfra {};
-    repo.update_status_by_id(&mut tx, &course.id, &CourseStatus::Closed)
+    repo.update_status_by_id(&mut tx, &CourseID::new(course.id.clone()), &CourseStatus::Closed)
         .await
         .unwrap();
     let status = sqlx::query_scalar!(
@@ -49,9 +49,11 @@ async fn empty_case() {
     let db_pool = get_test_db_conn().await.unwrap();
     let mut tx = db_pool.begin().await.unwrap();
 
+    let course_id: CourseID = Faker.fake();
+
     let repo = CourseRepositoryInfra {};
     let result = repo
-        .update_status_by_id(&mut tx, "none_exist_course_id", &CourseStatus::Closed)
+        .update_status_by_id(&mut tx, &course_id, &CourseStatus::Closed)
         .await;
     assert_eq!(result.is_ok(), true);
 }
