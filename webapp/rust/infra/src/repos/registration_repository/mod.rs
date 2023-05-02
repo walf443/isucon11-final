@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 use isucholar_core::db::DBConn;
-use isucholar_core::models::user::User;
+use isucholar_core::models::course::CourseID;
+use isucholar_core::models::user::{User, UserID};
 use isucholar_core::models::user_type::UserType;
 use isucholar_core::repos::error::Result;
 use isucholar_core::repos::registration_repository::RegistrationRepository;
@@ -20,8 +21,8 @@ impl RegistrationRepository for RegistrationRepositoryInfra {
     async fn create_or_update(
         &self,
         conn: &mut DBConn,
-        user_id: &str,
-        course_id: &str,
+        user_id: &UserID,
+        course_id: &CourseID,
     ) -> Result<()> {
         sqlx::query!(
             "INSERT INTO `registrations` (`course_id`, `user_id`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `course_id` = VALUES(`course_id`), `user_id` = VALUES(`user_id`)",

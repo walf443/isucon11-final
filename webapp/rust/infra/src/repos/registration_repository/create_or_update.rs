@@ -1,6 +1,8 @@
 use crate::repos::registration_repository::RegistrationRepositoryInfra;
 use fake::{Fake, Faker};
 use isucholar_core::db::get_test_db_conn;
+use isucholar_core::models::course::CourseID;
+use isucholar_core::models::user::UserID;
 use isucholar_core::repos::registration_repository::RegistrationRepository;
 
 #[tokio::test]
@@ -13,8 +15,8 @@ async fn insert_case() {
         .await
         .unwrap();
 
-    let user_id = Faker.fake::<String>();
-    let course_id = Faker.fake::<String>();
+    let user_id: UserID = Faker.fake();
+    let course_id: CourseID = Faker.fake();
     let repo = RegistrationRepositoryInfra {};
     repo.create_or_update(&mut tx, &user_id, &course_id)
         .await
@@ -42,8 +44,8 @@ async fn update_case() {
         .await
         .unwrap();
 
-    let user_id = Faker.fake::<String>();
-    let course_id = Faker.fake::<String>();
+    let user_id: UserID = Faker.fake();
+    let course_id: CourseID = Faker.fake();
     let repo = RegistrationRepositoryInfra {};
     repo.create_or_update(&mut tx, &user_id, &course_id)
         .await

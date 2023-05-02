@@ -1,5 +1,6 @@
 use crate::db::DBConn;
-use crate::models::user::User;
+use crate::models::course::CourseID;
+use crate::models::user::{User, UserID};
 use crate::repos::error::Result;
 use async_trait::async_trait;
 
@@ -9,8 +10,8 @@ pub trait RegistrationRepository {
     async fn create_or_update(
         &self,
         conn: &mut DBConn,
-        user_id: &str,
-        course_id: &str,
+        user_id: &UserID,
+        course_id: &CourseID,
     ) -> Result<()>;
     async fn exist_by_user_id_and_course_id(
         &self,
