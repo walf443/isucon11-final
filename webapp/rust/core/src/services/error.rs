@@ -1,3 +1,4 @@
+use crate::models::course::CourseID;
 use crate::repos::error::ReposError;
 use bcrypt::BcryptError;
 use serde::Serialize;
@@ -27,7 +28,7 @@ pub type Result<T> = std::result::Result<T, Error>;
 
 #[derive(Debug, Default, Serialize)]
 pub struct RegistrationCourseValidationError {
-    pub course_not_found: Vec<String>,
+    pub course_not_found: Vec<CourseID>,
     pub not_registrable_status: Vec<String>,
     pub schedule_conflict: Vec<String>,
 }

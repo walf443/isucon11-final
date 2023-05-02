@@ -14,7 +14,7 @@ use async_trait::async_trait;
 #[async_trait]
 pub trait RegistrationCourseService {
     async fn find_courses_by_user_id(&self, user_id: &UserID) -> Result<Vec<Course>>;
-    async fn create(&self, user_id: &str, course_ids: &Vec<String>) -> Result<()>;
+    async fn create(&self, user_id: &UserID, course_ids: &Vec<CourseID>) -> Result<()>;
 }
 
 pub trait HaveRegistrationCourseService {
@@ -42,10 +42,9 @@ pub trait RegistrationCourseServiceImpl:
         Ok(result)
     }
 
-    async fn create(&self, user_id: &str, course_ids: &Vec<String>) -> Result<()> {
+    async fn create(&self, user_id: &UserID, course_ids: &Vec<CourseID>) -> Result<()> {
         let pool = self.get_db_pool();
         let mut tx = pool.begin().await?;
-        let user_id = UserID::new(user_id.to_string());
 
         let course_repo = self.course_repo();
         let registration_course_repo = self.registration_course_repo();
@@ -54,8 +53,9 @@ pub trait RegistrationCourseServiceImpl:
         let mut errors = RegistrationCourseValidationError::default();
         let mut newly_added = Vec::new();
         for course_id in course_ids {
-            let cid = CourseID::new(course_id.to_string());
-            let course = course_repo.find_for_share_lock_by_id(&mut tx, &cid).await?;
+            let course = course_repo
+                .find_for_share_lock_by_id(&mut tx, &course_id)
+                .await?;
             if course.is_none() {
                 errors.course_not_found.push(course_id.clone());
                 continue;
@@ -69,7 +69,7 @@ pub trait RegistrationCourseServiceImpl:
 
             // すでに履修登録済みの科目は無視する
             let is_exist = registration_repo
-                .exist_by_user_id_and_course_id(&mut tx, &user_id, &cid)
+                .exist_by_user_id_and_course_id(&mut tx, &user_id, &course_id)
                 .await?;
             if is_exist {
                 continue;
@@ -120,7 +120,7 @@ impl<S: RegistrationCourseServiceImpl> RegistrationCourseService for S {
         RegistrationCourseServiceImpl::find_courses_by_user_id(self, user_id).await
     }
 
-    async fn create(&self, user_id: &str, course_ids: &Vec<String>) -> Result<()> {
+    async fn create(&self, user_id: &UserID, course_ids: &Vec<CourseID>) -> Result<()> {
         RegistrationCourseServiceImpl::create(self, user_id, course_ids).await
     }
 }
