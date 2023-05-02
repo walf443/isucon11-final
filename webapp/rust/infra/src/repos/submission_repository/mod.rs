@@ -1,6 +1,8 @@
 use async_trait::async_trait;
 use isucholar_core::db::DBConn;
+use isucholar_core::models::class::ClassID;
 use isucholar_core::models::submission::{CreateSubmission, SubmissionWithUserCode};
+use isucholar_core::models::user::UserCode;
 use isucholar_core::repos::error::Result;
 use isucholar_core::repos::submission_repository::SubmissionRepository;
 
@@ -50,8 +52,8 @@ impl SubmissionRepository for SubmissionRepositoryInfra {
     async fn update_score_by_user_code_and_class_id(
         &self,
         conn: &mut DBConn,
-        user_code: &str,
-        class_id: &str,
+        user_code: &UserCode,
+        class_id: &ClassID,
         score: i64,
     ) -> Result<()> {
         sqlx::query!(

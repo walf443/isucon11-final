@@ -25,3 +25,17 @@ impl UserID {
         self.0.clone()
     }
 }
+
+#[derive(Debug, Clone, PartialEq, Eq, Dummy, sqlx::Type)]
+#[sqlx(transparent)]
+pub struct UserCode(String);
+
+impl UserCode {
+    pub fn new(code: String) -> Self {
+        Self(code)
+    }
+
+    pub fn to_string(&self) -> String {
+        self.0.clone()
+    }
+}

@@ -1,5 +1,7 @@
 use crate::db::DBConn;
+use crate::models::class::ClassID;
 use crate::models::submission::{CreateSubmission, SubmissionWithUserCode};
+use crate::models::user::UserCode;
 use crate::repos::error::Result;
 use async_trait::async_trait;
 
@@ -14,8 +16,8 @@ pub trait SubmissionRepository {
     async fn update_score_by_user_code_and_class_id(
         &self,
         conn: &mut DBConn,
-        user_code: &str,
-        class_id: &str,
+        user_code: &UserCode,
+        class_id: &ClassID,
         score: i64,
     ) -> Result<()>;
     async fn find_score_by_class_id_and_user_id(

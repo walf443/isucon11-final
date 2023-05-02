@@ -2,6 +2,7 @@ use actix_web::{web, HttpResponse};
 use isucholar_core::models::assignment_path::AssignmentPath;
 use isucholar_core::models::class::ClassID;
 use isucholar_core::models::score::Score;
+use isucholar_core::models::user::UserCode;
 use isucholar_core::repos::class_repository::ClassRepository;
 use isucholar_core::repos::submission_repository::SubmissionRepository;
 use isucholar_http_core::responses::error::ResponseError::{
@@ -36,13 +37,9 @@ pub async fn register_scores(
     let submission_repo = SubmissionRepositoryInfra {};
 
     for score in req.into_inner() {
+        let user_code = UserCode::new(score.user_code.clone());
         submission_repo
-            .update_score_by_user_code_and_class_id(
-                &mut tx,
-                &score.user_code,
-                &class_id.to_string(),
-                score.score,
-            )
+            .update_score_by_user_code_and_class_id(&mut tx, &user_code, &class_id, score.score)
             .await?;
     }
 
