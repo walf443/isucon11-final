@@ -1,6 +1,7 @@
 use async_trait::async_trait;
 use isucholar_core::db::DBConn;
 use isucholar_core::models::class::{Class, ClassWithSubmitted, CreateClass};
+use isucholar_core::models::course::CourseID;
 use isucholar_core::models::user::UserID;
 use isucholar_core::repos::class_repository::ClassRepository;
 use isucholar_core::repos::error::ReposError::ClassDuplicate;
@@ -95,7 +96,7 @@ impl ClassRepository for ClassRepositoryInfra {
     async fn find_by_course_id_and_part(
         &self,
         conn: &mut DBConn,
-        course_id: &str,
+        course_id: &CourseID,
         part: &u8,
     ) -> Result<Class> {
         let class = sqlx::query_as!(

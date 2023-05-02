@@ -2,6 +2,7 @@ use crate::repos::class_repository::ClassRepositoryInfra;
 use fake::{Fake, Faker};
 use isucholar_core::db::get_test_db_conn;
 use isucholar_core::models::class::Class;
+use isucholar_core::models::course::CourseID;
 use isucholar_core::repos::class_repository::ClassRepository;
 
 #[tokio::test]
@@ -24,7 +25,7 @@ async fn success_case() {
 
     let repo = ClassRepositoryInfra {};
     let got = repo
-        .find_by_course_id_and_part(&mut tx, &class.course_id, &class.part)
+        .find_by_course_id_and_part(&mut tx, &CourseID::new(class.course_id.to_string()), &class.part)
         .await
         .unwrap();
     assert_eq!(got, class)
@@ -37,7 +38,7 @@ async fn empty_case() {
     let mut tx = db_pool.begin().await.unwrap();
 
     let repo = ClassRepositoryInfra {};
-    repo.find_by_course_id_and_part(&mut tx, "none_exist_course_id", &0)
+    repo.find_by_course_id_and_part(&mut tx, &CourseID::new("none_exist_course_id".to_string()), &0)
         .await
         .unwrap();
 }

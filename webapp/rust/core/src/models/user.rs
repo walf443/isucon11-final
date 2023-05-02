@@ -13,6 +13,7 @@ pub struct User {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Dummy, sqlx::Type)]
+#[sqlx(transparent)]
 pub struct UserID(String);
 
 impl UserID {

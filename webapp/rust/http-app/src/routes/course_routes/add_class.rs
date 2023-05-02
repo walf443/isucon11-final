@@ -1,5 +1,6 @@
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::class::CreateClass;
+use isucholar_core::models::course::CourseID;
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::repos::class_repository::ClassRepository;
 use isucholar_core::repos::course_repository::CourseRepository;
@@ -66,7 +67,7 @@ pub async fn add_class(
                 ReposError::CourseDuplicate => {
                     let mut conn = pool.acquire().await?;
                     let class = class_repo
-                        .find_by_course_id_and_part(&mut conn, course_id, &req.part)
+                        .find_by_course_id_and_part(&mut conn, &CourseID::new(course_id.to_string()), &req.part)
                         .await?;
                     if req.title != class.title || req.description != class.description {
                         return Err(CourseConflict);

@@ -19,6 +19,20 @@ pub struct Course {
     pub status: CourseStatus,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Dummy, sqlx::Type)]
+#[sqlx(transparent)]
+pub struct CourseID(String);
+
+impl CourseID {
+    pub fn new(course_id: String) -> Self {
+        Self(course_id)
+    }
+
+    pub fn to_string(&self) -> String {
+        self.0.clone()
+    }
+}
+
 #[derive(Debug, sqlx::FromRow, serde::Serialize)]
 pub struct CourseWithTeacher {
     pub id: String,
