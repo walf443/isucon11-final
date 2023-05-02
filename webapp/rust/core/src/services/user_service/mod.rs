@@ -1,4 +1,4 @@
-use crate::models::user::User;
+use crate::models::user::{User, UserCode};
 use crate::repos::user_repository::{HaveUserRepository, UserRepository};
 use crate::services::error::Result;
 use crate::services::HaveDBPool;
@@ -22,7 +22,10 @@ pub trait UserServiceImpl: Sync + HaveDBPool + HaveUserRepository {
     async fn find_by_code(&self, code: &str) -> Result<Option<User>> {
         let pool = self.get_db_pool();
         let mut conn = pool.acquire().await?;
-        let result = self.user_repo().find_by_code(&mut conn, code).await?;
+
+        let code = UserCode::new(code.to_string());
+
+        let result = self.user_repo().find_by_code(&mut conn, &code).await?;
         Ok(result)
     }
 
