@@ -1,6 +1,8 @@
+use crate::models::class::ClassID;
+
 #[derive(Debug, serde::Serialize)]
 pub struct ClassScore {
-    pub class_id: String,
+    pub class_id: ClassID,
     pub title: String,
     pub part: u8,
     pub score: Option<i64>, // 0~100点

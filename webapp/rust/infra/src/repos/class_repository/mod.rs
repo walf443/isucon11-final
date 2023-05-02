@@ -103,7 +103,7 @@ impl ClassRepository for ClassRepositoryInfra {
             Class,
             r"
                 SELECT
-                  id,
+                  id as `id:ClassID`,
                   course_id,
                   part,
                   title,
@@ -130,7 +130,7 @@ impl ClassRepository for ClassRepositoryInfra {
             Class,
             r"
             SELECT
-              id,
+              id as `id:ClassID`,
               course_id,
               part,
               title,
@@ -157,7 +157,7 @@ impl ClassRepository for ClassRepositoryInfra {
         let classes: Vec<ClassWithSubmitted> = sqlx::query_as!(ClassWithSubmitted,
             r"
                 SELECT
-                  `classes`.id,
+                  `classes`.id as `id:ClassID`,
                   `classes`.course_id,
                   `classes`.part,
                   `classes`.title,

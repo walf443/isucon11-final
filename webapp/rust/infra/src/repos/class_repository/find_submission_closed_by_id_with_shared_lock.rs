@@ -28,7 +28,7 @@ async fn true_case() {
 
     let repo = ClassRepositoryInfra {};
     let result = repo
-        .find_submission_closed_by_id_with_shared_lock(&mut tx, &ClassID::new(class.id))
+        .find_submission_closed_by_id_with_shared_lock(&mut tx, &class.id)
         .await
         .unwrap()
         .unwrap();
@@ -59,7 +59,7 @@ async fn false_case() {
 
     let repo = ClassRepositoryInfra {};
     let result = repo
-        .find_submission_closed_by_id_with_shared_lock(&mut tx, &ClassID::new(class.id))
+        .find_submission_closed_by_id_with_shared_lock(&mut tx, &class.id)
         .await
         .unwrap()
         .unwrap();

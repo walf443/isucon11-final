@@ -1,4 +1,5 @@
 use actix_web::{web, HttpResponse};
+use isucholar_core::models::class::ClassID;
 use isucholar_core::models::course::CourseID;
 use isucholar_core::models::user::UserID;
 use isucholar_core::services::class_service::{ClassService, HaveClassService};
@@ -7,7 +8,7 @@ use isucholar_http_core::routes::util::get_user_info;
 
 #[derive(Debug, serde::Serialize)]
 struct GetClassResponse {
-    id: String,
+    id: ClassID,
     part: u8,
     title: String,
     description: String,

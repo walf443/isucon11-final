@@ -1,5 +1,5 @@
 use actix_web::{web, HttpResponse};
-use isucholar_core::models::class::CreateClass;
+use isucholar_core::models::class::{ClassID, CreateClass};
 use isucholar_core::models::course::CourseID;
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::repos::class_repository::ClassRepository;
@@ -22,7 +22,7 @@ pub struct AddClassRequest {
 
 #[derive(Debug, serde::Serialize)]
 struct AddClassResponse {
-    class_id: String,
+    class_id: ClassID,
 }
 
 // POST /api/courses/{course_id}/classes 新規講義(&課題)追加
@@ -48,7 +48,7 @@ pub async fn add_class(
     }
 
     let class_repo = ClassRepositoryInfra {};
-    let class_id = util::new_ulid().await;
+    let class_id = ClassID::new(util::new_ulid().await);
     let form = CreateClass {
         id: class_id.clone(),
         course_id: course_id.to_string(),

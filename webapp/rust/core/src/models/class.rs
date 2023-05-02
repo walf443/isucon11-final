@@ -1,8 +1,9 @@
 use fake::{Dummy, Fake};
+use serde::Serialize;
 
 #[derive(Debug, sqlx::FromRow, PartialEq, Eq, Dummy)]
 pub struct Class {
-    pub id: String,
+    pub id: ClassID,
     pub course_id: String,
     pub part: u8,
     pub title: String,
@@ -10,7 +11,7 @@ pub struct Class {
     pub submission_closed: bool,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Dummy, sqlx::Type)]
+#[derive(Debug, Clone, PartialEq, Eq, Dummy, sqlx::Type, Serialize)]
 #[sqlx(transparent)]
 pub struct ClassID(String);
 
@@ -26,7 +27,7 @@ impl ClassID {
 
 #[derive(Dummy)]
 pub struct CreateClass {
-    pub id: String,
+    pub id: ClassID,
     pub course_id: String,
     pub part: u8,
     pub title: String,
@@ -35,7 +36,7 @@ pub struct CreateClass {
 
 #[derive(Debug, sqlx::FromRow)]
 pub struct ClassWithSubmitted {
-    pub id: String,
+    pub id: ClassID,
     pub course_id: String,
     pub part: u8,
     pub title: String,

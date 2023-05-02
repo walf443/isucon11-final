@@ -25,7 +25,7 @@ async fn success_case() {
     ).execute(&mut tx).await.unwrap();
 
     let repo = ClassRepositoryInfra {};
-    repo.update_submission_closed_by_id(&mut tx, &ClassID::new(class.id.clone()))
+    repo.update_submission_closed_by_id(&mut tx, &class.id)
         .await
         .unwrap();
 

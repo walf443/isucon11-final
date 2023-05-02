@@ -34,9 +34,6 @@ async fn true_case() {
     ).execute(&mut tx).await.unwrap();
 
     let repo = ClassRepositoryInfra {};
-    let result = repo
-        .for_update_by_id(&mut tx, &ClassID::new(class.id.clone()))
-        .await
-        .unwrap();
+    let result = repo.for_update_by_id(&mut tx, &class.id).await.unwrap();
     assert_eq!(result, true)
 }

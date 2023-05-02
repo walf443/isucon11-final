@@ -148,7 +148,7 @@ async fn have_record_with_submissions_case() {
         .unwrap();
 
     let mut submission: CreateSubmission = Faker.fake();
-    submission.class_id = class.id.clone();
+    submission.class_id = class.id.clone().to_string();
     submission.user_id = user.id.clone();
 
     let score = 100;

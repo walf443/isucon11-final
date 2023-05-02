@@ -1,4 +1,4 @@
-use crate::models::class::{ClassID, ClassWithSubmitted};
+use crate::models::class::ClassWithSubmitted;
 use crate::models::class_score::ClassScore;
 use crate::models::course::{Course, CourseID};
 use crate::models::course_result::CourseResult;
@@ -73,10 +73,11 @@ pub trait ClassServiceImpl:
 
         let submission_repo = self.submission_repo();
         for class in classes {
-            let cid = ClassID::new(class.id.clone());
-            let submissions_count = submission_repo.count_by_class_id(&mut conn, &cid).await?;
+            let submissions_count = submission_repo
+                .count_by_class_id(&mut conn, &class.id)
+                .await?;
             let my_score = submission_repo
-                .find_score_by_class_id_and_user_id(&mut conn, &cid, &user_id)
+                .find_score_by_class_id_and_user_id(&mut conn, &class.id, &user_id)
                 .await?;
 
             if let Some(my_score) = my_score {
