@@ -46,7 +46,14 @@ impl AnnouncementRepository for AnnouncementRepositoryInfra {
     async fn find_by_id(&self, conn: &mut DBConn, id: &AnnouncementID) -> Result<Announcement> {
         let announcement = sqlx::query_as!(
             Announcement,
-            "SELECT * FROM `announcements` WHERE `id` = ?",
+            r"
+                SELECT
+                    id as `id:AnnouncementID`,
+                    course_id,
+                    title,
+                    message
+                FROM `announcements` WHERE `id` = ?
+            ",
             id
         )
         .fetch_one(conn)

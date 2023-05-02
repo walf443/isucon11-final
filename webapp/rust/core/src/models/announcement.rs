@@ -1,14 +1,15 @@
 use fake::{Dummy, Fake};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, sqlx::FromRow, PartialEq, Eq, Dummy)]
 pub struct Announcement {
-    pub id: String,
+    pub id: AnnouncementID,
     pub course_id: String,
     pub title: String,
     pub message: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Dummy, sqlx::Type)]
+#[derive(Debug, Clone, PartialEq, Eq, Dummy, sqlx::Type, Serialize, Deserialize)]
 #[sqlx(transparent)]
 pub struct AnnouncementID(String);
 
@@ -24,7 +25,7 @@ impl AnnouncementID {
 
 #[derive(Debug, sqlx::FromRow, serde::Serialize)]
 pub struct AnnouncementWithoutDetail {
-    pub id: String,
+    pub id: AnnouncementID,
     pub course_id: String,
     pub course_name: String,
     pub title: String,

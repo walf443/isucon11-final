@@ -39,9 +39,6 @@ async fn success() {
     .unwrap();
 
     let repo = AnnouncementRepositoryInfra {};
-    let result = repo
-        .find_by_id(&mut tx, &AnnouncementID::new(announcement.id.clone()))
-        .await
-        .unwrap();
+    let result = repo.find_by_id(&mut tx, &announcement.id).await.unwrap();
     assert_eq!(result, announcement);
 }

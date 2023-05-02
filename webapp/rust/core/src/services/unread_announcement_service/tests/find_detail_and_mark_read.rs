@@ -55,7 +55,7 @@ async fn exist_by_user_id_and_course_id_err() -> () {
         .expect_find_announcement_detail_by_announcement_id_and_user_id()
         .returning(|_, _, _| {
             Ok(Some(AnnouncementDetail {
-                id: "".to_string(),
+                id: AnnouncementID::new("".to_string()),
                 course_id: "".to_string(),
                 course_name: "".to_string(),
                 title: "".to_string(),
@@ -87,7 +87,7 @@ async fn exist_by_user_id_and_course_id_false() -> () {
         .expect_find_announcement_detail_by_announcement_id_and_user_id()
         .returning(|_, _, _| {
             Ok(Some(AnnouncementDetail {
-                id: "".to_string(),
+                id: AnnouncementID::new("".to_string()),
                 course_id: "".to_string(),
                 course_name: "".to_string(),
                 title: "".to_string(),
@@ -119,7 +119,7 @@ async fn mark_read_failed() -> () {
         .expect_find_announcement_detail_by_announcement_id_and_user_id()
         .returning(|_, _, _| {
             Ok(Some(AnnouncementDetail {
-                id: "".to_string(),
+                id: AnnouncementID::new("".to_string()),
                 course_id: "".to_string(),
                 course_name: "".to_string(),
                 title: "".to_string(),
@@ -151,7 +151,7 @@ async fn success_case() -> Result<()> {
 
     let mut service = S::new().await;
     let expected = AnnouncementDetail {
-        id: "aid".to_string(),
+        id: AnnouncementID::new("aid".to_string()),
         course_id: "course_id".to_string(),
         course_name: "course_name".to_string(),
         title: "title".to_string(),

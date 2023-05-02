@@ -1,7 +1,7 @@
 use crate::responses::error::ResponseError::{AnnouncementConflict, CourseNotFound};
 use crate::responses::error::ResponseResult;
 use actix_web::{web, HttpResponse};
-use isucholar_core::models::announcement::Announcement;
+use isucholar_core::models::announcement::{Announcement, AnnouncementID};
 use isucholar_core::services::announcement_service::{
     AnnouncementService, HaveAnnouncementService,
 };
@@ -9,7 +9,7 @@ use isucholar_core::services::error::Error;
 
 #[derive(Debug, serde::Deserialize)]
 pub struct AddAnnouncementRequest {
-    id: String,
+    id: AnnouncementID,
     course_id: String,
     title: String,
     message: String,
@@ -43,6 +43,7 @@ mod tests {
     use actix_web::http::StatusCode;
     use actix_web::test::TestRequest;
     use actix_web::web::{Data, Json};
+    use isucholar_core::models::announcement::AnnouncementID;
 
     use crate::routes::announcement_routes::add_announcement::{
         add_announcement, AddAnnouncementRequest,
@@ -66,7 +67,7 @@ mod tests {
         add_announcement(
             Data::new(service),
             Json(AddAnnouncementRequest {
-                id: "".to_string(),
+                id: AnnouncementID::new("".to_string()),
                 course_id: "".to_string(),
                 title: "".to_string(),
                 message: "".to_string(),
@@ -90,7 +91,7 @@ mod tests {
         add_announcement(
             Data::new(service),
             Json(AddAnnouncementRequest {
-                id: "".to_string(),
+                id: AnnouncementID::new("".to_string()),
                 course_id: "".to_string(),
                 title: "".to_string(),
                 message: "".to_string(),
@@ -114,7 +115,7 @@ mod tests {
         add_announcement(
             Data::new(service),
             Json(AddAnnouncementRequest {
-                id: "".to_string(),
+                id: AnnouncementID::new("".to_string()),
                 course_id: "".to_string(),
                 title: "".to_string(),
                 message: "".to_string(),
@@ -137,7 +138,7 @@ mod tests {
         let result = add_announcement(
             Data::new(service),
             Json(AddAnnouncementRequest {
-                id: "".to_string(),
+                id: AnnouncementID::new("".to_string()),
                 course_id: "".to_string(),
                 title: "".to_string(),
                 message: "".to_string(),

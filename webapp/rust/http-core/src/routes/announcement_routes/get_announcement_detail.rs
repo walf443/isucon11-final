@@ -47,6 +47,7 @@ mod tests {
     use actix_web::test::TestRequest;
     use actix_web::web::{Bytes, Data, Path};
     use actix_web::FromRequest;
+    use isucholar_core::models::announcement::AnnouncementID;
     use isucholar_core::models::announcement_detail::AnnouncementDetail;
     use isucholar_core::services::error::Error::{AnnouncementNotFound, TestError};
     use isucholar_core::services::manager::tests::MockServiceManager;
@@ -116,7 +117,7 @@ mod tests {
             .expect_find_detail_and_mark_read()
             .returning(|_, _| {
                 Ok(AnnouncementDetail {
-                    id: "id".to_string(),
+                    id: AnnouncementID::new("id".to_string()),
                     course_id: "course_id".to_string(),
                     course_name: "course_name".to_string(),
                     title: "title".to_string(),
@@ -143,7 +144,7 @@ mod tests {
         eprintln!("{:?}", result);
         eprintln!("{:?}", result.body());
         let expected = AnnouncementDetail {
-            id: "id".to_string(),
+            id: AnnouncementID::new("id".to_string()),
             course_id: "course_id".to_string(),
             course_name: "course_name".to_string(),
             title: "title".to_string(),
