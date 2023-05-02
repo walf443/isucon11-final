@@ -1,7 +1,7 @@
 use crate::repos::user_repository::UserRepositoryInfra;
 use fake::{Fake, Faker};
 use isucholar_core::db::get_test_db_conn;
-use isucholar_core::models::user::User;
+use isucholar_core::models::user::{User, UserCode, UserID};
 use isucholar_core::repos::user_repository::UserRepository;
 
 #[tokio::test]
@@ -12,7 +12,10 @@ async fn empty_case() {
     let user: User = Faker.fake();
 
     let repo = UserRepositoryInfra {};
-    let got = repo.find_code_by_id(&mut tx, &user.id).await.unwrap();
+    let got = repo
+        .find_code_by_id(&mut tx, &UserID::new(user.id.clone()))
+        .await
+        .unwrap();
     assert_eq!(got.is_none(), true);
 }
 
@@ -37,10 +40,10 @@ async fn success_case() {
 
     let repo = UserRepositoryInfra {};
     let got = repo
-        .find_code_by_id(&mut tx, &user.id)
+        .find_code_by_id(&mut tx, &UserID::new(user.id.clone()))
         .await
         .unwrap()
         .unwrap();
 
-    assert_eq!(got, user.code);
+    assert_eq!(got, UserCode::new(user.code.clone()));
 }
