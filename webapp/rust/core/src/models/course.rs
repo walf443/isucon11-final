@@ -51,7 +51,7 @@ impl CourseCode {
 
 #[derive(Debug, sqlx::FromRow, serde::Serialize)]
 pub struct CourseWithTeacher {
-    pub id: String,
+    pub id: CourseID,
     pub code: CourseCode,
     #[serde(rename = "type")]
     #[sqlx(rename = "type")]

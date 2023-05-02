@@ -265,7 +265,7 @@ impl CourseRepository for CourseRepositoryInfra {
             CourseWithTeacher,
             r"
                 SELECT
-                   courses.id,
+                   courses.id as `id:CourseID`,
                    courses.code as `code:CourseCode`,
                    courses.type as `type_`,
                    courses.name,

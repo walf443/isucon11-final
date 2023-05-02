@@ -63,7 +63,7 @@ async fn success_case() {
         .await
         .unwrap()
         .unwrap();
-    assert_eq!(got.id, course.id.to_string());
+    assert_eq!(got.id, course.id);
     assert_eq!(got.code, course.code);
     assert_eq!(got.name, course.name);
     assert_eq!(got.description, course.description);
