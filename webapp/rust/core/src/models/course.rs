@@ -20,7 +20,7 @@ pub struct Course {
     pub status: CourseStatus,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Dummy, sqlx::Type, Serialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Dummy, sqlx::Type, Serialize, Deserialize)]
 #[sqlx(transparent)]
 pub struct CourseID(String);
 
