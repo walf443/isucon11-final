@@ -3,6 +3,8 @@ use crate::responses::error::ResponseResult;
 use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::announcement::AnnouncementWithoutDetail;
+use isucholar_core::models::course::CourseID;
+use isucholar_core::models::user::UserID;
 use isucholar_core::services::unread_announcement_service::{
     HaveUnreadAnnouncementService, UnreadAnnouncementService,
 };
@@ -27,10 +29,11 @@ pub async fn get_announcement_list<S: HaveUnreadAnnouncementService>(
     request: actix_web::HttpRequest,
 ) -> ResponseResult<HttpResponse> {
     let (user_id, _, _) = get_user_info(session)?;
+    let user_id = UserID::new(user_id);
 
-    let mut course_id: Option<String> = None;
+    let mut course_id: Option<CourseID> = None;
     if let Some(ref c_id) = params.course_id {
-        course_id = Some(c_id.clone());
+        course_id = Some(CourseID::new(c_id.clone()));
     }
 
     let page = if let Some(ref page_str) = params.page {

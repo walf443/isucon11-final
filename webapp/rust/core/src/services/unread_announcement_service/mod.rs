@@ -19,10 +19,10 @@ mod tests;
 pub trait UnreadAnnouncementService: Sync {
     async fn find_all_with_count(
         &self,
-        user_id: &str,
+        user_id: &UserID,
         limit: i64,
         page: i64,
-        course_id: Option<String>,
+        course_id: Option<CourseID>,
     ) -> Result<(Vec<AnnouncementWithoutDetail>, i64)>;
 
     async fn find_detail_and_mark_read(
@@ -44,18 +44,13 @@ pub trait UnreadAnnouncementServiceImpl:
 {
     async fn find_all_with_count(
         &self,
-        user_id: &str,
+        user_id: &UserID,
         limit: i64,
         page: i64,
-        course_id: Option<String>,
+        course_id: Option<CourseID>,
     ) -> Result<(Vec<AnnouncementWithoutDetail>, i64)> {
         let pool = self.get_db_pool();
         let mut tx = pool.begin().await?;
-        let user_id = UserID::new(user_id.to_string());
-        let course_id = match course_id {
-            None => None,
-            Some(cid) => Some(CourseID::new(cid)),
-        };
 
         let offset = limit * (page - 1);
 
@@ -120,10 +115,10 @@ pub trait UnreadAnnouncementServiceImpl:
 impl<S: UnreadAnnouncementServiceImpl> UnreadAnnouncementService for S {
     async fn find_all_with_count(
         &self,
-        user_id: &str,
+        user_id: &UserID,
         limit: i64,
         page: i64,
-        course_id: Option<String>,
+        course_id: Option<CourseID>,
     ) -> Result<(Vec<AnnouncementWithoutDetail>, i64)> {
         UnreadAnnouncementServiceImpl::find_all_with_count(self, user_id, limit, page, course_id)
             .await
