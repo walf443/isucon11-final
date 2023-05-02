@@ -92,7 +92,8 @@ pub trait CourseServiceImpl:
         let mut results: Vec<(Course, User)> = Vec::with_capacity(courses.len());
 
         for course in courses {
-            let teacher = self.user_repo().find(&mut tx, &course.teacher_id).await?;
+            let teacher_id = UserID::new(course.teacher_id.clone());
+            let teacher = self.user_repo().find(&mut tx, &teacher_id).await?;
 
             results.push((course, teacher))
         }

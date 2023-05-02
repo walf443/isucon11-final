@@ -2,7 +2,7 @@ use async_trait::async_trait;
 use futures::StreamExt;
 use isucholar_core::db::DBConn;
 use isucholar_core::models::course_status::CourseStatus;
-use isucholar_core::models::user::User;
+use isucholar_core::models::user::{User, UserID};
 use isucholar_core::models::user_type::UserType;
 use isucholar_core::repos::error::Result;
 use isucholar_core::repos::user_repository::UserRepository;
@@ -22,7 +22,7 @@ pub struct UserRepositoryInfra {}
 
 #[async_trait]
 impl UserRepository for UserRepositoryInfra {
-    async fn find(&self, conn: &mut DBConn, id: &str) -> Result<User> {
+    async fn find(&self, conn: &mut DBConn, id: &UserID) -> Result<User> {
         let user: User = sqlx::query_as!(
             User,
             r"
