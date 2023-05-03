@@ -9,7 +9,7 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  MYSQL_TEST_DATBASE: isucholar-test
+  MYSQL_TEST_DATBASE: isucholar
   DATABASE_URL: mysql://isucon:isucon@localhost:3306/isucholar_test
   SESSION_KEY: IyohDeechaengeThee9zoiNgewai3eexu6aec2AuKai1wechiJei4eitheineiKangaiwia2Boh2Aip4tohcae2soo1eidei0ni9Ouci2qua4hoshaiphaLahNgoozie
 
