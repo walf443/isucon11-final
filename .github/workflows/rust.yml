@@ -9,7 +9,7 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  MYSQL_TEST_DATBASE: isucholar
+  MYSQL_TEST_DATBASE: isucholar-test
   DATABASE_URL: mysql://isucon:isucon@localhost:3306/isucholar_test
   SESSION_KEY: IyohDeechaengeThee9zoiNgewai3eexu6aec2AuKai1wechiJei4eitheineiKangaiwia2Boh2Aip4tohcae2soo1eidei0ni9Ouci2qua4hoshaiphaLahNgoozie
 
@@ -30,7 +30,8 @@ jobs:
           do
             sleep 1
           done
-          MYSQL_DATABASE=$MYSQL_TEST_DATBASE ../sql/init.sh
+          cd ../sql
+          cat 0_setup.sql 1_schema.sql | mysql -h 127.0.0.1 -u root -P 3306 $MYSQL_TEST_DATBASE
     - uses: ./.github/actions/cache_cargo
     - name: Build
       run: |
