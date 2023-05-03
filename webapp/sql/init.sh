@@ -10,4 +10,4 @@ export MYSQL_PWD=${MYSQL_PWD:-isucon}
 export LANG="C.UTF-8"
 cd $CURRENT_DIR
 
-# cat 0_setup.sql 1_schema.sql | mysql --defaults-file=/dev/null -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USER $MYSQL_DATABASE
+cat 0_setup.sql 1_schema.sql | mysql --defaults-file=/dev/null -h $MYSQL_HOST -P $MYSQL_PORT -u $MYSQL_USER $MYSQL_DATABASE
