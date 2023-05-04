@@ -18,6 +18,8 @@ flowchart LR
   http-app --> core
   http-core --> core
   infra --> core
+  infra --> infra-storage-file
+  infra-storage-file --> core
 ```
 
 ## http-app
@@ -37,15 +39,20 @@ flowchart LR
 ```
 
 ## infra
-This crate handles DB code. don't handle HTTP
+This crate handles DB or storage codes. don't handle HTTP
 
 ```mermaid
 
 flowchart LR
   ServiceInfra --> RepositoryInfra
+  ServiceInfra --> StorageInfra
   RepositoryInfra --> DB[(MySQL)]
   RepositoryInfra -- models --> ServiceInfra
+  StorageInfra --> ObjectStorage[(LocalFile)]
 ```
+
+## infra-storage-file
+This crate implement file storage code.
 
 ## core
 core application API. don't handle HTTP
