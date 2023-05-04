@@ -1,8 +1,8 @@
+use crate::responses::error::ResponseResult;
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::course::CourseID;
 use isucholar_core::models::course_status::CourseStatus;
 use isucholar_core::services::course_service::{CourseService, HaveCourseService};
-use isucholar_http_core::responses::error::ResponseResult;
 
 #[derive(Debug, serde::Deserialize)]
 pub struct SetCourseStatusRequest {

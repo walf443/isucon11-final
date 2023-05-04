@@ -1,4 +1,3 @@
-use crate::routes::course_routes::get_course_routes;
 use crate::routes::initialize::initialize;
 use actix_session::config::PersistentSession;
 use actix_session::storage::CookieSessionStore;
@@ -11,6 +10,7 @@ use actix_web::{web, Error};
 use isucholar_core::db::DBPool;
 use isucholar_http_core::middleware::IsLoggedIn;
 use isucholar_http_core::routes::announcement_routes::get_announcement_routes;
+use isucholar_http_core::routes::course_routes::get_course_routes;
 use isucholar_http_core::routes::login::login;
 use isucholar_http_core::routes::logout::logout;
 use isucholar_http_core::routes::user_routes::get_user_routes;

@@ -1,3 +1,4 @@
+use crate::middleware::IsAdmin;
 use crate::routes::course_routes::add_class::add_class;
 use crate::routes::course_routes::add_course::add_course;
 use crate::routes::course_routes::download_submitted_assignments::download_submitted_assignments;
@@ -9,7 +10,6 @@ use crate::routes::course_routes::set_course_status::set_course_status;
 use crate::routes::course_routes::submit_assignment::submit_assignment;
 use actix_web::{web, Scope};
 use isucholar_core::services::manager::ServiceManager;
-use isucholar_http_core::middleware::IsAdmin;
 
 mod add_class;
 mod add_course;

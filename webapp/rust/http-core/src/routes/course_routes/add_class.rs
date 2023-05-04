@@ -1,12 +1,12 @@
+use crate::responses::error::ResponseError::{
+    CourseConflict, CourseIsNotInProgress, CourseNotFound,
+};
+use crate::responses::error::ResponseResult;
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::class::{ClassID, CreateClass};
 use isucholar_core::models::course::CourseID;
 use isucholar_core::services::class_service::{ClassService, HaveClassService};
 use isucholar_core::services::error::Error;
-use isucholar_http_core::responses::error::ResponseError::{
-    CourseConflict, CourseIsNotInProgress, CourseNotFound,
-};
-use isucholar_http_core::responses::error::ResponseResult;
 
 #[derive(Debug, serde::Deserialize)]
 pub struct AddClassRequest {

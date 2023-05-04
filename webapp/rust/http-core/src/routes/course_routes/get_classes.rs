@@ -1,9 +1,9 @@
+use crate::responses::error::ResponseResult;
+use crate::routes::util::get_user_info;
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::class::ClassID;
 use isucholar_core::models::course::CourseID;
 use isucholar_core::services::class_service::{ClassService, HaveClassService};
-use isucholar_http_core::responses::error::ResponseResult;
-use isucholar_http_core::routes::util::get_user_info;
 
 #[derive(Debug, serde::Serialize)]
 struct GetClassResponse {

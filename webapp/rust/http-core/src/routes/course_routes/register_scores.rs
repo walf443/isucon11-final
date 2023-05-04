@@ -1,13 +1,11 @@
+use crate::responses::error::ResponseError::{ClassIsNotSubmissionClosed, ClassNotFound};
+use crate::responses::error::ResponseResult;
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::assignment_path::AssignmentPath;
 use isucholar_core::models::class::ClassID;
 use isucholar_core::models::score::Score;
 use isucholar_core::services::error::Error;
 use isucholar_core::services::submission_service::{HaveSubmissionService, SubmissionService};
-use isucholar_http_core::responses::error::ResponseError::{
-    ClassIsNotSubmissionClosed, ClassNotFound,
-};
-use isucholar_http_core::responses::error::ResponseResult;
 
 // PUT /api/courses/{course_id}/classes/{class_id}/assignments/scores 採点結果登録
 pub async fn register_scores<Service: HaveSubmissionService>(
