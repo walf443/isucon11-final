@@ -1,4 +1,5 @@
 use crate::models::class::ClassID;
+use crate::models::submission::SubmissionWithUserCode;
 use crate::models::user::UserID;
 use crate::storages::StorageResult;
 use async_trait::async_trait;
@@ -10,6 +11,12 @@ pub trait SubmissionFileStorage {
         class_id: &ClassID,
         user_id: &UserID,
         data: &mut B,
+    ) -> StorageResult<String>;
+
+    async fn create_submissions_zip(
+        &self,
+        class_id: &ClassID,
+        submissions: &Vec<SubmissionWithUserCode>,
     ) -> StorageResult<String>;
 }
 

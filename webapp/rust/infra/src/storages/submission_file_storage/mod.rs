@@ -1,5 +1,6 @@
 use async_trait::async_trait;
 use isucholar_core::models::class::ClassID;
+use isucholar_core::models::submission::SubmissionWithUserCode;
 use isucholar_core::models::user::UserID;
 use isucholar_core::storages::submission_file_storage::SubmissionFileStorage;
 use isucholar_core::storages::StorageResult;
@@ -23,5 +24,14 @@ impl SubmissionFileStorage for SubmissionFileStorageInfra {
     ) -> StorageResult<String> {
         let file = SubmissionFileStorageFile::new();
         file.upload(class_id, user_id, buf).await
+    }
+
+    async fn create_submissions_zip(
+        &self,
+        class_id: &ClassID,
+        submissions: &Vec<SubmissionWithUserCode>,
+    ) -> StorageResult<String> {
+        let file = SubmissionFileStorageFile::new();
+        file.create_submissions_zip(class_id, submissions).await
     }
 }
