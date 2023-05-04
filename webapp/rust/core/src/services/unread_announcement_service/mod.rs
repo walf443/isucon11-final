@@ -131,7 +131,7 @@ impl<S: UnreadAnnouncementServiceImpl> UnreadAnnouncementService for S {
 }
 
 #[cfg(test)]
-mod tests_tmp {
+mod tests {
     use crate::db::{get_test_db_conn, DBPool};
     use crate::repos::registration_repository::{
         HaveRegistrationRepository, MockRegistrationRepository,

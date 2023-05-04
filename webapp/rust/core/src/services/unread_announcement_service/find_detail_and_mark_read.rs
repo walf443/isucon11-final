@@ -6,7 +6,7 @@ mod tests {
     use crate::models::user::UserID;
     use crate::repos::error::ReposError::TestError;
     use crate::services::error::Result;
-    use crate::services::unread_announcement_service::tests_tmp::S;
+    use crate::services::unread_announcement_service::tests::S;
     use crate::services::unread_announcement_service::UnreadAnnouncementServiceImpl;
     use fake::{Fake, Faker};
 
