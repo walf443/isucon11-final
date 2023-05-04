@@ -1,4 +1,4 @@
-use crate::models::class::ClassWithSubmitted;
+use crate::models::class::{ClassWithSubmitted, CreateClass};
 use crate::models::class_score::ClassScore;
 use crate::models::course::{Course, CourseID};
 use crate::models::course_result::CourseResult;
@@ -6,11 +6,12 @@ use crate::models::course_status::CourseStatus;
 use crate::models::user::UserID;
 use crate::repos::class_repository::{ClassRepository, HaveClassRepository};
 use crate::repos::course_repository::{CourseRepository, HaveCourseRepository};
+use crate::repos::error::ReposError;
 use crate::repos::registration_course_repository::{
     HaveRegistrationCourseRepository, RegistrationCourseRepository,
 };
 use crate::repos::submission_repository::{HaveSubmissionRepository, SubmissionRepository};
-use crate::services::error::Error::CourseNotFound;
+use crate::services::error::Error::{CourseConflict, CourseIsNotInProgress, CourseNotFound};
 use crate::services::error::Result;
 use crate::services::HaveDBPool;
 use crate::util;
@@ -19,6 +20,8 @@ use async_trait::async_trait;
 #[cfg_attr(any(test, feature = "test"), mockall::automock)]
 #[async_trait]
 pub trait ClassService {
+    async fn create(&self, form: &CreateClass) -> Result<()>;
+
     async fn get_user_scores_by_course_id(
         &self,
         user_id: &UserID,
@@ -57,6 +60,50 @@ pub trait ClassServiceImpl:
     + HaveRegistrationCourseRepository
     + HaveCourseRepository
 {
+    async fn create(&self, form: &CreateClass) -> Result<()> {
+        let pool = self.get_db_pool();
+        let mut tx = pool.begin().await?;
+
+        let course = self
+            .course_repo()
+            .find_for_share_lock_by_id(&mut tx, &form.course_id)
+            .await?;
+        if course.is_none() {
+            return Err(CourseNotFound);
+        }
+        let course = course.unwrap();
+        if course.status != CourseStatus::InProgress {
+            return Err(CourseIsNotInProgress);
+        }
+
+        let class_repo = self.class_repo();
+        let result = class_repo.create(&mut tx, &form).await;
+        match result {
+            Ok(_) => {
+                tx.commit().await?;
+            }
+            Err(e) => {
+                let _ = tx.rollback().await;
+                match e {
+                    ReposError::CourseDuplicate => {
+                        let mut conn = pool.acquire().await?;
+                        let class = class_repo
+                            .find_by_course_id_and_part(&mut conn, &form.course_id, &form.part)
+                            .await?;
+                        if form.title != class.title || form.description != class.description {
+                            return Err(CourseConflict);
+                        } else {
+                            return Ok(());
+                        }
+                    }
+                    _ => {}
+                }
+            }
+        }
+
+        Ok(())
+    }
+
     async fn get_user_scores_by_course_id(
         &self,
         user_id: &UserID,
@@ -197,6 +244,10 @@ pub trait ClassServiceImpl:
 
 #[async_trait]
 impl<S: ClassServiceImpl> ClassService for S {
+    async fn create(&self, form: &CreateClass) -> Result<()> {
+        ClassServiceImpl::create(self, form).await
+    }
+
     async fn get_user_scores_by_course_id(
         &self,
         user_id: &UserID,

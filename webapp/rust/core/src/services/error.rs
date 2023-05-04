@@ -20,6 +20,10 @@ pub enum Error {
     AnnouncementDuplicate,
     #[error("no such course.")]
     CourseNotFound,
+    #[error("This course is not in progress")]
+    CourseIsNotInProgress,
+    #[error("A class with the same part already exists.")]
+    CourseConflict,
     #[error("validation error")]
     RegistrationCourseValidationError(RegistrationCourseValidationError),
 }
