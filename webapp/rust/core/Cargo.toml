@@ -8,6 +8,7 @@ default = []
 test = ["mockall"]
 
 [dependencies]
+bytes.workspace = true
 sqlx.workspace = true
 serde.workspace = true
 async-trait.workspace = true

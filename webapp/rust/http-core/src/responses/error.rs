@@ -6,12 +6,15 @@ use isucholar_core::repos::error::ReposError;
 use std::io;
 
 use isucholar_core::services;
+use isucholar_core::storages::StorageError;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum ResponseError {
     #[error("repos error")]
     ReposError(#[from] ReposError),
+    #[error("strage error")]
+    StorageError(#[from] StorageError),
     #[error("repos error")]
     ServiceError(#[from] services::error::Error),
     #[error("actix error")]

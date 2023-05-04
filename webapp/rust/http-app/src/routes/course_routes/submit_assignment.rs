@@ -9,7 +9,7 @@ use isucholar_core::repos::class_repository::ClassRepository;
 use isucholar_core::repos::course_repository::CourseRepository;
 use isucholar_core::repos::registration_repository::RegistrationRepository;
 use isucholar_core::repos::submission_repository::SubmissionRepository;
-use isucholar_core::ASSIGNMENTS_DIRECTORY;
+use isucholar_core::storages::submission_file_storage::SubmissionFileStorage;
 use isucholar_http_core::responses::error::ResponseError::{
     ClassNotFound, CourseIsNotInProgress, CourseNotFound, InvalidFile, RegistrationAlready,
     SubmissionClosed,
@@ -20,7 +20,7 @@ use isucholar_infra::repos::class_repository::ClassRepositoryInfra;
 use isucholar_infra::repos::course_repository::CourseRepositoryInfra;
 use isucholar_infra::repos::registration_repository::RegistrationRepositoryInfra;
 use isucholar_infra::repos::submission_repository::SubmissionRepositoryInfra;
-use tokio::io::AsyncWriteExt;
+use isucholar_infra::storages::submission_file_storage::SubmissionFileStorageInfra;
 
 // POST /api/courses/{course_id}/classes/{class_id}/assignments 課題の提出
 pub async fn submit_assignment(
@@ -105,20 +105,10 @@ pub async fn submit_assignment(
         .map_ok(|b| web::BytesMut::from(&b[..]))
         .try_concat()
         .await?;
-    let dst = format!(
-        "{}{}-{}.pdf",
-        ASSIGNMENTS_DIRECTORY,
-        class_id.to_string(),
-        user_id.to_string(),
-    );
-    let mut file = tokio::fs::OpenOptions::new()
-        .write(true)
-        .create(true)
-        .truncate(true)
-        .mode(0o666)
-        .open(&dst)
+    let submission_file_storage = SubmissionFileStorageInfra::new();
+    submission_file_storage
+        .upload(&class_id, &user_id, &mut data)
         .await?;
-    file.write_all_buf(&mut data).await?;
 
     tx.commit().await?;
 

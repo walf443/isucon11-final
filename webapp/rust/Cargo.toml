@@ -1,5 +1,5 @@
 [workspace]
-members = ["core", "infra", "http-core", "http-app"]
+members = ["core", "infra", "infra-storage-file", "http-core", "http-app"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -22,3 +22,4 @@ sqlx = { version = "0.6", default-features = false, features = ["macros", "runti
 thiserror = { version = "1" }
 tokio = { version = "1", features = ["fs", "process", "macros"] }
 ulid = { version = "0.4" }
+bytes = "1"
