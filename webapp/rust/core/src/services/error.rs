@@ -18,6 +18,10 @@ pub enum Error {
     AnnouncementNotFound,
     #[error("announcement is duplicated.")]
     AnnouncementDuplicate,
+    #[error("No such class.")]
+    ClassNotFound,
+    #[error("This assignment is not closed yet.")]
+    ClassIsNotSubmissionClosed,
     #[error("no such course.")]
     CourseNotFound,
     #[error("This course is not in progress")]

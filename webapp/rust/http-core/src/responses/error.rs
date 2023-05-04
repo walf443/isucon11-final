@@ -44,10 +44,10 @@ pub enum ResponseError {
     AnnouncementNotFound,
     #[error("No such class.")]
     ClassNotFound,
-    #[error("No such course.")]
-    CourseNotFound,
     #[error("This assignment is not closed yet.")]
     ClassIsNotSubmissionClosed,
+    #[error("No such course.")]
+    CourseNotFound,
     #[error("This course is not in progress")]
     CourseIsNotInProgress,
     #[error("A class with the same part already exists.")]
