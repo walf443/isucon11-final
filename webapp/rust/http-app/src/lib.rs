@@ -14,13 +14,13 @@ use isucholar_http_core::routes::course_routes::get_course_routes;
 use isucholar_http_core::routes::login::login;
 use isucholar_http_core::routes::logout::logout;
 use isucholar_http_core::routes::user_routes::get_user_routes;
-use isucholar_infra::services::manager::ServiceManagerImpl;
+use isucholar_infra::services::manager::ServiceManagerInfra;
 
 pub mod routes;
 
 pub fn create_app(
     pool: DBPool,
-    service: ServiceManagerImpl,
+    service: ServiceManagerInfra,
 ) -> actix_web::App<
     impl ServiceFactory<
         ServiceRequest,
@@ -30,9 +30,9 @@ pub fn create_app(
         InitError = (),
     >,
 > {
-    let users_api = get_user_routes::<ServiceManagerImpl>();
-    let courses_api = get_course_routes::<ServiceManagerImpl>();
-    let announcements_api = get_announcement_routes::<ServiceManagerImpl>();
+    let users_api = get_user_routes::<ServiceManagerInfra>();
+    let courses_api = get_course_routes::<ServiceManagerInfra>();
+    let announcements_api = get_announcement_routes::<ServiceManagerInfra>();
 
     let session_key = env!("SESSION_KEY").try_into_bytes().unwrap().to_vec();
 
@@ -47,7 +47,7 @@ pub fn create_app(
                 .build(),
         )
         .route("/initialize", web::post().to(initialize))
-        .route("/login", web::post().to(login::<ServiceManagerImpl>))
+        .route("/login", web::post().to(login::<ServiceManagerInfra>))
         .route("/logout", web::post().to(logout))
         .service(
             web::scope("/api")

@@ -1,13 +1,13 @@
 use actix_web::test;
 use isucholar_core::db::get_test_db_conn;
 use isucholar_http_app::create_app;
-use isucholar_infra::services::manager::ServiceManagerImpl;
+use isucholar_infra::services::manager::ServiceManagerInfra;
 
 #[actix_web::test]
 #[should_panic(expected = "You are not logged in.")]
 async fn get_me() {
     let db_pool = get_test_db_conn().await.unwrap();
-    let service = ServiceManagerImpl::new(db_pool.clone());
+    let service = ServiceManagerInfra::new(db_pool.clone());
 
     let app = create_app(db_pool, service);
 
@@ -21,7 +21,7 @@ async fn get_me() {
 #[should_panic(expected = "You are not logged in.")]
 async fn get_me_courses() {
     let db_pool = get_test_db_conn().await.unwrap();
-    let service = ServiceManagerImpl::new(db_pool.clone());
+    let service = ServiceManagerInfra::new(db_pool.clone());
 
     let app = create_app(db_pool, service);
 
@@ -37,7 +37,7 @@ async fn get_me_courses() {
 #[should_panic(expected = "You are not logged in.")]
 async fn put_me_courses() {
     let db_pool = get_test_db_conn().await.unwrap();
-    let service = ServiceManagerImpl::new(db_pool.clone());
+    let service = ServiceManagerInfra::new(db_pool.clone());
 
     let app = create_app(db_pool, service);
 
@@ -53,7 +53,7 @@ async fn put_me_courses() {
 #[should_panic(expected = "You are not logged in.")]
 async fn get_me_grades() {
     let db_pool = get_test_db_conn().await.unwrap();
-    let service = ServiceManagerImpl::new(db_pool.clone());
+    let service = ServiceManagerInfra::new(db_pool.clone());
 
     let app = create_app(db_pool, service);
 

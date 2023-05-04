@@ -19,7 +19,7 @@ use isucholar_core::services::user_service::HaveUserService;
 use std::sync::Arc;
 
 #[derive(Clone)]
-pub struct ServiceManagerImpl {
+pub struct ServiceManagerInfra {
     announcement_service: AnnouncementServiceInfra,
     unread_announcement_service: UnreadAnnouncementServiceInfra,
     user_service: UserServiceInfra,
@@ -30,9 +30,9 @@ pub struct ServiceManagerImpl {
     submission_service: SubmissionServiceInfra,
 }
 
-impl ServiceManager for ServiceManagerImpl {}
+impl ServiceManager for ServiceManagerInfra {}
 
-impl ServiceManagerImpl {
+impl ServiceManagerInfra {
     pub fn new(db_pool: DBPool) -> Self {
         let pool = Arc::new(db_pool);
         Self {
@@ -48,7 +48,7 @@ impl ServiceManagerImpl {
     }
 }
 
-impl HaveAnnouncementService for ServiceManagerImpl {
+impl HaveAnnouncementService for ServiceManagerInfra {
     type Service = AnnouncementServiceInfra;
 
     fn announcement_service(&self) -> &Self::Service {
@@ -56,7 +56,7 @@ impl HaveAnnouncementService for ServiceManagerImpl {
     }
 }
 
-impl HaveCourseService for ServiceManagerImpl {
+impl HaveCourseService for ServiceManagerInfra {
     type Service = CourseServiceInfra;
 
     fn course_service(&self) -> &Self::Service {
@@ -64,21 +64,21 @@ impl HaveCourseService for ServiceManagerImpl {
     }
 }
 
-impl HaveUnreadAnnouncementService for ServiceManagerImpl {
+impl HaveUnreadAnnouncementService for ServiceManagerInfra {
     type Service = UnreadAnnouncementServiceInfra;
 
     fn unread_announcement_service(&self) -> &Self::Service {
         &self.unread_announcement_service
     }
 }
-impl HaveUserService for ServiceManagerImpl {
+impl HaveUserService for ServiceManagerInfra {
     type Service = UserServiceInfra;
 
     fn user_service(&self) -> &Self::Service {
         &self.user_service
     }
 }
-impl HaveClassService for ServiceManagerImpl {
+impl HaveClassService for ServiceManagerInfra {
     type Service = ClassServiceInfra;
 
     fn class_service(&self) -> &Self::Service {
@@ -86,7 +86,7 @@ impl HaveClassService for ServiceManagerImpl {
     }
 }
 
-impl HaveRegistrationCourseService for ServiceManagerImpl {
+impl HaveRegistrationCourseService for ServiceManagerInfra {
     type Service = RegistrationCourseServiceInfra;
 
     fn registration_course_service(&self) -> &Self::Service {
@@ -94,7 +94,7 @@ impl HaveRegistrationCourseService for ServiceManagerImpl {
     }
 }
 
-impl HaveGradeSummaryService for ServiceManagerImpl {
+impl HaveGradeSummaryService for ServiceManagerInfra {
     type Service = GradeSummaryServiceInfra;
 
     fn grade_summary_service(&self) -> &Self::Service {
@@ -102,7 +102,7 @@ impl HaveGradeSummaryService for ServiceManagerImpl {
     }
 }
 
-impl HaveSubmissionService for ServiceManagerImpl {
+impl HaveSubmissionService for ServiceManagerInfra {
     type Service = SubmissionServiceInfra;
 
     fn submission_service(&self) -> &Self::Service {

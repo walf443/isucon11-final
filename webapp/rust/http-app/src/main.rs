@@ -1,7 +1,7 @@
 use isucholar_http_app::create_app;
 
 use isucholar_infra::db::get_db_conn;
-use isucholar_infra::services::manager::ServiceManagerImpl;
+use isucholar_infra::services::manager::ServiceManagerInfra;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -9,7 +9,7 @@ async fn main() -> std::io::Result<()> {
         .init();
 
     let pool = get_db_conn().await.expect("failed to connect db");
-    let service = ServiceManagerImpl::new(pool.clone());
+    let service = ServiceManagerInfra::new(pool.clone());
 
     let server = actix_web::HttpServer::new(move || {
         let app = create_app(pool.clone(), service.clone());
