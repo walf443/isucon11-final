@@ -34,6 +34,33 @@ pub async fn submit_assignment(
     let course_id = CourseID::new(path.course_id.to_string());
     let class_id = ClassID::new(path.class_id.to_string());
 
+    let mut file = None;
+    while let Some(field) = payload.next().await {
+        let field = field.map_err(|_| InvalidFile)?;
+        let content_disposition = field.content_disposition();
+        if let Some(name) = content_disposition.get_name() {
+            if name == "file" {
+                file = Some(field);
+                break;
+            }
+        }
+    }
+    if file.is_none() {
+        return Err(InvalidFile);
+    }
+    let file = file.unwrap();
+
+    let file_name = file
+        .content_disposition()
+        .get_filename()
+        .unwrap()
+        .to_string();
+
+    let mut data = file
+        .map_ok(|b| web::BytesMut::from(&b[..]))
+        .try_concat()
+        .await?;
+
     let mut tx = pool.begin().await?;
     let course_repo = CourseRepositoryInfra {};
     let status = course_repo
@@ -69,42 +96,18 @@ pub async fn submit_assignment(
         return Err(ClassNotFound);
     }
 
-    let mut file = None;
-    while let Some(field) = payload.next().await {
-        let field = field.map_err(|_| InvalidFile)?;
-        let content_disposition = field.content_disposition();
-        if let Some(name) = content_disposition.get_name() {
-            if name == "file" {
-                file = Some(field);
-                break;
-            }
-        }
-    }
-    if file.is_none() {
-        return Err(InvalidFile);
-    }
-    let file = file.unwrap();
-
     let submission_repo = SubmissionRepositoryInfra {};
     submission_repo
         .create_or_update(
             &mut tx,
             &CreateSubmission {
+                file_name: file_name,
                 user_id: user_id.clone(),
                 class_id: class_id.clone(),
-                file_name: file
-                    .content_disposition()
-                    .get_filename()
-                    .unwrap()
-                    .to_string(),
             },
         )
         .await?;
 
-    let mut data = file
-        .map_ok(|b| web::BytesMut::from(&b[..]))
-        .try_concat()
-        .await?;
     let submission_file_storage = SubmissionFileStorageInfra::new();
     submission_file_storage
         .upload(&class_id, &user_id, &mut data)
