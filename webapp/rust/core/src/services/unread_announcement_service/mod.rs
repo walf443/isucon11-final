@@ -142,7 +142,7 @@ mod tests {
     use crate::services::unread_announcement_service::UnreadAnnouncementServiceImpl;
     use crate::services::HaveDBPool;
 
-    pub(crate) struct S {
+    pub(super) struct S {
         db_pool: DBPool,
         pub unread_announcement_repo: MockUnreadAnnouncementRepository,
         pub registration_repo: MockRegistrationRepository,
