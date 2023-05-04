@@ -13,9 +13,9 @@ use thiserror::Error;
 pub enum ResponseError {
     #[error("repos error")]
     ReposError(#[from] ReposError),
-    #[error("strage error")]
+    #[error("storage error")]
     StorageError(#[from] StorageError),
-    #[error("repos error")]
+    #[error("service error")]
     ServiceError(#[from] services::error::Error),
     #[error("actix error")]
     ActixError(#[from] actix_web::Error),

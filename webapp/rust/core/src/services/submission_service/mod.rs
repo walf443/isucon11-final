@@ -10,6 +10,8 @@ pub trait SubmissionService {
         data: &mut B,
     ) -> Result<()>;
 
+    async fn download_submissions_zip(&self, class_id: &ClassID) -> Result<String>;
+
     async fn update_user_scores_by_class_id(
         &self,
         class_id: &ClassID,
@@ -118,6 +120,35 @@ pub trait SubmissionServiceImpl:
         Ok(())
     }
 
+    async fn download_submissions_zip(&self, class_id: &ClassID) -> Result<String> {
+        let pool = self.get_db_pool();
+
+        let mut tx = pool.begin().await?;
+        let class_repo = self.class_repo();
+        let is_exist = class_repo.for_update_by_id(&mut tx, &class_id).await?;
+
+        if !is_exist {
+            return Err(ClassNotFound);
+        }
+        let submission_repo = self.submission_repo();
+        let submissions = submission_repo
+            .find_all_with_user_code_by_class_id(&mut tx, &class_id)
+            .await?;
+
+        let submission_file_storage = self.submission_file_storage();
+        let zip_file_path = submission_file_storage
+            .create_submissions_zip(&class_id, &submissions)
+            .await?;
+
+        class_repo
+            .update_submission_closed_by_id(&mut tx, &class_id)
+            .await?;
+
+        tx.commit().await?;
+
+        Ok(zip_file_path)
+    }
+
     async fn update_user_scores_by_class_id(
         &self,
         class_id: &ClassID,
@@ -166,6 +197,10 @@ impl<S: SubmissionServiceImpl> SubmissionService for S {
     ) -> Result<()> {
         SubmissionServiceImpl::create_or_update(self, user_id, course_id, class_id, file_name, data)
             .await
+    }
+
+    async fn download_submissions_zip(&self, class_id: &ClassID) -> Result<String> {
+        SubmissionServiceImpl::download_submissions_zip(self, class_id).await
     }
 
     async fn update_user_scores_by_class_id(

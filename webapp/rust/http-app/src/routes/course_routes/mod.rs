@@ -61,6 +61,6 @@ pub fn get_course_routes<Service: ServiceManager + 'static>() -> Scope {
             web::resource("/{course_id}/classes/{class_id}/assignments/export")
                 .guard(actix_web::guard::Get())
                 .wrap(IsAdmin)
-                .to(download_submitted_assignments),
+                .to(download_submitted_assignments::<Service>),
         )
 }
