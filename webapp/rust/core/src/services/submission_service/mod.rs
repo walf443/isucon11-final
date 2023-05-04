@@ -1,3 +1,4 @@
+#[cfg_attr(any(test, feature = "test"), mockall::automock)]
 #[async_trait]
 pub trait SubmissionService {
     async fn update_user_scores_by_class_id(

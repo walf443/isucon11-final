@@ -15,6 +15,7 @@ pub mod course_service;
 pub mod grade_summary_service;
 pub mod manager;
 pub mod registration_course_service;
+pub mod submission_service;
 pub mod unread_announcement_service;
 pub mod user_service;
 

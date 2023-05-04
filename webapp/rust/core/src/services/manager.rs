@@ -3,6 +3,7 @@ use crate::services::class_service::HaveClassService;
 use crate::services::course_service::HaveCourseService;
 use crate::services::grade_summary_service::HaveGradeSummaryService;
 use crate::services::registration_course_service::HaveRegistrationCourseService;
+use crate::services::submission_service::HaveSubmissionService;
 use crate::services::unread_announcement_service::HaveUnreadAnnouncementService;
 use crate::services::user_service::HaveUserService;
 
@@ -14,6 +15,7 @@ pub trait ServiceManager:
     + HaveClassService
     + HaveRegistrationCourseService
     + HaveGradeSummaryService
+    + HaveSubmissionService
 {
 }
 
@@ -29,6 +31,7 @@ pub mod tests {
     use crate::services::registration_course_service::{
         HaveRegistrationCourseService, MockRegistrationCourseService,
     };
+    use crate::services::submission_service::{HaveSubmissionService, MockSubmissionService};
     use crate::services::unread_announcement_service::{
         HaveUnreadAnnouncementService, MockUnreadAnnouncementService,
     };
@@ -42,6 +45,7 @@ pub mod tests {
         pub class_service: MockClassService,
         pub registration_course_service: MockRegistrationCourseService,
         pub grade_summary_service: MockGradeSummaryService,
+        pub submission_service: MockSubmissionService,
     }
 
     impl MockServiceManager {
@@ -54,6 +58,7 @@ pub mod tests {
                 class_service: MockClassService::new(),
                 registration_course_service: MockRegistrationCourseService::new(),
                 grade_summary_service: MockGradeSummaryService::new(),
+                submission_service: MockSubmissionService::new(),
             }
         }
     }
@@ -113,6 +118,14 @@ pub mod tests {
 
         fn grade_summary_service(&self) -> &Self::Service {
             &self.grade_summary_service
+        }
+    }
+
+    impl HaveSubmissionService for MockServiceManager {
+        type Service = MockSubmissionService;
+
+        fn submission_service(&self) -> &Self::Service {
+            &self.submission_service
         }
     }
 }
