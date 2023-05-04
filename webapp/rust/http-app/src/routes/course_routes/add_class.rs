@@ -1,17 +1,13 @@
 use actix_web::{web, HttpResponse};
 use isucholar_core::models::class::{ClassID, CreateClass};
 use isucholar_core::models::course::CourseID;
-use isucholar_core::models::course_status::CourseStatus;
-use isucholar_core::repos::class_repository::ClassRepository;
-use isucholar_core::repos::course_repository::CourseRepository;
-use isucholar_core::repos::error::ReposError;
+use isucholar_core::services::class_service::{ClassService, HaveClassService};
+use isucholar_core::services::error::Error;
 use isucholar_core::util;
 use isucholar_http_core::responses::error::ResponseError::{
     CourseConflict, CourseIsNotInProgress, CourseNotFound,
 };
 use isucholar_http_core::responses::error::ResponseResult;
-use isucholar_infra::repos::class_repository::ClassRepositoryInfra;
-use isucholar_infra::repos::course_repository::CourseRepositoryInfra;
 
 #[derive(Debug, serde::Deserialize)]
 pub struct AddClassRequest {
@@ -26,28 +22,13 @@ struct AddClassResponse {
 }
 
 // POST /api/courses/{course_id}/classes 新規講義(&課題)追加
-pub async fn add_class(
-    pool: web::Data<sqlx::MySqlPool>,
+pub async fn add_class<Service: HaveClassService>(
+    service: web::Data<Service>,
     course_id: web::Path<(String,)>,
     req: web::Json<AddClassRequest>,
 ) -> ResponseResult<HttpResponse> {
     let course_id = CourseID::new(course_id.0.to_string());
 
-    let mut tx = pool.begin().await?;
-
-    let course_repo = CourseRepositoryInfra {};
-    let course = course_repo
-        .find_for_share_lock_by_id(&mut tx, &course_id)
-        .await?;
-    if course.is_none() {
-        return Err(CourseNotFound);
-    }
-    let course = course.unwrap();
-    if course.status != CourseStatus::InProgress {
-        return Err(CourseIsNotInProgress);
-    }
-
-    let class_repo = ClassRepositoryInfra {};
     let class_id = ClassID::new(util::new_ulid().await);
     let form = CreateClass {
         id: class_id.clone(),
@@ -56,31 +37,18 @@ pub async fn add_class(
         title: req.title.clone(),
         description: req.description.clone(),
     };
-    let result = class_repo.create(&mut tx, &form).await;
-    match result {
-        Ok(_) => {
-            tx.commit().await?;
-        }
-        Err(e) => {
-            let _ = tx.rollback().await;
-            match e {
-                ReposError::CourseDuplicate => {
-                    let mut conn = pool.acquire().await?;
-                    let class = class_repo
-                        .find_by_course_id_and_part(&mut conn, &course_id, &req.part)
-                        .await?;
-                    if req.title != class.title || req.description != class.description {
-                        return Err(CourseConflict);
-                    } else {
-                        return Ok(
-                            HttpResponse::Created().json(AddClassResponse { class_id: class.id })
-                        );
-                    }
-                }
-                _ => {}
-            }
-        }
-    }
 
-    Ok(HttpResponse::Created().json(AddClassResponse { class_id }))
+    let result = service.class_service().create(&form).await;
+
+    match result {
+        Ok(_) => Ok(HttpResponse::Created().json(AddClassResponse { class_id })),
+        Err(e) => match e {
+            Error::CourseNotFound => return Err(CourseNotFound),
+            Error::CourseIsNotInProgress => return Err(CourseIsNotInProgress),
+            Error::CourseConflict => {
+                return Err(CourseConflict);
+            }
+            _ => return Err(e.into()),
+        },
+    }
 }
