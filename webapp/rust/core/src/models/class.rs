@@ -28,7 +28,6 @@ impl ClassID {
 
 #[derive(Dummy)]
 pub struct CreateClass {
-    pub id: ClassID,
     pub course_id: CourseID,
     pub part: u8,
     pub title: String,

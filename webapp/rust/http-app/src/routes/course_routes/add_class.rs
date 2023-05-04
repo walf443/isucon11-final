@@ -3,7 +3,6 @@ use isucholar_core::models::class::{ClassID, CreateClass};
 use isucholar_core::models::course::CourseID;
 use isucholar_core::services::class_service::{ClassService, HaveClassService};
 use isucholar_core::services::error::Error;
-use isucholar_core::util;
 use isucholar_http_core::responses::error::ResponseError::{
     CourseConflict, CourseIsNotInProgress, CourseNotFound,
 };
@@ -29,9 +28,7 @@ pub async fn add_class<Service: HaveClassService>(
 ) -> ResponseResult<HttpResponse> {
     let course_id = CourseID::new(course_id.0.to_string());
 
-    let class_id = ClassID::new(util::new_ulid().await);
     let form = CreateClass {
-        id: class_id.clone(),
         course_id: course_id.clone(),
         part: req.part.clone(),
         title: req.title.clone(),
@@ -41,7 +38,7 @@ pub async fn add_class<Service: HaveClassService>(
     let result = service.class_service().create(&form).await;
 
     match result {
-        Ok(_) => Ok(HttpResponse::Created().json(AddClassResponse { class_id })),
+        Ok(class_id) => Ok(HttpResponse::Created().json(AddClassResponse { class_id })),
         Err(e) => match e {
             Error::CourseNotFound => return Err(CourseNotFound),
             Error::CourseIsNotInProgress => return Err(CourseIsNotInProgress),

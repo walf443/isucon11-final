@@ -13,7 +13,7 @@ use isucholar_core::services::course_service::HaveCourseService;
 use isucholar_core::services::grade_summary_service::HaveGradeSummaryService;
 use isucholar_core::services::manager::ServiceManager;
 use isucholar_core::services::registration_course_service::HaveRegistrationCourseService;
-use isucholar_core::services::submission_service::{HaveSubmissionService, SubmissionService};
+use isucholar_core::services::submission_service::HaveSubmissionService;
 use isucholar_core::services::unread_announcement_service::HaveUnreadAnnouncementService;
 use isucholar_core::services::user_service::HaveUserService;
 use std::sync::Arc;

@@ -1,4 +1,4 @@
-use crate::models::class::{ClassWithSubmitted, CreateClass};
+use crate::models::class::{ClassID, ClassWithSubmitted, CreateClass};
 use crate::models::class_score::ClassScore;
 use crate::models::course::{Course, CourseID};
 use crate::models::course_result::CourseResult;
@@ -20,7 +20,7 @@ use async_trait::async_trait;
 #[cfg_attr(any(test, feature = "test"), mockall::automock)]
 #[async_trait]
 pub trait ClassService {
-    async fn create(&self, form: &CreateClass) -> Result<()>;
+    async fn create(&self, form: &CreateClass) -> Result<ClassID>;
 
     async fn get_user_scores_by_course_id(
         &self,
@@ -60,7 +60,9 @@ pub trait ClassServiceImpl:
     + HaveRegistrationCourseRepository
     + HaveCourseRepository
 {
-    async fn create(&self, form: &CreateClass) -> Result<()> {
+    async fn create(&self, form: &CreateClass) -> Result<ClassID> {
+        let class_id = ClassID::new(util::new_ulid().await);
+
         let pool = self.get_db_pool();
         let mut tx = pool.begin().await?;
 
@@ -77,7 +79,7 @@ pub trait ClassServiceImpl:
         }
 
         let class_repo = self.class_repo();
-        let result = class_repo.create(&mut tx, &form).await;
+        let result = class_repo.create(&mut tx, &class_id, &form).await;
         match result {
             Ok(_) => {
                 tx.commit().await?;
@@ -93,7 +95,7 @@ pub trait ClassServiceImpl:
                         if form.title != class.title || form.description != class.description {
                             return Err(CourseConflict);
                         } else {
-                            return Ok(());
+                            return Ok(class_id);
                         }
                     }
                     _ => {}
@@ -101,7 +103,7 @@ pub trait ClassServiceImpl:
             }
         }
 
-        Ok(())
+        Ok(class_id)
     }
 
     async fn get_user_scores_by_course_id(
@@ -244,7 +246,7 @@ pub trait ClassServiceImpl:
 
 #[async_trait]
 impl<S: ClassServiceImpl> ClassService for S {
-    async fn create(&self, form: &CreateClass) -> Result<()> {
+    async fn create(&self, form: &CreateClass) -> Result<ClassID> {
         ClassServiceImpl::create(self, form).await
     }
 

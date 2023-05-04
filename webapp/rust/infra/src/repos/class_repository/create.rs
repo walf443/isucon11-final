@@ -15,14 +15,15 @@ async fn success_case() {
         .await
         .unwrap();
 
+    let class_id: ClassID = Faker.fake();
     let class: CreateClass = Faker.fake();
 
     let repo = ClassRepositoryInfra {};
-    repo.create(&mut tx, &class).await.unwrap();
+    repo.create(&mut tx, &class_id, &class).await.unwrap();
 
     let got = sqlx::query_as!(Class,
         "SELECT id as `id:ClassID`, course_id as `course_id:CourseID`, part, title, description, submission_closed as `submission_closed:bool` FROM classes WHERE id = ?",
-        &class.id)
+        &class_id)
         .fetch_one(&mut tx)
         .await
         .unwrap();
@@ -44,11 +45,12 @@ async fn duplicate_case() {
         .await
         .unwrap();
 
+    let class_id: ClassID = Faker.fake();
     let class: CreateClass = Faker.fake();
 
     let repo = ClassRepositoryInfra {};
-    repo.create(&mut tx, &class).await.unwrap();
-    repo.create(&mut tx, &class).await.unwrap();
+    repo.create(&mut tx, &class_id, &class).await.unwrap();
+    repo.create(&mut tx, &class_id, &class).await.unwrap();
 }
 
 #[tokio::test]
@@ -57,8 +59,9 @@ async fn error_case() {
     let db_pool = get_test_db_conn().await.unwrap();
     let mut tx = db_pool.begin().await.unwrap();
 
+    let class_id: ClassID = Faker.fake();
     let class: CreateClass = Faker.fake();
 
     let repo = ClassRepositoryInfra {};
-    repo.create(&mut tx, &class).await.unwrap();
+    repo.create(&mut tx, &class_id, &class).await.unwrap();
 }

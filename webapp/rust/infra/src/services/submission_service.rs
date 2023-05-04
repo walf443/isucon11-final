@@ -3,7 +3,7 @@ use crate::repos::submission_repository::SubmissionRepositoryInfra;
 use isucholar_core::db::DBPool;
 use isucholar_core::repos::class_repository::HaveClassRepository;
 use isucholar_core::repos::submission_repository::HaveSubmissionRepository;
-use isucholar_core::services::submission_service::{SubmissionService, SubmissionServiceImpl};
+use isucholar_core::services::submission_service::SubmissionServiceImpl;
 use isucholar_core::services::HaveDBPool;
 use std::sync::Arc;
 

@@ -39,9 +39,14 @@ impl ClassRepository for ClassRepositoryInfra {
         Ok(class_count == 1)
     }
 
-    async fn create(&self, conn: &mut DBConn, class: &CreateClass) -> Result<()> {
+    async fn create(
+        &self,
+        conn: &mut DBConn,
+        class_id: &ClassID,
+        class: &CreateClass,
+    ) -> Result<()> {
         let result = sqlx::query!("INSERT INTO `classes` (`id`, `course_id`, `part`, `title`, `description`) VALUES (?, ?, ?, ?, ?)",
-            &class.id,
+            &class_id,
             &class.course_id,
             &class.part,
             &class.title,
