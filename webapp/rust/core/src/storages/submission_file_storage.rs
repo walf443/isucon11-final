@@ -21,7 +21,7 @@ pub trait SubmissionFileStorage {
 }
 
 pub trait HaveSubmissionFileStorage {
-    type Storage: SubmissionFileStorage;
+    type Storage: Sync + SubmissionFileStorage;
 
-    fn submission_file_storage() -> Self::Storage;
+    fn submission_file_storage(&self) -> &Self::Storage;
 }

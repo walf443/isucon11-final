@@ -6,6 +6,7 @@ use isucholar_core::storages::submission_file_storage::SubmissionFileStorage;
 use isucholar_core::storages::StorageResult;
 use isucholar_infra_storage_file::submission_file_storage::SubmissionFileStorageFile;
 
+#[derive(Clone)]
 pub struct SubmissionFileStorageInfra {}
 
 impl SubmissionFileStorageInfra {

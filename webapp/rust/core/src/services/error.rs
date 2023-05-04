@@ -1,5 +1,6 @@
 use crate::models::course::CourseID;
 use crate::repos::error::ReposError;
+use crate::storages::StorageError;
 use bcrypt::BcryptError;
 use serde::Serialize;
 use thiserror::Error;
@@ -10,6 +11,8 @@ pub enum Error {
     TestError,
     #[error("repos error")]
     ReposError(#[from] ReposError),
+    #[error("storage error")]
+    StorageError(#[from] StorageError),
     #[error("sqlx error")]
     SqlxError(#[from] sqlx::Error),
     #[error("bcrypt error")]
@@ -30,6 +33,10 @@ pub enum Error {
     CourseConflict,
     #[error("validation error")]
     RegistrationCourseValidationError(RegistrationCourseValidationError),
+    #[error("You have not taken this course.")]
+    RegistrationAlready,
+    #[error("Submission has been closed for this class.")]
+    SubmissionClosed,
 }
 
 pub type Result<T> = std::result::Result<T, Error>;
