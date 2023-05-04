@@ -49,7 +49,7 @@ pub fn get_course_routes<Service: ServiceManager + 'static>() -> Scope {
         )
         .route(
             "/{course_id}/classes/{class_id}/assignments",
-            web::post().to(submit_assignment),
+            web::post().to(submit_assignment::<Service>),
         )
         .service(
             web::resource("/{course_id}/classes/{class_id}/assignments/scores")

@@ -3,28 +3,18 @@ use futures::{StreamExt, TryStreamExt};
 use isucholar_core::models::assignment_path::AssignmentPath;
 use isucholar_core::models::class::ClassID;
 use isucholar_core::models::course::CourseID;
-use isucholar_core::models::course_status::CourseStatus;
-use isucholar_core::models::submission::CreateSubmission;
-use isucholar_core::repos::class_repository::ClassRepository;
-use isucholar_core::repos::course_repository::CourseRepository;
-use isucholar_core::repos::registration_repository::RegistrationRepository;
-use isucholar_core::repos::submission_repository::SubmissionRepository;
-use isucholar_core::storages::submission_file_storage::SubmissionFileStorage;
+use isucholar_core::services::error::Error;
+use isucholar_core::services::submission_service::{HaveSubmissionService, SubmissionService};
 use isucholar_http_core::responses::error::ResponseError::{
     ClassNotFound, CourseIsNotInProgress, CourseNotFound, InvalidFile, RegistrationAlready,
     SubmissionClosed,
 };
 use isucholar_http_core::responses::error::ResponseResult;
 use isucholar_http_core::routes::util::get_user_info;
-use isucholar_infra::repos::class_repository::ClassRepositoryInfra;
-use isucholar_infra::repos::course_repository::CourseRepositoryInfra;
-use isucholar_infra::repos::registration_repository::RegistrationRepositoryInfra;
-use isucholar_infra::repos::submission_repository::SubmissionRepositoryInfra;
-use isucholar_infra::storages::submission_file_storage::SubmissionFileStorageInfra;
 
 // POST /api/courses/{course_id}/classes/{class_id}/assignments 課題の提出
-pub async fn submit_assignment(
-    pool: web::Data<sqlx::MySqlPool>,
+pub async fn submit_assignment<Service: HaveSubmissionService>(
+    service: web::Data<Service>,
     session: actix_session::Session,
     path: web::Path<AssignmentPath>,
     mut payload: actix_multipart::Multipart,
@@ -61,59 +51,20 @@ pub async fn submit_assignment(
         .try_concat()
         .await?;
 
-    let mut tx = pool.begin().await?;
-    let course_repo = CourseRepositoryInfra {};
-    let status = course_repo
-        .find_status_for_share_lock_by_id(&mut tx, &course_id)
-        .await?;
-    if let Some(status) = status {
-        if status != CourseStatus::InProgress {
-            return Err(CourseIsNotInProgress);
-        }
-    } else {
-        return Err(CourseNotFound);
+    let result = service
+        .submission_service()
+        .create_or_update(&user_id, &course_id, &class_id, &file_name, &mut data)
+        .await;
+
+    match result {
+        Ok(_) => Ok(HttpResponse::NoContent().finish()),
+        Err(e) => match e {
+            Error::CourseIsNotInProgress => Err(CourseIsNotInProgress),
+            Error::CourseNotFound => Err(CourseNotFound),
+            Error::RegistrationAlready => Err(RegistrationAlready),
+            Error::SubmissionClosed => Err(SubmissionClosed),
+            Error::ClassNotFound => Err(ClassNotFound),
+            _ => Err(e.into()),
+        },
     }
-
-    let registration_repo = RegistrationRepositoryInfra {};
-
-    let is_registered = registration_repo
-        .exist_by_user_id_and_course_id(&mut tx, &user_id, &course_id)
-        .await?;
-    if is_registered {
-        return Err(RegistrationAlready);
-    }
-
-    let class_repo = ClassRepositoryInfra {};
-    let submission_closed = class_repo
-        .find_submission_closed_by_id_with_shared_lock(&mut tx, &class_id)
-        .await?;
-
-    if let Some(submission_closed) = submission_closed {
-        if submission_closed {
-            return Err(SubmissionClosed);
-        }
-    } else {
-        return Err(ClassNotFound);
-    }
-
-    let submission_repo = SubmissionRepositoryInfra {};
-    submission_repo
-        .create_or_update(
-            &mut tx,
-            &CreateSubmission {
-                file_name: file_name,
-                user_id: user_id.clone(),
-                class_id: class_id.clone(),
-            },
-        )
-        .await?;
-
-    let submission_file_storage = SubmissionFileStorageInfra::new();
-    submission_file_storage
-        .upload(&class_id, &user_id, &mut data)
-        .await?;
-
-    tx.commit().await?;
-
-    Ok(HttpResponse::NoContent().finish())
 }
