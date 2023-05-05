@@ -1,6 +1,6 @@
 use crate::models::class::ClassID;
 use crate::models::user::{UserCode, UserID};
-use fake::{Dummy, Fake};
+use fake::Dummy;
 
 #[derive(Debug, Dummy)]
 pub struct CreateSubmission {

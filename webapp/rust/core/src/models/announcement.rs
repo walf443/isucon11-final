@@ -1,5 +1,5 @@
 use crate::models::course::CourseID;
-use fake::{Dummy, Fake};
+use fake::Dummy;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, sqlx::FromRow, PartialEq, Eq, Dummy)]

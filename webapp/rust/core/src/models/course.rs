@@ -2,7 +2,7 @@ use crate::models::course_status::CourseStatus;
 use crate::models::course_type::CourseType;
 use crate::models::day_of_week::DayOfWeek;
 use crate::models::user::UserID;
-use fake::{Dummy, Fake};
+use fake::Dummy;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, sqlx::FromRow, PartialEq, Eq, Dummy)]
