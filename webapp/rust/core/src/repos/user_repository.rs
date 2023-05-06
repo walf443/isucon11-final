@@ -3,6 +3,7 @@ use crate::models::user::{User, UserCode, UserID};
 use crate::repos::error::Result;
 use async_trait::async_trait;
 
+#[cfg_attr(any(test, feature = "test"), mockall::automock)]
 #[async_trait]
 pub trait UserRepository {
     async fn find(&self, conn: &mut DBConn, id: &UserID) -> Result<User>;

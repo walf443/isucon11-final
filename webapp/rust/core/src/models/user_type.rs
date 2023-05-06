@@ -4,7 +4,7 @@ use sqlx::encode::IsNull;
 use sqlx::error::BoxDynError;
 use sqlx::{Database, Decode, Encode};
 
-#[derive(Debug, PartialEq, Eq, Dummy)]
+#[derive(Debug, Clone, PartialEq, Eq, Dummy)]
 pub enum UserType {
     Student,
     Teacher,

@@ -2,7 +2,7 @@ use crate::models::course::CourseID;
 use fake::Dummy;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, sqlx::FromRow, PartialEq, Eq, Dummy)]
+#[derive(Debug, Clone, sqlx::FromRow, PartialEq, Eq, Dummy)]
 pub struct Announcement {
     pub id: AnnouncementID,
     pub course_id: CourseID,

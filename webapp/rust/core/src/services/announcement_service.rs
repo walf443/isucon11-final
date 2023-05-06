@@ -11,6 +11,8 @@ use crate::services::error::Result;
 use crate::services::HaveDBPool;
 use async_trait::async_trait;
 
+mod create;
+
 #[cfg_attr(any(test, feature = "test"), mockall::automock)]
 #[async_trait]
 pub trait AnnouncementService: Sync {
@@ -94,3 +96,6 @@ impl<S: AnnouncementServiceImpl> AnnouncementService for S {
         AnnouncementServiceImpl::create(self, announcement).await
     }
 }
+
+#[cfg(test)]
+mod tests {}

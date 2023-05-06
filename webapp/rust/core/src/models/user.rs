@@ -2,7 +2,7 @@ use crate::models::user_type::UserType;
 use fake::Dummy;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, sqlx::FromRow, PartialEq, Eq, Dummy)]
+#[derive(Debug, Clone, sqlx::FromRow, PartialEq, Eq, Dummy)]
 pub struct User {
     pub id: UserID,
     pub code: UserCode,

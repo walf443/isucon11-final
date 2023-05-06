@@ -3,6 +3,7 @@ use crate::models::announcement::{Announcement, AnnouncementID};
 use crate::repos::error::Result;
 use async_trait::async_trait;
 
+#[cfg_attr(any(test, feature = "test"), mockall::automock)]
 #[async_trait]
 pub trait AnnouncementRepository {
     async fn create(&self, conn: &mut DBConn, announcement: &Announcement) -> Result<()>;

@@ -4,6 +4,7 @@ use crate::models::user::UserID;
 use crate::repos::error::Result;
 use async_trait::async_trait;
 
+#[cfg_attr(any(test, feature = "test"), mockall::automock)]
 #[async_trait]
 pub trait RegistrationCourseRepository {
     async fn find_courses_by_user_id(
