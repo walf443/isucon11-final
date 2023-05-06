@@ -1,15 +1,17 @@
 #[cfg(test)]
 mod tests {
+    use crate::db::get_test_db_conn;
     use crate::models::user::UserID;
     use crate::repos::error::ReposError::TestError;
-    use crate::services::unread_announcement_service::tests::S;
+    use crate::repos::manager::tests::MockRepositoryManager;
     use crate::services::unread_announcement_service::UnreadAnnouncementServiceImpl;
     use fake::{Fake, Faker};
 
     #[tokio::test]
     #[should_panic(expected = "ReposError(TestError)")]
     async fn find_unread_announcements_by_user_id_failed() -> () {
-        let mut service = S::new().await;
+        let db_pool = get_test_db_conn().await.unwrap();
+        let mut service = MockRepositoryManager::new(db_pool);
         let user_id: UserID = Faker.fake();
 
         service
@@ -26,7 +28,8 @@ mod tests {
     #[tokio::test]
     #[should_panic(expected = "ReposError(TestError)")]
     async fn count_unread_by_user_id_failed() -> () {
-        let mut service = S::new().await;
+        let db_pool = get_test_db_conn().await.unwrap();
+        let mut service = MockRepositoryManager::new(db_pool);
         let user_id: UserID = Faker.fake();
 
         service
@@ -48,7 +51,8 @@ mod tests {
     }
     #[tokio::test]
     async fn success_case() -> () {
-        let mut service = S::new().await;
+        let db_pool = get_test_db_conn().await.unwrap();
+        let mut service = MockRepositoryManager::new(db_pool);
         let user_id: UserID = Faker.fake();
 
         service

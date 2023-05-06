@@ -1,19 +1,21 @@
 #[cfg(test)]
 mod tests {
+    use crate::db::get_test_db_conn;
     use crate::models::announcement::AnnouncementID;
     use crate::models::announcement_detail::AnnouncementDetail;
     use crate::models::course::CourseID;
     use crate::models::user::UserID;
     use crate::repos::error::ReposError::TestError;
+    use crate::repos::manager::tests::MockRepositoryManager;
     use crate::services::error::Result;
-    use crate::services::unread_announcement_service::tests::S;
     use crate::services::unread_announcement_service::UnreadAnnouncementServiceImpl;
     use fake::{Fake, Faker};
 
     #[tokio::test]
     #[should_panic(expected = "ReposError(TestError)")]
     async fn find_announcement_detail_by_announcement_id_and_user_id_err() -> () {
-        let mut service = S::new().await;
+        let db_pool = get_test_db_conn().await.unwrap();
+        let mut service = MockRepositoryManager::new(db_pool);
         service
             .unread_announcement_repo
             .expect_find_announcement_detail_by_announcement_id_and_user_id()
@@ -31,7 +33,8 @@ mod tests {
     #[tokio::test]
     #[should_panic(expected = "AnnouncementNotFound")]
     async fn find_announcement_detail_by_announcement_id_and_user_id_none() -> () {
-        let mut service = S::new().await;
+        let db_pool = get_test_db_conn().await.unwrap();
+        let mut service = MockRepositoryManager::new(db_pool);
         service
             .unread_announcement_repo
             .expect_find_announcement_detail_by_announcement_id_and_user_id()
@@ -48,7 +51,8 @@ mod tests {
     #[tokio::test]
     #[should_panic(expected = "ReposError(TestError)")]
     async fn exist_by_user_id_and_course_id_err() -> () {
-        let mut service = S::new().await;
+        let db_pool = get_test_db_conn().await.unwrap();
+        let mut service = MockRepositoryManager::new(db_pool);
 
         let aid: AnnouncementID = Faker.fake();
         let user_id: UserID = Faker.fake();
@@ -84,7 +88,8 @@ mod tests {
         let aid: AnnouncementID = Faker.fake();
         let user_id: UserID = Faker.fake();
 
-        let mut service = S::new().await;
+        let db_pool = get_test_db_conn().await.unwrap();
+        let mut service = MockRepositoryManager::new(db_pool);
         service
             .unread_announcement_repo
             .expect_find_announcement_detail_by_announcement_id_and_user_id()
@@ -116,7 +121,8 @@ mod tests {
         let aid: AnnouncementID = Faker.fake();
         let user_id: UserID = Faker.fake();
 
-        let mut service = S::new().await;
+        let db_pool = get_test_db_conn().await.unwrap();
+        let mut service = MockRepositoryManager::new(db_pool);
         service
             .unread_announcement_repo
             .expect_find_announcement_detail_by_announcement_id_and_user_id()
@@ -152,7 +158,8 @@ mod tests {
         let aid: AnnouncementID = Faker.fake();
         let user_id: UserID = Faker.fake();
 
-        let mut service = S::new().await;
+        let db_pool = get_test_db_conn().await.unwrap();
+        let mut service = MockRepositoryManager::new(db_pool);
         let expected = AnnouncementDetail {
             id: AnnouncementID::new("aid".to_string()),
             course_id: CourseID::new("course_id".to_string()),

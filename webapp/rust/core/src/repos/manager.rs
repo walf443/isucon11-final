@@ -42,6 +42,7 @@ pub(crate) mod tests {
     };
     use crate::repos::user_repository::{HaveUserRepository, MockUserRepository};
     use crate::services::announcement_service::AnnouncementServiceImpl;
+    use crate::services::unread_announcement_service::UnreadAnnouncementServiceImpl;
     use crate::services::HaveDBPool;
 
     pub struct MockRepositoryManager {
@@ -74,6 +75,7 @@ pub(crate) mod tests {
 
     impl RepositoryManager for MockRepositoryManager {}
     impl AnnouncementServiceImpl for MockRepositoryManager {}
+    impl UnreadAnnouncementServiceImpl for MockRepositoryManager {}
 
     impl HaveDBPool for MockRepositoryManager {
         fn get_db_pool(&self) -> &DBPool {
