@@ -68,7 +68,7 @@ pub struct CourseWithTeacher {
     pub teacher: String,
 }
 
-#[derive(Debug, serde::Deserialize)]
+#[derive(Debug, serde::Deserialize, Dummy)]
 pub struct CreateCourse {
     pub id: CourseID,
     pub user_id: UserID,

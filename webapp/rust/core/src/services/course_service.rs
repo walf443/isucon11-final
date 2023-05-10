@@ -11,6 +11,8 @@ use crate::services::error::Result;
 use crate::services::HaveDBPool;
 use async_trait::async_trait;
 
+mod create;
+
 #[cfg_attr(any(test, feature = "test"), mockall::automock)]
 #[async_trait]
 pub trait CourseService: Sync {

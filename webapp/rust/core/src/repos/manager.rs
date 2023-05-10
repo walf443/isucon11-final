@@ -42,6 +42,7 @@ pub(crate) mod tests {
     };
     use crate::repos::user_repository::{HaveUserRepository, MockUserRepository};
     use crate::services::announcement_service::AnnouncementServiceImpl;
+    use crate::services::course_service::CourseServiceImpl;
     use crate::services::unread_announcement_service::UnreadAnnouncementServiceImpl;
     use crate::services::HaveDBPool;
 
@@ -75,6 +76,7 @@ pub(crate) mod tests {
 
     impl RepositoryManager for MockRepositoryManager {}
     impl AnnouncementServiceImpl for MockRepositoryManager {}
+    impl CourseServiceImpl for MockRepositoryManager {}
     impl UnreadAnnouncementServiceImpl for MockRepositoryManager {}
 
     impl HaveDBPool for MockRepositoryManager {
