@@ -21,7 +21,7 @@ pub struct SearchCoursesQuery {
 #[cfg_attr(any(test, feature = "test"), mockall::automock)]
 #[async_trait]
 pub trait CourseRepository {
-    async fn create(&self, pool: &DBPool, course: &CreateCourse) -> Result<CourseID>;
+    async fn create(&self, conn: &mut DBConn, req: &CreateCourse) -> Result<CourseID>;
     async fn find_all_with_teacher(
         &self,
         pool: &DBPool,

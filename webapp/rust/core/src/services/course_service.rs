@@ -2,6 +2,7 @@ use crate::models::course::{Course, CourseID, CourseWithTeacher, CreateCourse};
 use crate::models::course_status::CourseStatus;
 use crate::models::user::{User, UserID};
 use crate::repos::course_repository::{CourseRepository, HaveCourseRepository, SearchCoursesQuery};
+use crate::repos::error::ReposError;
 use crate::repos::registration_course_repository::{
     HaveRegistrationCourseRepository, RegistrationCourseRepository,
 };
@@ -40,12 +41,34 @@ pub trait HaveCourseService {
 pub trait CourseServiceImpl:
     Sync + HaveDBPool + HaveUserRepository + HaveCourseRepository + HaveRegistrationCourseRepository
 {
-    async fn create(&self, course: &CreateCourse) -> Result<CourseID> {
+    async fn create(&self, req: &CreateCourse) -> Result<CourseID> {
         let db_pool = self.get_db_pool();
+        let mut conn = db_pool.acquire().await?;
 
-        let course_id = self.course_repo().create(&db_pool, course).await?;
+        let course_repo = self.course_repo();
+        let result = course_repo.create(&mut conn, req).await;
+        match result {
+            Ok(course_id) => Ok(course_id),
+            Err(e) => match e {
+                ReposError::CourseDuplicate => {
+                    let course = course_repo.find_by_code(&mut conn, &req.code).await?;
 
-        Ok(course_id)
+                    if req.type_ != course.type_
+                        || req.name != course.name
+                        || req.description != course.description
+                        || req.credit != course.credit as i64
+                        || req.period != course.period as i64
+                        || req.day_of_week != course.day_of_week
+                        || req.keywords != course.keywords
+                    {
+                        return Err(e.into());
+                    } else {
+                        return Ok(course.id.clone());
+                    }
+                }
+                _ => Err(e.into()),
+            },
+        }
     }
 
     async fn update_status_by_id(&self, course_id: &CourseID, status: &CourseStatus) -> Result<()> {

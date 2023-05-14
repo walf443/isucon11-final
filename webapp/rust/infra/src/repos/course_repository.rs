@@ -32,7 +32,7 @@ pub struct CourseRepositoryInfra {}
 
 #[async_trait]
 impl CourseRepository for CourseRepositoryInfra {
-    async fn create(&self, pool: &DBPool, req: &CreateCourse) -> Result<CourseID> {
+    async fn create(&self, conn: &mut DBConn, req: &CreateCourse) -> Result<CourseID> {
         let result = sqlx::query!(
             "INSERT INTO `courses` (`id`, `code`, `type`, `name`, `description`, `credit`, `period`, `day_of_week`, `teacher_id`, `keywords`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             &req.id,
@@ -46,7 +46,7 @@ impl CourseRepository for CourseRepositoryInfra {
             &req.user_id,
             &req.keywords,
         )
-            .execute(pool)
+            .execute(conn)
             .await;
 
         if let Err(sqlx::Error::Database(ref db_error)) = result {
@@ -54,21 +54,7 @@ impl CourseRepository for CourseRepositoryInfra {
                 db_error.try_downcast_ref::<sqlx::mysql::MySqlDatabaseError>()
             {
                 if mysql_error.number() == MYSQL_ERR_NUM_DUPLICATE_ENTRY {
-                    let mut conn = pool.acquire().await?;
-                    let course = self.find_by_code(&mut conn, &req.code).await?;
-
-                    if req.type_ != course.type_
-                        || req.name != course.name
-                        || req.description != course.description
-                        || req.credit != course.credit as i64
-                        || req.period != course.period as i64
-                        || req.day_of_week != course.day_of_week
-                        || req.keywords != course.keywords
-                    {
-                        return Err(ReposError::CourseDuplicate);
-                    } else {
-                        return Ok(course.id.clone());
-                    }
+                    return Err(ReposError::CourseDuplicate);
                 }
             }
         }
