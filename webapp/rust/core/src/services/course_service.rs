@@ -56,8 +56,8 @@ pub trait CourseServiceImpl:
                     if req.type_ != course.type_
                         || req.name != course.name
                         || req.description != course.description
-                        || req.credit != course.credit as i64
-                        || req.period != course.period as i64
+                        || req.credit != course.credit
+                        || req.period != course.period
                         || req.day_of_week != course.day_of_week
                         || req.keywords != course.keywords
                     {

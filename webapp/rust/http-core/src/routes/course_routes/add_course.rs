@@ -15,8 +15,8 @@ pub struct AddCourseRequest {
     type_: CourseType,
     name: String,
     description: String,
-    credit: i64,
-    period: i64,
+    credit: u8,
+    period: u8,
     day_of_week: DayOfWeek,
     keywords: String,
 }

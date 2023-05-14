@@ -4,7 +4,7 @@ use sqlx::encode::IsNull;
 use sqlx::error::BoxDynError;
 use sqlx::{Database, Decode, Encode};
 
-#[derive(Debug, PartialEq, Eq, serde::Serialize, serde::Deserialize, Dummy)]
+#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize, Dummy)]
 #[serde(rename_all = "kebab-case")]
 pub enum CourseStatus {
     Registration,

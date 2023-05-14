@@ -5,7 +5,7 @@ use crate::models::user::UserID;
 use fake::Dummy;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, sqlx::FromRow, PartialEq, Eq, Dummy)]
+#[derive(Debug, Clone, sqlx::FromRow, PartialEq, Eq, Dummy)]
 pub struct Course {
     pub id: CourseID,
     pub code: CourseCode,
@@ -77,8 +77,8 @@ pub struct CreateCourse {
     pub type_: CourseType,
     pub name: String,
     pub description: String,
-    pub credit: i64,
-    pub period: i64,
+    pub credit: u8,
+    pub period: u8,
     pub day_of_week: DayOfWeek,
     pub keywords: String,
 }
