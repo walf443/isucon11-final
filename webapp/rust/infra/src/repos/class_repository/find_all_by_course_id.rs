@@ -4,19 +4,18 @@ use isucholar_core::db::get_test_db_conn;
 use isucholar_core::models::class::Class;
 use isucholar_core::models::course::CourseID;
 use isucholar_core::repos::class_repository::ClassRepository;
+use sqlx::Acquire;
 
 #[tokio::test]
 async fn empty_case() {
     let db_pool = get_test_db_conn().await.unwrap();
     let mut tx = db_pool.begin().await.unwrap();
+    let conn = tx.acquire().await.unwrap();
 
     let course_id: CourseID = Faker.fake();
 
     let repo = ClassRepositoryInfra {};
-    let got = repo
-        .find_all_by_course_id(&mut tx, &course_id)
-        .await
-        .unwrap();
+    let got = repo.find_all_by_course_id(conn, &course_id).await.unwrap();
     assert_eq!(got.len(), 0);
 }
 
@@ -24,11 +23,14 @@ async fn empty_case() {
 async fn success_case() {
     let db_pool = get_test_db_conn().await.unwrap();
     let mut tx = db_pool.begin().await.unwrap();
+    let conn = tx.acquire().await.unwrap();
+
     sqlx::query!("SET foreign_key_checks=0")
-        .execute(&mut tx)
+        .execute(conn)
         .await
         .unwrap();
     let class: Class = Faker.fake();
+    let conn = tx.acquire().await.unwrap();
     sqlx::query!("INSERT INTO classes (id, course_id, part, title, description, submission_closed) VALUES (?,?,?,?,?,?)",
         &class.id,
         &class.course_id,
@@ -36,11 +38,12 @@ async fn success_case() {
         &class.title,
         &class.description,
         &class.submission_closed,
-    ).execute(&mut tx).await.unwrap();
+    ).execute(conn).await.unwrap();
 
     let repo = ClassRepositoryInfra {};
+    let conn = tx.acquire().await.unwrap();
     let got = repo
-        .find_all_by_course_id(&mut tx, &class.course_id)
+        .find_all_by_course_id(conn, &class.course_id)
         .await
         .unwrap();
     assert_eq!(got.len(), 1);

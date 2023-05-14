@@ -3,16 +3,18 @@ use fake::{Fake, Faker};
 use isucholar_core::db::get_test_db_conn;
 use isucholar_core::models::user::User;
 use isucholar_core::repos::user_repository::UserRepository;
+use sqlx::Acquire;
 
 #[tokio::test]
 async fn empty_case() {
     let pool = get_test_db_conn().await.unwrap();
     let mut tx = pool.begin().await.unwrap();
+    let conn = tx.acquire().await.unwrap();
 
     let user: User = Faker.fake();
 
     let repo = UserRepositoryInfra {};
-    let got = repo.find_code_by_id(&mut tx, &user.id).await.unwrap();
+    let got = repo.find_code_by_id(conn, &user.id).await.unwrap();
     assert_eq!(got.is_none(), true);
 }
 
@@ -20,6 +22,7 @@ async fn empty_case() {
 async fn success_case() {
     let pool = get_test_db_conn().await.unwrap();
     let mut tx = pool.begin().await.unwrap();
+    let conn = tx.acquire().await.unwrap();
 
     let mut user: User = Faker.fake();
     user.hashed_password.resize(60, 0);
@@ -31,16 +34,13 @@ async fn success_case() {
         &user.hashed_password,
         &user.type_
     )
-    .execute(&mut tx)
+    .execute(conn)
     .await
     .unwrap();
 
     let repo = UserRepositoryInfra {};
-    let got = repo
-        .find_code_by_id(&mut tx, &user.id)
-        .await
-        .unwrap()
-        .unwrap();
+    let conn = tx.acquire().await.unwrap();
+    let got = repo.find_code_by_id(conn, &user.id).await.unwrap().unwrap();
 
     assert_eq!(got, user.code);
 }

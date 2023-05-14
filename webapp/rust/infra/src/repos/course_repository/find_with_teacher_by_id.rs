@@ -5,17 +5,19 @@ use isucholar_core::models::course::{Course, CourseID};
 use isucholar_core::models::user::User;
 use isucholar_core::models::user_type::UserType::Teacher;
 use isucholar_core::repos::course_repository::CourseRepository;
+use sqlx::Acquire;
 
 #[tokio::test]
 async fn empty_case() {
     let db_pool = get_test_db_conn().await.unwrap();
     let mut tx = db_pool.begin().await.unwrap();
+    let conn = tx.acquire().await.unwrap();
 
     let course_id: CourseID = Faker.fake();
 
     let repo = CourseRepositoryInfra {};
     let got = repo
-        .find_with_teacher_by_id(&mut tx, &course_id)
+        .find_with_teacher_by_id(conn, &course_id)
         .await
         .unwrap();
     assert_eq!(got.is_none(), true);
@@ -25,6 +27,8 @@ async fn empty_case() {
 async fn success_case() {
     let db_pool = get_test_db_conn().await.unwrap();
     let mut tx = db_pool.begin().await.unwrap();
+    let conn = tx.acquire().await.unwrap();
+
     let mut teacher: User = Faker.fake();
     teacher.type_ = Teacher;
 
@@ -36,12 +40,13 @@ async fn success_case() {
         &teacher.hashed_password,
         &teacher.type_,
     )
-    .execute(&mut tx)
+    .execute(conn)
     .await
     .unwrap();
 
     let mut course: Course = Faker.fake();
     course.teacher_id = teacher.id.clone();
+    let conn = tx.acquire().await.unwrap();
 
     sqlx::query!("INSERT INTO courses (id, code, type, name, description, credit, period, day_of_week, teacher_id, keywords, status) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
         &course.id,
@@ -55,11 +60,12 @@ async fn success_case() {
         &course.teacher_id,
         &course.keywords,
         &course.status,
-    ).execute(&mut tx).await.unwrap();
+    ).execute(conn).await.unwrap();
 
     let repo = CourseRepositoryInfra {};
+    let conn = tx.acquire().await.unwrap();
     let got = repo
-        .find_with_teacher_by_id(&mut tx, &course.id)
+        .find_with_teacher_by_id(conn, &course.id)
         .await
         .unwrap()
         .unwrap();

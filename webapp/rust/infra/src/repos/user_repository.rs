@@ -101,7 +101,7 @@ impl UserRepository for UserRepositoryInfra {
                 .fetch(conn);
             let mut gpas = Vec::new();
             while let Some(row) = rows.next().await {
-                let gpa: sqlx::types::Decimal = row?.unwrap();
+                let gpa: sqlx::types::BigDecimal = row?.unwrap();
                 gpas.push(gpa.to_f64().unwrap());
             }
 

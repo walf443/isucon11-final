@@ -3,16 +3,20 @@ use fake::{Fake, Faker};
 use isucholar_core::db::get_test_db_conn;
 use isucholar_core::models::course::{Course, CourseID};
 use isucholar_core::repos::course_repository::CourseRepository;
+use sqlx::Acquire;
 
 #[tokio::test]
 async fn true_case() {
     let db_pool = get_test_db_conn().await.unwrap();
     let mut tx = db_pool.begin().await.unwrap();
+    let conn = tx.acquire().await.unwrap();
+
     sqlx::query!("SET foreign_key_checks=0")
-        .execute(&mut tx)
+        .execute(conn)
         .await
         .unwrap();
     let course: Course = Faker.fake();
+    let conn = tx.acquire().await.unwrap();
 
     sqlx::query!("INSERT INTO courses (id, code, type, name, description, credit, period, day_of_week, teacher_id, keywords, status) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
         &course.id,
@@ -26,10 +30,11 @@ async fn true_case() {
         &course.teacher_id,
         &course.keywords,
         &course.status,
-    ).execute(&mut tx).await.unwrap();
+    ).execute(conn).await.unwrap();
 
     let repo = CourseRepositoryInfra {};
-    let got = repo.exist_by_id(&mut tx, &course.id.clone()).await.unwrap();
+    let conn = tx.acquire().await.unwrap();
+    let got = repo.exist_by_id(conn, &course.id.clone()).await.unwrap();
     assert_eq!(got, true)
 }
 
@@ -37,10 +42,11 @@ async fn true_case() {
 async fn false_case() {
     let db_pool = get_test_db_conn().await.unwrap();
     let mut tx = db_pool.begin().await.unwrap();
+    let conn = tx.acquire().await.unwrap();
 
     let course_id: CourseID = Faker.fake();
 
     let repo = CourseRepositoryInfra {};
-    let got = repo.exist_by_id(&mut tx, &course_id).await.unwrap();
+    let got = repo.exist_by_id(conn, &course_id).await.unwrap();
     assert_eq!(got, false)
 }

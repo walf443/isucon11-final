@@ -4,30 +4,34 @@ use isucholar_core::db::get_test_db_conn;
 use isucholar_core::models::course::CourseID;
 use isucholar_core::models::user::UserID;
 use isucholar_core::repos::registration_repository::RegistrationRepository;
+use sqlx::Acquire;
 
 #[tokio::test]
 async fn insert_case() {
     let db_pool = get_test_db_conn().await.unwrap();
     let mut tx = db_pool.begin().await.unwrap();
+    let conn = tx.acquire().await.unwrap();
 
     sqlx::query!("SET foreign_key_checks=0")
-        .execute(&mut tx)
+        .execute(conn)
         .await
         .unwrap();
 
     let user_id: UserID = Faker.fake();
     let course_id: CourseID = Faker.fake();
     let repo = RegistrationRepositoryInfra {};
-    repo.create_or_update(&mut tx, &user_id, &course_id)
+    let conn = tx.acquire().await.unwrap();
+    repo.create_or_update(conn, &user_id, &course_id)
         .await
         .unwrap();
 
+    let conn = tx.acquire().await.unwrap();
     let row_count = sqlx::query_scalar!(
         "SELECT COUNT(*) FROM registrations WHERE user_id = ? AND course_id = ?",
         &user_id,
         &course_id
     )
-    .fetch_one(&mut tx)
+    .fetch_one(conn)
     .await
     .unwrap();
 
@@ -38,29 +42,33 @@ async fn insert_case() {
 async fn update_case() {
     let db_pool = get_test_db_conn().await.unwrap();
     let mut tx = db_pool.begin().await.unwrap();
+    let conn = tx.acquire().await.unwrap();
 
     sqlx::query!("SET foreign_key_checks=0")
-        .execute(&mut tx)
+        .execute(conn)
         .await
         .unwrap();
 
     let user_id: UserID = Faker.fake();
     let course_id: CourseID = Faker.fake();
     let repo = RegistrationRepositoryInfra {};
-    repo.create_or_update(&mut tx, &user_id, &course_id)
+    let conn = tx.acquire().await.unwrap();
+    repo.create_or_update(conn, &user_id, &course_id)
         .await
         .unwrap();
 
-    repo.create_or_update(&mut tx, &user_id, &course_id)
+    let conn = tx.acquire().await.unwrap();
+    repo.create_or_update(conn, &user_id, &course_id)
         .await
         .unwrap();
 
+    let conn = tx.acquire().await.unwrap();
     let row_count = sqlx::query_scalar!(
         "SELECT COUNT(*) FROM registrations WHERE user_id = ? AND course_id = ?",
         &user_id,
         &course_id
     )
-    .fetch_one(&mut tx)
+    .fetch_one(conn)
     .await
     .unwrap();
 

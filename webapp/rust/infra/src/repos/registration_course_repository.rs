@@ -108,7 +108,7 @@ impl RegistrationCourseRepository for RegistrationCourseRepositoryInfra {
             .fetch(conn);
         let mut totals = Vec::new();
         while let Some(row) = rows.next().await {
-            let total_score: sqlx::types::Decimal = row?;
+            let total_score: sqlx::types::BigDecimal = row?;
             totals.push(total_score.to_i64().unwrap());
         }
 

@@ -5,17 +5,19 @@ use isucholar_core::models::class::Class;
 use isucholar_core::models::course::{Course, CourseID};
 use isucholar_core::models::user::User;
 use isucholar_core::repos::registration_course_repository::RegistrationCourseRepository;
+use sqlx::Acquire;
 
 #[tokio::test]
 async fn empty_case() {
     let db_pool = get_test_db_conn().await.unwrap();
     let mut tx = db_pool.begin().await.unwrap();
+    let conn = tx.acquire().await.unwrap();
 
     let course_id: CourseID = Faker.fake();
 
     let repo = RegistrationCourseRepositoryInfra {};
     let scores = repo
-        .find_total_scores_by_course_id_group_by_user_id(&mut tx, &course_id)
+        .find_total_scores_by_course_id_group_by_user_id(conn, &course_id)
         .await
         .unwrap();
     assert_eq!(scores.len(), 0);
@@ -25,13 +27,15 @@ async fn empty_case() {
 async fn success_case() {
     let db_pool = get_test_db_conn().await.unwrap();
     let mut tx = db_pool.begin().await.unwrap();
+    let conn = tx.acquire().await.unwrap();
 
     sqlx::query!("SET foreign_key_checks=0")
-        .execute(&mut tx)
+        .execute(conn)
         .await
         .unwrap();
 
     let course: Course = Faker.fake();
+    let conn = tx.acquire().await.unwrap();
 
     sqlx::query!("INSERT INTO courses (id, code, type, name, description, credit, period, day_of_week, teacher_id, keywords, status) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
         &course.id,
@@ -45,9 +49,10 @@ async fn success_case() {
         &course.teacher_id,
         &course.keywords,
         &course.status,
-    ).execute(&mut tx).await.unwrap();
+    ).execute(conn).await.unwrap();
 
     let user: User = Faker.fake();
+    let conn = tx.acquire().await.unwrap();
     sqlx::query!(
         "INSERT INTO users (id, code, name, hashed_password, type) VALUES (?, ?, ?, ?, ?)",
         &user.id,
@@ -56,21 +61,23 @@ async fn success_case() {
         &user.hashed_password,
         &user.type_,
     )
-    .execute(&mut tx)
+    .execute(conn)
     .await
     .unwrap();
 
+    let conn = tx.acquire().await.unwrap();
     sqlx::query!(
         "INSERT INTO registrations (course_id, user_id) VALUES (?, ?)",
         &course.id,
         &user.id,
     )
-    .execute(&mut tx)
+    .execute(conn)
     .await
     .unwrap();
 
     let mut class: Class = Faker.fake();
     class.course_id = course.id.clone();
+    let conn = tx.acquire().await.unwrap();
     sqlx::query!(
         "INSERT INTO classes (id, course_id, part, title, description, submission_closed) VALUES (?, ?, ?, ?, ?, ?)",
         &class.id,
@@ -79,8 +86,9 @@ async fn success_case() {
         &class.title,
         &class.description,
         &class.submission_closed,
-    ).execute(&mut tx).await.unwrap();
+    ).execute(conn).await.unwrap();
 
+    let conn = tx.acquire().await.unwrap();
     sqlx::query!(
         "INSERT INTO submissions (user_id, class_id, file_name, score) VALUES (?, ?, ?, ?)",
         &user.id,
@@ -88,13 +96,14 @@ async fn success_case() {
         "file_name",
         100,
     )
-    .execute(&mut tx)
+    .execute(conn)
     .await
     .unwrap();
 
     let repo = RegistrationCourseRepositoryInfra {};
+    let conn = tx.acquire().await.unwrap();
     let scores = repo
-        .find_total_scores_by_course_id_group_by_user_id(&mut tx, &course.id)
+        .find_total_scores_by_course_id_group_by_user_id(conn, &course.id)
         .await
         .unwrap();
     assert_eq!(scores.len(), 1);
