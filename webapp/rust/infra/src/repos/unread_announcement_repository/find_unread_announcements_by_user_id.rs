@@ -75,7 +75,6 @@ async fn record_exist_case() {
     .await
     .unwrap();
 
-    let conn = tx.acquire().await.unwrap();
     let announcements = repo
         .find_unread_announcements_by_user_id(&mut tx, &user_id, 10, 0, None)
         .await
