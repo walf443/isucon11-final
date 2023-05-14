@@ -17,7 +17,7 @@ pub struct AnnouncementRepositoryInfra {}
 
 #[async_trait]
 impl AnnouncementRepository for AnnouncementRepositoryInfra {
-    async fn create(&self, tx: &mut DBConn, req: &Announcement) -> Result<()> {
+    async fn create(&self, conn: &mut DBConn, req: &Announcement) -> Result<()> {
         let result = sqlx::query!(
             "INSERT INTO `announcements` (`id`, `course_id`, `title`, `message`) VALUES (?, ?, ?, ?)",
             &req.id,
@@ -25,7 +25,7 @@ impl AnnouncementRepository for AnnouncementRepositoryInfra {
             &req.title,
             &req.message,
         )
-            .execute(tx)
+            .execute(conn)
             .await;
 
         if let Err(e) = result {
