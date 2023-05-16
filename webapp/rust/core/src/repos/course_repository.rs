@@ -4,8 +4,9 @@ use crate::models::course_status::CourseStatus;
 use crate::models::day_of_week::DayOfWeek;
 use crate::repos::error::Result;
 use async_trait::async_trait;
+use fake::Dummy;
 
-#[derive(Debug, serde::Deserialize, serde::Serialize)]
+#[derive(Debug, Clone, serde::Deserialize, PartialEq, Eq, serde::Serialize, Dummy)]
 pub struct SearchCoursesQuery {
     #[serde(rename = "type")]
     pub type_: Option<String>,

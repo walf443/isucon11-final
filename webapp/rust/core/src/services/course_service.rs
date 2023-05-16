@@ -13,6 +13,7 @@ use crate::services::HaveDBPool;
 use async_trait::async_trait;
 
 mod create;
+mod find_all_with_teacher;
 mod update_status_by_id;
 
 #[cfg_attr(any(test, feature = "test"), mockall::automock)]
