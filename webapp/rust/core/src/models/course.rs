@@ -49,7 +49,7 @@ impl CourseCode {
     }
 }
 
-#[derive(Debug, sqlx::FromRow, serde::Serialize, Dummy)]
+#[derive(Debug, Clone, PartialEq, Eq, sqlx::FromRow, serde::Serialize, Dummy)]
 pub struct CourseWithTeacher {
     pub id: CourseID,
     pub code: CourseCode,
