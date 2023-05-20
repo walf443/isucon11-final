@@ -45,7 +45,7 @@ impl CourseRepository for CourseRepositoryInfra {
             &req.credit,
             &req.period,
             &req.day_of_week,
-            &req.user_id,
+            &req.teacher_id,
             &req.keywords,
         )
             .execute(conn)

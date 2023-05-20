@@ -60,7 +60,7 @@ async fn success_case() {
     assert_eq!(got.day_of_week, course.day_of_week);
     assert_eq!(got.keywords, course.keywords);
     assert_eq!(got.status, CourseStatus::Registration);
-    assert_eq!(got.teacher_id, course.user_id);
+    assert_eq!(got.teacher_id, course.teacher_id);
 }
 
 #[tokio::test]
