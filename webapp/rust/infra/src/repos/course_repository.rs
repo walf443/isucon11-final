@@ -13,6 +13,8 @@ use isucholar_core::MYSQL_ERR_NUM_DUPLICATE_ENTRY;
 use sqlx::Arguments;
 
 #[cfg(test)]
+mod create;
+#[cfg(test)]
 mod exist_by_id;
 #[cfg(test)]
 mod find_by_code;
