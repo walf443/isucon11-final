@@ -41,7 +41,7 @@ impl SubmissionFileStorage for SubmissionFileStorageFile {
     async fn create_submissions_zip(
         &self,
         class_id: &ClassID,
-        submissions: &Vec<SubmissionWithUserCode>,
+        submissions: &[SubmissionWithUserCode],
     ) -> StorageResult<String> {
         let zip_file_path = format!("{}{}.zip", ASSIGNMENTS_DIRECTORY, class_id);
 

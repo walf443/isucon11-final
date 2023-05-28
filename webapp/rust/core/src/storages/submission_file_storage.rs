@@ -16,7 +16,7 @@ pub trait SubmissionFileStorage {
     async fn create_submissions_zip(
         &self,
         class_id: &ClassID,
-        submissions: &Vec<SubmissionWithUserCode>,
+        submissions: &[SubmissionWithUserCode],
     ) -> StorageResult<String>;
 }
 

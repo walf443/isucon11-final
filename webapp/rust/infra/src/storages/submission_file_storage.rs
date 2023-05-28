@@ -24,7 +24,7 @@ impl SubmissionFileStorage for SubmissionFileStorageInfra {
     async fn create_submissions_zip(
         &self,
         class_id: &ClassID,
-        submissions: &Vec<SubmissionWithUserCode>,
+        submissions: &[SubmissionWithUserCode],
     ) -> StorageResult<String> {
         let file = SubmissionFileStorageFile::default();
         file.create_submissions_zip(class_id, submissions).await
