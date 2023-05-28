@@ -69,7 +69,7 @@ async fn exist_but_null_case() {
         .find_score_by_class_id_and_user_id(conn, &submission.class_id, &submission.user_id)
         .await
         .unwrap();
-    assert_eq!(score.is_none(), true);
+    assert!(score.is_none());
 }
 
 #[tokio::test]
@@ -85,5 +85,5 @@ async fn empty_case() {
         .find_score_by_class_id_and_user_id(conn, &submission.class_id, &submission.user_id)
         .await
         .unwrap();
-    assert_eq!(score.is_none(), true);
+    assert!(score.is_none());
 }

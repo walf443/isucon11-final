@@ -35,7 +35,7 @@ async fn true_case() {
     let repo = CourseRepositoryInfra {};
     let conn = tx.acquire().await.unwrap();
     let got = repo.for_update_by_id(conn, &course.id).await.unwrap();
-    assert_eq!(got, true)
+    assert!(got)
 }
 
 #[tokio::test]
@@ -48,5 +48,5 @@ async fn false_case() {
 
     let repo = CourseRepositoryInfra {};
     let got = repo.for_update_by_id(conn, &course_id).await.unwrap();
-    assert_eq!(got, false)
+    assert!(!got)
 }

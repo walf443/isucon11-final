@@ -13,7 +13,7 @@ mod tests {
 
     #[tokio::test]
     #[should_panic(expected = "ReposError(TestError)")]
-    async fn find_announcement_detail_by_announcement_id_and_user_id_err() -> () {
+    async fn find_announcement_detail_by_announcement_id_and_user_id_err() {
         let db_pool = get_test_db_conn().await.unwrap();
         let mut service = MockRepositoryManager::new(db_pool);
         service
@@ -32,7 +32,7 @@ mod tests {
 
     #[tokio::test]
     #[should_panic(expected = "AnnouncementNotFound")]
-    async fn find_announcement_detail_by_announcement_id_and_user_id_none() -> () {
+    async fn find_announcement_detail_by_announcement_id_and_user_id_none() {
         let db_pool = get_test_db_conn().await.unwrap();
         let mut service = MockRepositoryManager::new(db_pool);
         service
@@ -50,7 +50,7 @@ mod tests {
 
     #[tokio::test]
     #[should_panic(expected = "ReposError(TestError)")]
-    async fn exist_by_user_id_and_course_id_err() -> () {
+    async fn exist_by_user_id_and_course_id_err() {
         let db_pool = get_test_db_conn().await.unwrap();
         let mut service = MockRepositoryManager::new(db_pool);
 
@@ -84,7 +84,7 @@ mod tests {
 
     #[tokio::test]
     #[should_panic(expected = "AnnouncementNotFound")]
-    async fn exist_by_user_id_and_course_id_false() -> () {
+    async fn exist_by_user_id_and_course_id_false() {
         let aid: AnnouncementID = Faker.fake();
         let user_id: UserID = Faker.fake();
 
@@ -117,7 +117,7 @@ mod tests {
 
     #[tokio::test]
     #[should_panic(expected = "ReposError(TestError)")]
-    async fn mark_read_failed() -> () {
+    async fn mark_read_failed() {
         let aid: AnnouncementID = Faker.fake();
         let user_id: UserID = Faker.fake();
 
@@ -186,8 +186,7 @@ mod tests {
             .registration_repo
             .expect_exist_by_user_id_and_course_id()
             .withf(move |_, user_id, course_id| {
-                user_id.to_string() == uid.to_string()
-                    && course_id.to_string() == "course_id".to_string()
+                user_id.to_string() == uid.to_string() && course_id.to_string() == *"course_id"
             })
             .returning(|_, _, _| Ok(true));
 

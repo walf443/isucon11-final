@@ -14,7 +14,7 @@ async fn false_case() {
     let class_id: ClassID = Faker.fake();
     let repo = ClassRepositoryInfra {};
     let result = repo.for_update_by_id(conn, &class_id).await.unwrap();
-    assert_eq!(result, false)
+    assert!(!result)
 }
 
 #[tokio::test]
@@ -41,5 +41,5 @@ async fn true_case() {
     let repo = ClassRepositoryInfra {};
     let conn = tx.acquire().await.unwrap();
     let result = repo.for_update_by_id(conn, &class.id).await.unwrap();
-    assert_eq!(result, true)
+    assert!(result)
 }

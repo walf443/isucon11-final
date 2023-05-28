@@ -60,7 +60,7 @@ async fn without_submission_record_case() {
     assert_eq!(got.title, class.title);
     assert_eq!(got.description, class.description);
     assert_eq!(got.submission_closed, class.submission_closed);
-    assert_eq!(got.submitted, false)
+    assert!(!got.submitted)
 }
 
 #[tokio::test]
@@ -112,5 +112,5 @@ async fn success_case() {
     assert_eq!(got.title, class.title);
     assert_eq!(got.description, class.description);
     assert_eq!(got.submission_closed, class.submission_closed);
-    assert_eq!(got.submitted, true)
+    assert!(got.submitted)
 }

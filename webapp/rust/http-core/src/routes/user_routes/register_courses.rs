@@ -25,7 +25,7 @@ pub async fn register_courses<Service: HaveRegistrationCourseService>(
         .registration_course_service()
         .create(&user_id, &course_ids)
         .await;
-    return match result {
+    match result {
         Ok(_) => Ok(HttpResponse::Ok().finish()),
         Err(e) => match e {
             Error::RegistrationCourseValidationError(errors) => {
@@ -33,5 +33,5 @@ pub async fn register_courses<Service: HaveRegistrationCourseService>(
             }
             _ => Err(e.into()),
         },
-    };
+    }
 }

@@ -47,10 +47,7 @@ pub trait AnnouncementServiceImpl:
             return Err(CourseNotFound);
         }
 
-        let result = self
-            .announcement_repo()
-            .create(&mut tx, &announcement)
-            .await;
+        let result = self.announcement_repo().create(&mut tx, announcement).await;
 
         match result {
             Ok(_) => {}

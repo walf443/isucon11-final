@@ -86,7 +86,7 @@ async fn record_exist_case() {
     assert_eq!(ann.course_id, course.id);
     assert_eq!(ann.course_name, course.name);
     assert_eq!(ann.title, announcement.title);
-    assert_eq!(ann.unread, true);
+    assert!(ann.unread);
 }
 
 #[tokio::test]

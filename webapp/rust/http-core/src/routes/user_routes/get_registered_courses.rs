@@ -51,7 +51,7 @@ mod tests {
         service
             .course_service
             .expect_find_open_courses_by_user_id()
-            .withf(|uid| uid.to_string() == "1".to_string())
+            .withf(|uid| uid.to_string() == *"1")
             .returning(|_| Err(TestError));
 
         let req = TestRequest::with_uri("/users/me/courses").to_http_request();
@@ -72,7 +72,7 @@ mod tests {
         service
             .course_service
             .expect_find_open_courses_by_user_id()
-            .withf(|uid| uid.to_string() == "1".to_string())
+            .withf(|uid| uid.to_string() == *"1")
             .returning(|_| Ok(Vec::new()));
 
         let req = TestRequest::with_uri("/users/me/courses").to_http_request();

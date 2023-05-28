@@ -15,7 +15,7 @@ async fn empty_case() {
 
     let repo = UserRepositoryInfra {};
     let got = repo.find_code_by_id(conn, &user.id).await.unwrap();
-    assert_eq!(got.is_none(), true);
+    assert!(got.is_none());
 }
 
 #[tokio::test]

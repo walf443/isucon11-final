@@ -30,7 +30,7 @@ pub async fn add_class<Service: HaveClassService>(
 
     let form = CreateClass {
         course_id: course_id.clone(),
-        part: req.part.clone(),
+        part: req.part,
         title: req.title.clone(),
         description: req.description.clone(),
     };
@@ -40,12 +40,10 @@ pub async fn add_class<Service: HaveClassService>(
     match result {
         Ok(class_id) => Ok(HttpResponse::Created().json(AddClassResponse { class_id })),
         Err(e) => match e {
-            Error::CourseNotFound => return Err(CourseNotFound),
-            Error::CourseIsNotInProgress => return Err(CourseIsNotInProgress),
-            Error::CourseConflict => {
-                return Err(CourseConflict);
-            }
-            _ => return Err(e.into()),
+            Error::CourseNotFound => Err(CourseNotFound),
+            Error::CourseIsNotInProgress => Err(CourseIsNotInProgress),
+            Error::CourseConflict => Err(CourseConflict),
+            _ => Err(e.into()),
         },
     }
 }

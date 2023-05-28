@@ -66,7 +66,7 @@ pub trait SubmissionServiceImpl:
         let mut tx = pool.begin().await?;
         let course_repo = self.course_repo();
         let status = course_repo
-            .find_status_for_share_lock_by_id(&mut tx, &course_id)
+            .find_status_for_share_lock_by_id(&mut tx, course_id)
             .await?;
         if let Some(status) = status {
             if status != CourseStatus::InProgress {
@@ -79,7 +79,7 @@ pub trait SubmissionServiceImpl:
         let registration_repo = self.registration_repo();
 
         let is_registered = registration_repo
-            .exist_by_user_id_and_course_id(&mut tx, &user_id, &course_id)
+            .exist_by_user_id_and_course_id(&mut tx, user_id, course_id)
             .await?;
         if is_registered {
             return Err(RegistrationAlready);
@@ -87,7 +87,7 @@ pub trait SubmissionServiceImpl:
 
         let class_repo = self.class_repo();
         let submission_closed = class_repo
-            .find_submission_closed_by_id_with_shared_lock(&mut tx, &class_id)
+            .find_submission_closed_by_id_with_shared_lock(&mut tx, class_id)
             .await?;
 
         if let Some(submission_closed) = submission_closed {
@@ -112,7 +112,7 @@ pub trait SubmissionServiceImpl:
 
         let submission_file_storage = self.submission_file_storage();
         submission_file_storage
-            .upload(&class_id, &user_id, data)
+            .upload(class_id, user_id, data)
             .await?;
 
         tx.commit().await?;
@@ -125,23 +125,23 @@ pub trait SubmissionServiceImpl:
 
         let mut tx = pool.begin().await?;
         let class_repo = self.class_repo();
-        let is_exist = class_repo.for_update_by_id(&mut tx, &class_id).await?;
+        let is_exist = class_repo.for_update_by_id(&mut tx, class_id).await?;
 
         if !is_exist {
             return Err(ClassNotFound);
         }
         let submission_repo = self.submission_repo();
         let submissions = submission_repo
-            .find_all_with_user_code_by_class_id(&mut tx, &class_id)
+            .find_all_with_user_code_by_class_id(&mut tx, class_id)
             .await?;
 
         let submission_file_storage = self.submission_file_storage();
         let zip_file_path = submission_file_storage
-            .create_submissions_zip(&class_id, &submissions)
+            .create_submissions_zip(class_id, &submissions)
             .await?;
 
         class_repo
-            .update_submission_closed_by_id(&mut tx, &class_id)
+            .update_submission_closed_by_id(&mut tx, class_id)
             .await?;
 
         tx.commit().await?;
@@ -159,7 +159,7 @@ pub trait SubmissionServiceImpl:
 
         let submission_closed = self
             .class_repo()
-            .find_submission_closed_by_id_with_shared_lock(&mut tx, &class_id)
+            .find_submission_closed_by_id_with_shared_lock(&mut tx, class_id)
             .await?;
 
         if let Some(submission_closed) = submission_closed {
@@ -175,7 +175,7 @@ pub trait SubmissionServiceImpl:
         for score in scores {
             let user_code = UserCode::new(score.user_code.clone());
             submission_repo
-                .update_score_by_user_code_and_class_id(&mut tx, &user_code, &class_id, score.score)
+                .update_score_by_user_code_and_class_id(&mut tx, &user_code, class_id, score.score)
                 .await?;
         }
 

@@ -46,5 +46,5 @@ async fn success_case() {
         .fetch_one(conn)
         .await
         .unwrap();
-    assert_eq!(is_deleted, true);
+    assert!(is_deleted);
 }

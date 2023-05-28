@@ -56,10 +56,10 @@ pub trait UnreadAnnouncementServiceImpl:
 
         let repo = self.unread_announcement_repo();
         let announcements = repo
-            .find_unread_announcements_by_user_id(&mut tx, &user_id, limit, offset, course_id)
+            .find_unread_announcements_by_user_id(&mut tx, user_id, limit, offset, course_id)
             .await?;
 
-        let unread_count = repo.count_unread_by_user_id(&mut tx, &user_id).await?;
+        let unread_count = repo.count_unread_by_user_id(&mut tx, user_id).await?;
 
         tx.commit().await?;
 
@@ -78,8 +78,8 @@ pub trait UnreadAnnouncementServiceImpl:
             .unread_announcement_repo()
             .find_announcement_detail_by_announcement_id_and_user_id(
                 &mut tx,
-                &announcement_id,
-                &user_id,
+                announcement_id,
+                user_id,
             )
             .await?;
 
@@ -90,7 +90,7 @@ pub trait UnreadAnnouncementServiceImpl:
 
         let is_exist = self
             .registration_repo()
-            .exist_by_user_id_and_course_id(&mut tx, &user_id, &announcement.course_id)
+            .exist_by_user_id_and_course_id(&mut tx, user_id, &announcement.course_id)
             .await?;
 
         if !is_exist {
@@ -98,7 +98,7 @@ pub trait UnreadAnnouncementServiceImpl:
         }
 
         self.unread_announcement_repo()
-            .mark_read(&mut tx, &announcement_id, &user_id)
+            .mark_read(&mut tx, announcement_id, user_id)
             .await?;
 
         tx.commit().await?;

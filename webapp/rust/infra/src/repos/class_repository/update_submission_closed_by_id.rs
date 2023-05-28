@@ -41,7 +41,7 @@ async fn success_case() {
     .fetch_one(conn)
     .await
     .unwrap();
-    assert_eq!(got, true);
+    assert!(got);
 }
 
 #[tokio::test]

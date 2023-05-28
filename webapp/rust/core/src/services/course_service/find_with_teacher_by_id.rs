@@ -19,7 +19,7 @@ mod tests {
         let course_id: CourseID = Faker.fake();
         let result = service.find_with_teacher_by_id(&course_id).await.unwrap();
 
-        assert_eq!(result.is_none(), true);
+        assert!(result.is_none());
     }
 
     #[tokio::test]
@@ -38,7 +38,7 @@ mod tests {
         let course_id: CourseID = Faker.fake();
         let result = service.find_with_teacher_by_id(&course_id).await.unwrap();
 
-        assert_eq!(result.is_some(), true);
+        assert!(result.is_some());
         assert_eq!(result.unwrap(), course);
     }
 }

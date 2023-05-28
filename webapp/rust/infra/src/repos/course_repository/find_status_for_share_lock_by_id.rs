@@ -53,5 +53,5 @@ async fn none_case() {
         .find_status_for_share_lock_by_id(conn, &course_id)
         .await
         .unwrap();
-    assert_eq!(got.is_none(), true)
+    assert!(got.is_none())
 }

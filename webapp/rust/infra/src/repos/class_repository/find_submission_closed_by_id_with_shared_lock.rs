@@ -36,7 +36,7 @@ async fn true_case() {
         .await
         .unwrap()
         .unwrap();
-    assert_eq!(result, true)
+    assert!(result)
 }
 
 #[tokio::test]
@@ -70,7 +70,7 @@ async fn false_case() {
         .await
         .unwrap()
         .unwrap();
-    assert_eq!(result, false)
+    assert!(!result)
 }
 
 #[tokio::test]
@@ -86,5 +86,5 @@ async fn none_case() {
         .find_submission_closed_by_id_with_shared_lock(conn, &class_id)
         .await
         .unwrap();
-    assert_eq!(result.is_none(), true);
+    assert!(result.is_none());
 }

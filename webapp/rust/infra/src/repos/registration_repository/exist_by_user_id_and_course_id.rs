@@ -20,7 +20,7 @@ async fn false_case() {
         .exist_by_user_id_and_course_id(conn, &user_id, &course_id)
         .await
         .unwrap();
-    assert_eq!(got, false);
+    assert!(!got);
 }
 
 #[tokio::test]
@@ -52,5 +52,5 @@ async fn true_case() {
         .exist_by_user_id_and_course_id(conn, &user_id, &course_id)
         .await
         .unwrap();
-    assert_eq!(got, true);
+    assert!(got);
 }

@@ -95,8 +95,8 @@ impl UnreadAnnouncementRepository for UnreadAnnouncementRepositoryInfra {
             " ORDER BY `announcements`.`id` DESC",
             " LIMIT ? OFFSET ?",
         ));
-        args.add(&user_id);
-        args.add(&user_id);
+        args.add(user_id);
+        args.add(user_id);
         args.add(limit + 1);
         args.add(offset);
 

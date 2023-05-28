@@ -17,7 +17,7 @@ pub async fn download_submitted_assignments<Service: HaveSubmissionService>(
         .download_submissions_zip(&class_id)
         .await;
     match result {
-        Ok(zip_file_path) => Ok(actix_files::NamedFile::open(&zip_file_path)?),
+        Ok(zip_file_path) => Ok(actix_files::NamedFile::open(zip_file_path)?),
         Err(e) => match e {
             Error::ClassNotFound => Err(ClassNotFound),
             _ => Err(e.into()),

@@ -79,7 +79,7 @@ pub trait ClassServiceImpl:
         }
 
         let class_repo = self.class_repo();
-        let result = class_repo.create(&mut tx, &class_id, &form).await;
+        let result = class_repo.create(&mut tx, &class_id, form).await;
         match result {
             Ok(_) => {
                 tx.commit().await?;
@@ -116,7 +116,7 @@ pub trait ClassServiceImpl:
 
         let classes = self
             .class_repo()
-            .find_all_by_course_id(&mut conn, &course_id)
+            .find_all_by_course_id(&mut conn, course_id)
             .await?;
         let mut class_scores = Vec::with_capacity(classes.len());
 
@@ -126,7 +126,7 @@ pub trait ClassServiceImpl:
                 .count_by_class_id(&mut conn, &class.id)
                 .await?;
             let my_score = submission_repo
-                .find_score_by_class_id_and_user_id(&mut conn, &class.id, &user_id)
+                .find_score_by_class_id_and_user_id(&mut conn, &class.id, user_id)
                 .await?;
 
             if let Some(my_score) = my_score {
@@ -161,7 +161,7 @@ pub trait ClassServiceImpl:
         let mut conn = pool.acquire().await?;
 
         let class_scores = self
-            .get_user_scores_by_course_id(&user_id, &course.id)
+            .get_user_scores_by_course_id(user_id, &course.id)
             .await?;
 
         let mut my_total_score: i64 = 0;
@@ -201,7 +201,7 @@ pub trait ClassServiceImpl:
 
         for course in courses {
             let course_result = self
-                .get_user_course_result_by_course(&user_id, &course)
+                .get_user_course_result_by_course(user_id, course)
                 .await?;
             let my_total_score = course_result.total_score;
             course_results.push(course_result);
@@ -227,7 +227,7 @@ pub trait ClassServiceImpl:
         let pool = self.get_db_pool();
 
         let mut tx = pool.begin().await?;
-        let is_exist = self.course_repo().exist_by_id(&mut tx, &course_id).await?;
+        let is_exist = self.course_repo().exist_by_id(&mut tx, course_id).await?;
 
         if !is_exist {
             return Err(CourseNotFound);
@@ -235,7 +235,7 @@ pub trait ClassServiceImpl:
 
         let classes = self
             .class_repo()
-            .find_all_with_submitted_by_user_id_and_course_id(&mut tx, &user_id, &course_id)
+            .find_all_with_submitted_by_user_id_and_course_id(&mut tx, user_id, course_id)
             .await?;
 
         tx.commit().await?;

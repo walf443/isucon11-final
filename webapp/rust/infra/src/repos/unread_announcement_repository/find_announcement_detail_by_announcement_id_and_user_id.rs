@@ -133,5 +133,5 @@ async fn none_case() {
         .await
         .unwrap();
 
-    assert_eq!(detail.is_none(), true);
+    assert!(detail.is_none());
 }

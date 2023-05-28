@@ -20,7 +20,7 @@ pub async fn get_test_db_conn() -> Result<DBPool, sqlx::Error> {
         None => {
             panic!("please set MYSQL_TEST_DATABASE");
         }
-        Some(database) => return _get_db_conn(&database).await,
+        Some(database) => _get_db_conn(database).await,
     }
 }
 
@@ -49,7 +49,8 @@ async fn _get_db_conn(database: &str) -> Result<DBPool, sqlx::Error> {
         )
         .database(database)
         .ssl_mode(sqlx::mysql::MySqlSslMode::Disabled);
-    let pool = sqlx::mysql::MySqlPoolOptions::new()
+
+    sqlx::mysql::MySqlPoolOptions::new()
         .max_connections(10)
         .after_connect(|conn, _| {
             Box::pin(async move {
@@ -58,7 +59,5 @@ async fn _get_db_conn(database: &str) -> Result<DBPool, sqlx::Error> {
             })
         })
         .connect_with(mysql_config)
-        .await;
-
-    pool
+        .await
 }

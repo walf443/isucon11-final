@@ -29,14 +29,14 @@ pub async fn add_announcement<Service: HaveAnnouncementService>(
     };
 
     let result = service.announcement_service().create(&announcement).await;
-    return match result {
+    match result {
         Ok(_) => Ok(HttpResponse::Created().finish()),
         Err(e) => match e {
             Error::AnnouncementDuplicate => Err(AnnouncementConflict),
             Error::CourseNotFound => Err(CourseNotFound),
             _ => Err(e.into()),
         },
-    };
+    }
 }
 
 #[cfg(test)]

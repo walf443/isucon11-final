@@ -43,7 +43,7 @@ impl ServiceManagerInfra {
             class_service: ClassServiceInfra::new(pool.clone()),
             registration_course_service: RegistrationCourseServiceInfra::new(pool.clone()),
             grade_summary_service: GradeSummaryServiceInfra::new(pool.clone()),
-            submission_service: SubmissionServiceInfra::new(pool.clone()),
+            submission_service: SubmissionServiceInfra::new(pool),
         }
     }
 }

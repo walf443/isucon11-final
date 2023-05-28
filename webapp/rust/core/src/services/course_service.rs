@@ -66,7 +66,7 @@ pub trait CourseServiceImpl:
                     {
                         return Err(e.into());
                     } else {
-                        return Ok(course.id.clone());
+                        return Ok(course.id);
                     }
                 }
                 _ => Err(e.into()),
@@ -79,13 +79,13 @@ pub trait CourseServiceImpl:
         let course_repo = self.course_repo();
         let mut tx = db_pool.begin().await?;
 
-        let is_exist = course_repo.for_update_by_id(&mut tx, &course_id).await?;
+        let is_exist = course_repo.for_update_by_id(&mut tx, course_id).await?;
         if !is_exist {
             return Err(CourseNotFound);
         }
 
         course_repo
-            .update_status_by_id(&mut tx, &course_id, status)
+            .update_status_by_id(&mut tx, course_id, status)
             .await?;
 
         tx.commit().await?;
@@ -103,7 +103,7 @@ pub trait CourseServiceImpl:
 
         let courses = self
             .course_repo()
-            .find_all_with_teacher(&db_pool, limit, offset, query)
+            .find_all_with_teacher(db_pool, limit, offset, query)
             .await?;
         Ok(courses)
     }
@@ -114,7 +114,7 @@ pub trait CourseServiceImpl:
 
         let courses = self
             .registration_course_repo()
-            .find_open_courses_by_user_id(&mut tx, &user_id)
+            .find_open_courses_by_user_id(&mut tx, user_id)
             .await?;
 
         let mut results: Vec<(Course, User)> = Vec::with_capacity(courses.len());
@@ -138,7 +138,7 @@ pub trait CourseServiceImpl:
         let mut conn = pool.acquire().await?;
         let course = self
             .course_repo()
-            .find_with_teacher_by_id(&mut conn, &course_id)
+            .find_with_teacher_by_id(&mut conn, course_id)
             .await?;
 
         Ok(course)

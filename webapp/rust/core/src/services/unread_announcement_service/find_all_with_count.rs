@@ -9,7 +9,7 @@ mod tests {
 
     #[tokio::test]
     #[should_panic(expected = "ReposError(TestError)")]
-    async fn find_unread_announcements_by_user_id_failed() -> () {
+    async fn find_unread_announcements_by_user_id_failed() {
         let db_pool = get_test_db_conn().await.unwrap();
         let mut service = MockRepositoryManager::new(db_pool);
         let user_id: UserID = Faker.fake();
@@ -27,7 +27,7 @@ mod tests {
     }
     #[tokio::test]
     #[should_panic(expected = "ReposError(TestError)")]
-    async fn count_unread_by_user_id_failed() -> () {
+    async fn count_unread_by_user_id_failed() {
         let db_pool = get_test_db_conn().await.unwrap();
         let mut service = MockRepositoryManager::new(db_pool);
         let user_id: UserID = Faker.fake();
@@ -50,7 +50,7 @@ mod tests {
             .unwrap();
     }
     #[tokio::test]
-    async fn success_case() -> () {
+    async fn success_case() {
         let db_pool = get_test_db_conn().await.unwrap();
         let mut service = MockRepositoryManager::new(db_pool);
         let user_id: UserID = Faker.fake();

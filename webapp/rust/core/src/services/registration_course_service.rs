@@ -36,7 +36,7 @@ pub trait RegistrationCourseServiceImpl:
         let mut conn = pool.acquire().await?;
         let result = self
             .registration_course_repo()
-            .find_courses_by_user_id(&mut conn, &user_id)
+            .find_courses_by_user_id(&mut conn, user_id)
             .await?;
 
         Ok(result)
@@ -54,7 +54,7 @@ pub trait RegistrationCourseServiceImpl:
         let mut newly_added = Vec::new();
         for course_id in course_ids {
             let course = course_repo
-                .find_for_share_lock_by_id(&mut tx, &course_id)
+                .find_for_share_lock_by_id(&mut tx, course_id)
                 .await?;
             if course.is_none() {
                 errors.course_not_found.push(course_id.clone());
@@ -69,7 +69,7 @@ pub trait RegistrationCourseServiceImpl:
 
             // すでに履修登録済みの科目は無視する
             let is_exist = registration_repo
-                .exist_by_user_id_and_course_id(&mut tx, &user_id, &course_id)
+                .exist_by_user_id_and_course_id(&mut tx, user_id, course_id)
                 .await?;
             if is_exist {
                 continue;
@@ -79,7 +79,7 @@ pub trait RegistrationCourseServiceImpl:
         }
 
         let already_registered = registration_course_repo
-            .find_open_courses_by_user_id(&mut tx, &user_id)
+            .find_open_courses_by_user_id(&mut tx, user_id)
             .await?;
 
         for course1 in &newly_added {
@@ -103,7 +103,7 @@ pub trait RegistrationCourseServiceImpl:
 
         for course in newly_added {
             registration_repo
-                .create_or_update(&mut tx, &user_id, &course.id)
+                .create_or_update(&mut tx, user_id, &course.id)
                 .await?;
         }
 

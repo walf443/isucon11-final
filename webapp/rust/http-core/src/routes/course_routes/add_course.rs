@@ -30,8 +30,8 @@ impl AddCourseRequest {
             type_: self.type_.clone(),
             name: self.name.clone(),
             description: self.description.clone(),
-            credit: self.credit.clone(),
-            period: self.period.clone(),
+            credit: self.credit,
+            period: self.period,
             day_of_week: self.day_of_week.clone(),
             keywords: self.keywords.clone(),
         }

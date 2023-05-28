@@ -63,5 +63,5 @@ async fn empty_case() {
     let result = repo
         .update_status_by_id(conn, &course_id, &CourseStatus::Closed)
         .await;
-    assert_eq!(result.is_ok(), true);
+    assert!(result.is_ok());
 }

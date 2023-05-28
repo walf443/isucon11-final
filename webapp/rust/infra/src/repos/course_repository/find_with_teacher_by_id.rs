@@ -20,7 +20,7 @@ async fn empty_case() {
         .find_with_teacher_by_id(conn, &course_id)
         .await
         .unwrap();
-    assert_eq!(got.is_none(), true);
+    assert!(got.is_none());
 }
 
 #[tokio::test]

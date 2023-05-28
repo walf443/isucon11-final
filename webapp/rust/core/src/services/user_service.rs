@@ -23,7 +23,7 @@ pub trait UserServiceImpl: Sync + HaveDBPool + HaveUserRepository {
         let pool = self.get_db_pool();
         let mut conn = pool.acquire().await?;
 
-        let result = self.user_repo().find_by_code(&mut conn, &code).await?;
+        let result = self.user_repo().find_by_code(&mut conn, code).await?;
         Ok(result)
     }
 
@@ -31,10 +31,7 @@ pub trait UserServiceImpl: Sync + HaveDBPool + HaveUserRepository {
         let pool = self.get_db_pool();
         let mut conn = pool.acquire().await?;
 
-        let result = self
-            .user_repo()
-            .find_code_by_id(&mut conn, &user_id)
-            .await?;
+        let result = self.user_repo().find_code_by_id(&mut conn, user_id).await?;
 
         Ok(result)
     }
