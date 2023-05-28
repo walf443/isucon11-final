@@ -1,6 +1,7 @@
 use crate::models::user_type::UserType;
 use fake::Dummy;
 use serde::{Deserialize, Serialize};
+use std::fmt::{Display, Formatter};
 
 #[derive(Debug, Clone, sqlx::FromRow, PartialEq, Eq, Dummy)]
 pub struct User {
@@ -20,9 +21,11 @@ impl UserID {
     pub fn new(user_id: String) -> Self {
         Self(user_id)
     }
+}
 
-    pub fn to_string(&self) -> String {
-        self.0.clone()
+impl Display for UserID {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
     }
 }
 
@@ -34,8 +37,10 @@ impl UserCode {
     pub fn new(code: String) -> Self {
         Self(code)
     }
+}
 
-    pub fn to_string(&self) -> String {
-        self.0.clone()
+impl Display for UserCode {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
     }
 }

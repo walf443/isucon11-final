@@ -1,6 +1,7 @@
 use crate::models::course::CourseID;
 use fake::Dummy;
 use serde::{Deserialize, Serialize};
+use std::fmt::{Debug, Display, Formatter};
 
 #[derive(Debug, Clone, sqlx::FromRow, PartialEq, Eq, Dummy)]
 pub struct Announcement {
@@ -18,9 +19,11 @@ impl AnnouncementID {
     pub fn new(id: String) -> Self {
         Self(id)
     }
+}
 
-    pub fn to_string(&self) -> String {
-        self.0.clone()
+impl Display for AnnouncementID {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
     }
 }
 

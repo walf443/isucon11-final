@@ -4,6 +4,7 @@ use crate::models::day_of_week::DayOfWeek;
 use crate::models::user::UserID;
 use fake::Dummy;
 use serde::{Deserialize, Serialize};
+use std::fmt::{Display, Formatter};
 
 #[derive(Debug, Clone, sqlx::FromRow, PartialEq, Eq, Dummy)]
 pub struct Course {
@@ -29,9 +30,11 @@ impl CourseID {
     pub fn new(course_id: String) -> Self {
         Self(course_id)
     }
+}
 
-    pub fn to_string(&self) -> String {
-        self.0.clone()
+impl Display for CourseID {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
     }
 }
 
@@ -43,9 +46,11 @@ impl CourseCode {
     pub fn new(code: String) -> Self {
         Self(code)
     }
+}
 
-    pub fn to_string(&self) -> String {
-        self.0.clone()
+impl Display for CourseCode {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.0)
     }
 }
 
