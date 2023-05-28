@@ -86,19 +86,16 @@ pub trait ClassServiceImpl:
             }
             Err(e) => {
                 let _ = tx.rollback().await;
-                match e {
-                    ReposError::CourseDuplicate => {
-                        let mut conn = pool.acquire().await?;
-                        let class = class_repo
-                            .find_by_course_id_and_part(&mut conn, &form.course_id, &form.part)
-                            .await?;
-                        if form.title != class.title || form.description != class.description {
-                            return Err(CourseConflict);
-                        } else {
-                            return Ok(class_id);
-                        }
+                if let ReposError::CourseDuplicate = e {
+                    let mut conn = pool.acquire().await?;
+                    let class = class_repo
+                        .find_by_course_id_and_part(&mut conn, &form.course_id, &form.part)
+                        .await?;
+                    if form.title != class.title || form.description != class.description {
+                        return Err(CourseConflict);
+                    } else {
+                        return Ok(class_id);
                     }
-                    _ => {}
                 }
             }
         }
