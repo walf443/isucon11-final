@@ -87,10 +87,8 @@ impl SubmissionRepository for SubmissionRepositoryInfra {
 
         match score {
             None => Ok(None),
-            Some(score) => match score {
-                None => Ok(None),
-                Some(score) => Ok(Some(score)),
-            },
+            Some(Some(score)) => Ok(Some(score)),
+            Some(None) => Ok(None),
         }
     }
 
