@@ -6,14 +6,8 @@ use isucholar_core::storages::submission_file_storage::SubmissionFileStorage;
 use isucholar_core::storages::StorageResult;
 use isucholar_infra_storage_file::submission_file_storage::SubmissionFileStorageFile;
 
-#[derive(Clone)]
+#[derive(Clone, Default)]
 pub struct SubmissionFileStorageInfra {}
-
-impl SubmissionFileStorageInfra {
-    pub fn new() -> Self {
-        Self {}
-    }
-}
 
 #[async_trait]
 impl SubmissionFileStorage for SubmissionFileStorageInfra {
@@ -23,7 +17,7 @@ impl SubmissionFileStorage for SubmissionFileStorageInfra {
         user_id: &UserID,
         buf: &mut B,
     ) -> StorageResult<String> {
-        let file = SubmissionFileStorageFile::new();
+        let file = SubmissionFileStorageFile::default();
         file.upload(class_id, user_id, buf).await
     }
 
@@ -32,7 +26,7 @@ impl SubmissionFileStorage for SubmissionFileStorageInfra {
         class_id: &ClassID,
         submissions: &Vec<SubmissionWithUserCode>,
     ) -> StorageResult<String> {
-        let file = SubmissionFileStorageFile::new();
+        let file = SubmissionFileStorageFile::default();
         file.create_submissions_zip(class_id, submissions).await
     }
 }

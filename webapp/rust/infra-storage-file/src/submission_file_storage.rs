@@ -7,13 +7,10 @@ use isucholar_core::storages::StorageResult;
 use isucholar_core::ASSIGNMENTS_DIRECTORY;
 use tokio::io::AsyncWriteExt;
 
+#[derive(Default)]
 pub struct SubmissionFileStorageFile {}
 
 impl SubmissionFileStorageFile {
-    pub fn new() -> Self {
-        Self {}
-    }
-
     pub fn get_filename(&self, class_id: &ClassID, user_id: &UserID) -> String {
         let dst = format!(
             "{}{}-{}.pdf",

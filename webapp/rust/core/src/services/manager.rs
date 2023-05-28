@@ -48,6 +48,12 @@ pub mod tests {
         pub submission_service: MockSubmissionService,
     }
 
+    impl Default for MockServiceManager {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+
     impl MockServiceManager {
         pub fn new() -> Self {
             Self {

@@ -30,7 +30,7 @@ impl SubmissionServiceInfra {
             class_repo: ClassRepositoryInfra {},
             course_repo: CourseRepositoryInfra {},
             submission_repo: SubmissionRepositoryInfra {},
-            submission_file_storage: SubmissionFileStorageInfra::new(),
+            submission_file_storage: SubmissionFileStorageInfra::default(),
             registration_repo: RegistrationRepositoryInfra {},
         }
     }
