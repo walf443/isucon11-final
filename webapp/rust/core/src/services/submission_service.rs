@@ -15,7 +15,7 @@ pub trait SubmissionService {
     async fn update_user_scores_by_class_id(
         &self,
         class_id: &ClassID,
-        scores: &Vec<Score>,
+        scores: &[Score],
     ) -> Result<()>;
 }
 
@@ -152,7 +152,7 @@ pub trait SubmissionServiceImpl:
     async fn update_user_scores_by_class_id(
         &self,
         class_id: &ClassID,
-        scores: &Vec<Score>,
+        scores: &[Score],
     ) -> Result<()> {
         let pool = self.get_db_pool();
         let mut tx = pool.begin().await?;
@@ -206,7 +206,7 @@ impl<S: SubmissionServiceImpl> SubmissionService for S {
     async fn update_user_scores_by_class_id(
         &self,
         class_id: &ClassID,
-        scores: &Vec<Score>,
+        scores: &[Score],
     ) -> Result<()> {
         SubmissionServiceImpl::update_user_scores_by_class_id(self, class_id, scores).await
     }

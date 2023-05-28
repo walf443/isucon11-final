@@ -19,7 +19,7 @@ pub async fn register_courses<Service: HaveRegistrationCourseService>(
     let mut req = req.into_inner();
     req.sort_by(|x, y| x.id.cmp(&y.id));
 
-    let course_ids = req.iter().map(|i| CourseID::new(i.id.clone())).collect();
+    let course_ids: Vec<CourseID> = req.iter().map(|i| CourseID::new(i.id.clone())).collect();
 
     let result = service
         .registration_course_service()

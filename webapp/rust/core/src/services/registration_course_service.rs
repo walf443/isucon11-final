@@ -14,7 +14,7 @@ use async_trait::async_trait;
 #[async_trait]
 pub trait RegistrationCourseService {
     async fn find_courses_by_user_id(&self, user_id: &UserID) -> Result<Vec<Course>>;
-    async fn create(&self, user_id: &UserID, course_ids: &Vec<CourseID>) -> Result<()>;
+    async fn create(&self, user_id: &UserID, course_ids: &[CourseID]) -> Result<()>;
 }
 
 pub trait HaveRegistrationCourseService {
@@ -42,7 +42,7 @@ pub trait RegistrationCourseServiceImpl:
         Ok(result)
     }
 
-    async fn create(&self, user_id: &UserID, course_ids: &Vec<CourseID>) -> Result<()> {
+    async fn create(&self, user_id: &UserID, course_ids: &[CourseID]) -> Result<()> {
         let pool = self.get_db_pool();
         let mut tx = pool.begin().await?;
 
@@ -119,7 +119,7 @@ impl<S: RegistrationCourseServiceImpl> RegistrationCourseService for S {
         RegistrationCourseServiceImpl::find_courses_by_user_id(self, user_id).await
     }
 
-    async fn create(&self, user_id: &UserID, course_ids: &Vec<CourseID>) -> Result<()> {
+    async fn create(&self, user_id: &UserID, course_ids: &[CourseID]) -> Result<()> {
         RegistrationCourseServiceImpl::create(self, user_id, course_ids).await
     }
 }
