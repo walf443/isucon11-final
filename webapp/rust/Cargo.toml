@@ -19,7 +19,7 @@ num-traits = { version = "0" }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 num-bigint = { version = "0.4" }
-sqlx = { version = "0.7.0-alpha.3", default-features = false, features = ["macros", "runtime-tokio", "tls-rustls", "mysql", "chrono", "bigdecimal"] }
+sqlx = { version = "0.7", default-features = false, features = ["macros", "runtime-tokio", "tls-rustls", "mysql", "chrono", "bigdecimal"] }
 thiserror = { version = "1" }
 tokio = { version = "1", features = ["fs", "process", "macros"] }
 ulid = { version = "0.4" }
