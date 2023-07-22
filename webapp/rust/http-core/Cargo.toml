@@ -6,10 +6,8 @@ edition = "2021"
 [dependencies]
 isucholar-core = { path = "../core/" }
 
-bcrypt = "0.10"
 mime = "0.3"
 serde_urlencoded = "0.7"
-ulid = "0.4"
 
 actix-files.workspace = true
 actix-multipart.workspace = true
@@ -26,6 +24,8 @@ serde_json.workspace = true
 sqlx.workspace = true
 thiserror.workspace = true
 tokio.workspace = true
+ulid.workspace = true
+bcrypt.workspace = true
 
 [dev-dependencies]
 isucholar-core = { path = "../core/", features = ["test"] }

@@ -8,8 +8,7 @@ isucholar-core = { path = "../core/" }
 isucholar-infra = { path = "../infra/" }
 isucholar-http-core = { path = "../http-core/" }
 
-env_logger = "0.9"
-listenfd = "0.3"
+listenfd = "1"
 serde_urlencoded = "0.7"
 
 actix-files.workspace = true
@@ -25,6 +24,7 @@ serde_json.workspace = true
 sqlx.workspace = true
 thiserror.workspace = true
 tokio.workspace = true
+env_logger.workspace = true
 
 [dev-dependencies]
 isucholar-core = { path = "../core/", features = ["test"] }
