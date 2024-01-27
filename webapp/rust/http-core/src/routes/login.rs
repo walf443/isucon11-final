@@ -17,7 +17,7 @@ pub async fn login<Service: HaveUserService>(
     session: actix_session::Session,
     req: web::Json<LoginRequest>,
 ) -> ResponseResult<HttpResponse> {
-    let code = UserCode::new(req.code.to_string());
+    let code = UserCode::new(req.code.to_string().into());
     let user = service.user_service().find_by_code(&code).await?;
 
     if user.is_none() {
@@ -33,7 +33,7 @@ pub async fn login<Service: HaveUserService>(
     }
 
     if let Some(user_id) = session.get::<String>("userID")? {
-        if user_id == user.id.to_string() {
+        if user_id == user.id.inner().to_string() {
             return Err(AlreadyLogin);
         }
     }

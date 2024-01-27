@@ -52,7 +52,7 @@ mod tests {
         service
             .user_service
             .expect_find_code_by_id()
-            .withf(|uid| uid.to_string() == "1")
+            .withf(|uid| uid.inner() == "1")
             .returning(|_| Ok(None));
 
         let req = TestRequest::with_uri("/user/me").to_http_request();
@@ -72,7 +72,7 @@ mod tests {
         service
             .user_service
             .expect_find_code_by_id()
-            .withf(|uid| uid.to_string() == "1")
+            .withf(|uid| uid.inner() == "1")
             .returning(|_| Err(TestError));
 
         let req = TestRequest::with_uri("/user/me").to_http_request();
@@ -91,8 +91,8 @@ mod tests {
         service
             .user_service
             .expect_find_code_by_id()
-            .withf(|uid| uid.to_string() == "1")
-            .returning(|_| Ok(Some(UserCode::new("abc".to_string()))));
+            .withf(|uid| uid.inner() == "1")
+            .returning(|_| Ok(Some(UserCode::new("abc".to_string().into()))));
 
         let req = TestRequest::with_uri("/user/me").to_http_request();
         let session = req.get_session();
@@ -103,7 +103,7 @@ mod tests {
         let result = get_me(web::Data::new(service), session).await.unwrap();
         assert_eq!(result.status(), StatusCode::OK);
         let expected = GetMeResponse {
-            code: UserCode::new("abc".to_string()),
+            code: UserCode::new("abc".to_string().into()),
             name: "1".to_string(),
             is_admin: false,
         };

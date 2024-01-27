@@ -174,7 +174,7 @@ impl ClassRepository for ClassRepositoryInfra {
                 WHERE `classes`.`course_id` = ?
                 ORDER BY `classes`.`part`
             ",
-            user_id.to_string(),
+            user_id,
             course_id,
         )
             .fetch_all(conn)
