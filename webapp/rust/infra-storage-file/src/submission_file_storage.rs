@@ -76,7 +76,9 @@ impl SubmissionFileStorage for SubmissionFileStorageFile {
                 .arg(self.get_filename(class_id, &submission.user_id))
                 .arg(&format!(
                     "{}{}-{}",
-                    tmp_dir, submission.user_code, submission.file_name
+                    tmp_dir,
+                    submission.user_code.inner().to_string(),
+                    submission.file_name
                 ))
                 .status()
                 .await?;

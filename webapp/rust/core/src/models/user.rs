@@ -2,9 +2,9 @@ use crate::models::user_type::UserType;
 use fake::Dummy;
 use kubetsu::Id;
 use serde::Serialize;
-use std::fmt::{Display, Formatter};
+use std::fmt::Display;
 
-#[derive(Debug, Clone, sqlx::FromRow, PartialEq, Eq, Dummy)]
+#[derive(Debug, Clone, sqlx::FromRow, PartialEq, Dummy)]
 pub struct User {
     pub id: UserID,
     pub code: UserCode,
@@ -16,18 +16,20 @@ pub struct User {
 
 pub type UserID = Id<User, String>;
 
-#[derive(Debug, Clone, PartialEq, Eq, Dummy, sqlx::Type, Serialize)]
-#[sqlx(transparent)]
-pub struct UserCode(#[dummy(faker = "6")] String);
+pub type UserCode = Id<User, UserCodeCode>;
 
-impl UserCode {
-    pub fn new(code: String) -> Self {
-        Self(code)
+#[derive(Debug, Clone, PartialEq, Dummy, sqlx::Type, Serialize)]
+#[sqlx(transparent)]
+pub struct UserCodeCode(#[dummy(faker = "6")] String);
+
+impl From<String> for UserCodeCode {
+    fn from(value: String) -> Self {
+        UserCodeCode(value)
     }
 }
 
-impl Display for UserCode {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+impl Display for UserCodeCode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.0)
     }
 }

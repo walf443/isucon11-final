@@ -173,7 +173,7 @@ pub trait SubmissionServiceImpl:
         let submission_repo = self.submission_repo();
 
         for score in scores {
-            let user_code = UserCode::new(score.user_code.clone());
+            let user_code = UserCode::new(score.user_code.clone().into());
             submission_repo
                 .update_score_by_user_code_and_class_id(&mut tx, &user_code, class_id, score.score)
                 .await?;
