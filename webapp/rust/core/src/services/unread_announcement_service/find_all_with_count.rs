@@ -41,7 +41,7 @@ mod tests {
         service
             .unread_announcement_repo
             .expect_count_unread_by_user_id()
-            .withf(move |_, uid| uid.to_string() == id.to_string())
+            .withf(move |_, uid| uid == &id)
             .returning(|_, _| Err(TestError));
 
         service
@@ -64,7 +64,7 @@ mod tests {
         service
             .unread_announcement_repo
             .expect_count_unread_by_user_id()
-            .withf(move |_, uid| uid.to_string() == id.to_string())
+            .withf(move |_, uid| uid == &id)
             .returning(|_, _| Ok(1));
 
         let result = service

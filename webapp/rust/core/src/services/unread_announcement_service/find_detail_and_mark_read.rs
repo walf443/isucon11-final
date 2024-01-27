@@ -175,18 +175,14 @@ mod tests {
         service
             .unread_announcement_repo
             .expect_find_announcement_detail_by_announcement_id_and_user_id()
-            .withf(move |_, aid, user_id| {
-                aid == &announcement_id && user_id.to_string() == uid.to_string()
-            })
+            .withf(move |_, aid, user_id| aid == &announcement_id && user_id == &uid)
             .returning(move |_, _, _| Ok(Some(detail.clone())));
 
         let uid = user_id.clone();
         service
             .registration_repo
             .expect_exist_by_user_id_and_course_id()
-            .withf(move |_, user_id, course_id| {
-                user_id.to_string() == uid.to_string() && course_id.inner() == "course_id"
-            })
+            .withf(move |_, user_id, course_id| user_id == &uid && course_id.inner() == "course_id")
             .returning(|_, _, _| Ok(true));
 
         let announcement_id = aid.clone();
@@ -194,9 +190,7 @@ mod tests {
         service
             .unread_announcement_repo
             .expect_mark_read()
-            .withf(move |_, aid, user_id| {
-                aid == &announcement_id && user_id.to_string() == uid.to_string()
-            })
+            .withf(move |_, aid, user_id| aid == &announcement_id && user_id == &uid)
             .returning(|_, _, _| Ok(()));
 
         let detail = service

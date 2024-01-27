@@ -12,7 +12,12 @@ pub struct SubmissionFileStorageFile {}
 
 impl SubmissionFileStorageFile {
     pub fn get_filename(&self, class_id: &ClassID, user_id: &UserID) -> String {
-        let dst = format!("{}{}-{}.pdf", ASSIGNMENTS_DIRECTORY, class_id.inner(), user_id,);
+        let dst = format!(
+            "{}{}-{}.pdf",
+            ASSIGNMENTS_DIRECTORY,
+            class_id.inner(),
+            user_id.inner(),
+        );
         dst
     }
 }

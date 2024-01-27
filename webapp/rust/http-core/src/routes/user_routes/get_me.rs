@@ -52,7 +52,7 @@ mod tests {
         service
             .user_service
             .expect_find_code_by_id()
-            .withf(|uid| uid.to_string() == "1")
+            .withf(|uid| uid.inner() == "1")
             .returning(|_| Ok(None));
 
         let req = TestRequest::with_uri("/user/me").to_http_request();
@@ -72,7 +72,7 @@ mod tests {
         service
             .user_service
             .expect_find_code_by_id()
-            .withf(|uid| uid.to_string() == "1")
+            .withf(|uid| uid.inner() == "1")
             .returning(|_| Err(TestError));
 
         let req = TestRequest::with_uri("/user/me").to_http_request();
@@ -91,7 +91,7 @@ mod tests {
         service
             .user_service
             .expect_find_code_by_id()
-            .withf(|uid| uid.to_string() == "1")
+            .withf(|uid| uid.inner() == "1")
             .returning(|_| Ok(Some(UserCode::new("abc".to_string()))));
 
         let req = TestRequest::with_uri("/user/me").to_http_request();

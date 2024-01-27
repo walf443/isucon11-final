@@ -88,7 +88,7 @@ async fn success_case() {
     let conn = tx.acquire().await.unwrap();
     sqlx::query!(
         "INSERT INTO submissions (user_id,class_id,file_name,score) VALUES (?,?,?,?)",
-        user_id.to_string(),
+        &user_id,
         &class.id,
         "file_name",
         0,
