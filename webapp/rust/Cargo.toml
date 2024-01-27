@@ -14,6 +14,7 @@ async-trait = { version = "0" }
 chrono = "0.4"
 env_logger = "0"
 futures = "0"
+kubetsu = { version = "0.2", features = ["serde", "sqlx-mysql", "fake"]}
 lazy_static = { version = "1" }
 log = "0.4"
 num-traits = { version = "0" }

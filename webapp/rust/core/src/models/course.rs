@@ -3,8 +3,7 @@ use crate::models::course_type::CourseType;
 use crate::models::day_of_week::DayOfWeek;
 use crate::models::user::UserID;
 use fake::Dummy;
-use serde::{Deserialize, Serialize};
-use std::fmt::{Display, Formatter};
+use kubetsu::Id;
 
 #[derive(Debug, Clone, sqlx::FromRow, PartialEq, Eq, Dummy)]
 pub struct Course {
@@ -22,37 +21,8 @@ pub struct Course {
     pub status: CourseStatus,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Dummy, sqlx::Type, Serialize, Deserialize)]
-#[sqlx(transparent)]
-pub struct CourseID(String);
-
-impl CourseID {
-    pub fn new(course_id: String) -> Self {
-        Self(course_id)
-    }
-}
-
-impl Display for CourseID {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.0)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Dummy, sqlx::Type, Serialize, Deserialize)]
-#[sqlx(transparent)]
-pub struct CourseCode(String);
-
-impl CourseCode {
-    pub fn new(code: String) -> Self {
-        Self(code)
-    }
-}
-
-impl Display for CourseCode {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.0)
-    }
-}
+pub type CourseID = Id<Course, String>;
+pub type CourseCode = Id<Course, String>;
 
 #[derive(Debug, Clone, PartialEq, Eq, sqlx::FromRow, serde::Serialize, Dummy)]
 pub struct CourseWithTeacher {

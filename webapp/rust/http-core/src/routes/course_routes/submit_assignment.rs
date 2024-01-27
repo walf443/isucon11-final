@@ -8,7 +8,6 @@ use actix_web::{web, HttpResponse};
 use futures::{StreamExt, TryStreamExt};
 use isucholar_core::models::assignment_path::AssignmentPath;
 use isucholar_core::models::class::ClassID;
-use isucholar_core::models::course::CourseID;
 use isucholar_core::services::error::Error;
 use isucholar_core::services::submission_service::{HaveSubmissionService, SubmissionService};
 
@@ -21,7 +20,7 @@ pub async fn submit_assignment<Service: HaveSubmissionService>(
 ) -> ResponseResult<HttpResponse> {
     let (user_id, _, _) = get_user_info(session)?;
 
-    let course_id = CourseID::new(path.course_id.to_string());
+    let course_id = path.course_id.clone();
     let class_id = ClassID::new(path.class_id.to_string());
 
     let mut file = None;
