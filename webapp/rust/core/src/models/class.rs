@@ -1,7 +1,6 @@
 use crate::models::course::CourseID;
 use fake::Dummy;
-use serde::{Deserialize, Serialize};
-use std::fmt::{Display, Formatter};
+use kubetsu::Id;
 
 #[derive(Debug, sqlx::FromRow, PartialEq, Eq, Dummy)]
 pub struct Class {
@@ -13,21 +12,7 @@ pub struct Class {
     pub submission_closed: bool,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Dummy, sqlx::Type, Serialize, Deserialize)]
-#[sqlx(transparent)]
-pub struct ClassID(String);
-
-impl ClassID {
-    pub fn new(id: String) -> Self {
-        Self(id)
-    }
-}
-
-impl Display for ClassID {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.0)
-    }
-}
+pub type ClassID = Id<Class, String>;
 
 #[derive(Dummy)]
 pub struct CreateClass {

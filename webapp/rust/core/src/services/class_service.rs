@@ -168,7 +168,7 @@ pub trait ClassServiceImpl:
             }
         }
 
-        let course_id= course.id.clone();
+        let course_id = course.id.clone();
         let totals = self
             .registration_course_repo()
             .find_total_scores_by_course_id_group_by_user_id(&mut conn, &course_id)

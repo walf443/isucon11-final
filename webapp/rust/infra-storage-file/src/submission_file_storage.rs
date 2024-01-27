@@ -12,7 +12,7 @@ pub struct SubmissionFileStorageFile {}
 
 impl SubmissionFileStorageFile {
     pub fn get_filename(&self, class_id: &ClassID, user_id: &UserID) -> String {
-        let dst = format!("{}{}-{}.pdf", ASSIGNMENTS_DIRECTORY, class_id, user_id,);
+        let dst = format!("{}{}-{}.pdf", ASSIGNMENTS_DIRECTORY, class_id.inner(), user_id,);
         dst
     }
 }
@@ -43,9 +43,9 @@ impl SubmissionFileStorage for SubmissionFileStorageFile {
         class_id: &ClassID,
         submissions: &[SubmissionWithUserCode],
     ) -> StorageResult<String> {
-        let zip_file_path = format!("{}{}.zip", ASSIGNMENTS_DIRECTORY, class_id);
+        let zip_file_path = format!("{}{}.zip", ASSIGNMENTS_DIRECTORY, class_id.inner());
 
-        let tmp_dir = format!("{}{}/", ASSIGNMENTS_DIRECTORY, class_id);
+        let tmp_dir = format!("{}{}/", ASSIGNMENTS_DIRECTORY, class_id.inner());
         tokio::process::Command::new("rm")
             .stdin(std::process::Stdio::null())
             .stdout(std::process::Stdio::null())
