@@ -16,6 +16,7 @@ use crate::services::error::Result;
 use crate::services::HaveDBPool;
 use crate::util;
 use async_trait::async_trait;
+use fake::Dummy;
 
 #[cfg_attr(any(test, feature = "test"), mockall::automock)]
 #[async_trait]
